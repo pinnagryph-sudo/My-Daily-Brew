@@ -10,33 +10,44 @@ A cozy habit tracker and daily schedule app with a warm café aesthetic. Built a
 - ⭐ **Habit Tracking** - Track daily rituals with streak counting
 - ✓ **Task Management** - Prioritize tasks with high/medium/low levels
 - 🔔 **Reminder Notifications** - Get alerted at scheduled times for your tasks
+- ⏱️ **Focus Timer** - Pomodoro-style timer with preset and custom durations
+- 📆 **Calendar View** - Monthly overview of your mood and activity history
+- 📊 **Statistics** - Track mood trends, habit streaks, and task completion rates
+- 😊 **Mood Tracker** - Log your daily mood and see patterns over time
+- ☀️🌙 **Light & Dark Brew** - Toggle between light and dark themes
 - 📱 **Mobile Optimized** - Works great on phones and tablets
 - 🔌 **Offline Support** - Use the app without internet
 - 📲 **Installable** - Add to home screen for app-like experience
 - 🔋 **Battery Conscious** - Only checks for updates when opening the app
-- 💾 **Persistent Data** - Your habits and tasks are saved locally
+- 💾 **Persistent Data** - Your data is saved locally
 
-## Notification Features
+## New in v2.0
 
-The app supports native push notifications that:
-- **Appear on lock screen** - See reminders without unlocking your phone
-- **Use system sounds** - Plays your device's default notification sound
-- **Vibrate** - Gets your attention with a vibration pattern
-- **Quick actions** - Mark as done or snooze (+10 min) directly from the notification
-- **Stay visible** - Notifications remain until you interact with them
+### 🌙 Dark Brew Mode
+Switch between Light Brew (warm beige theme) and Dark Brew (cozy dark theme) using the toggle button in the header. Your preference is saved automatically.
 
-### How Reminders Work
+### ⏱️ Focus Timer
+- Preset durations: 5, 15, 25, 45 minutes
+- Start timer directly from any incomplete task
+- Get notified when your focus session ends
+- Pause and reset functionality
 
-1. When creating a task, set a time and enable "Remind me at this time"
-2. Grant notification permission when prompted
-3. At the scheduled time, you'll receive a notification
-4. From the notification, you can:
-   - Tap **✓ Done** to mark the task complete
-   - Tap **⏰ +10 min** to snooze the reminder
-   - Tap the notification to open the app
+### 📆 Calendar View
+- Monthly calendar showing your tracked days
+- Mood emoji indicators for each day
+- Navigate between months
+- Visual mood legend
 
-### iOS Note
-On iOS, notifications work best when the app is installed to the home screen (Add to Home Screen). Safari PWA notifications have some limitations compared to Android.
+### 📊 Statistics Dashboard
+- Average mood for the month
+- Mood distribution chart
+- Habit streak rankings
+- Task completion by priority level
+
+### 😊 Mood Tracking
+- Quick daily mood logging (5 levels from 😢 to 🤩)
+- Mood history saved with timestamps
+- Integrated into calendar and statistics
 
 ## Deployment to GitHub Pages
 
