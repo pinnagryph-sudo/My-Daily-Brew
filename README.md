@@ -1,73 +1,54 @@
-# ☕ My Daily Brew v6.0 - Grand Reopening!
+# ☕ My Daily Brew v6.2 - Grand Reopening!
 
-A cozy, comprehensive habit tracker, task manager, and daily reflection app with warm café aesthetics. Now with brew-specific soundscapes, challenges, AI coaching, and so much more!
+A cozy, comprehensive habit tracker, task manager, and daily reflection app with warm café aesthetics. Now with relaxing brew-specific soundscapes, independent sound controls, and more!
 
-## 🎉 What's New in v6.0 - The Grand Reopening
+## 🎉 What's New in v6.2
 
-We've been renovating! Here's everything that's new:
+### 🎵 Floating Sound Button (NEW!)
+- Sound controls now accessible from **any screen** via floating button (bottom left)
+- No need to go to the Timer tab to control sounds
+- Visual indicator shows when sound is playing
 
-### 🎵 Brew-Specific Soundscapes (NEW!)
-Each brew has its own unique audio experience:
+### 🔄 Background Playback Toggle (NEW!)
+- By default, sound **stops when you leave the app**
+- Enable "Play in Background" to keep music going
+- Your preference is saved
+
+### ⏯️ Independent Sound Playback (NEW!)
+- Sound no longer requires the timer to be running
+- Play café sounds anytime, even while browsing habits
+- Big play/pause button in Sound Menu
+
+## 🎵 Sound Features
+
+### Brew-Specific Soundscapes
+Each brew has its own unique, ultra-relaxing audio experience:
 
 | Brew | Ambiance | Music Style |
 |------|----------|-------------|
-| ☕ **Coffee** | Warm brown noise (café hum) | Jazzy lo-fi piano, swing chords |
-| 🍵 **Tea** | Soft pink noise (rain-like) | Gentle wind chimes, ethereal |
-| 🍃 **Matcha** | Airy wind sounds | Zen singing bowls, Japanese scale |
+| ☕ **Coffee** | Gentle brown noise (soft café hum) | Warm piano with harmonics |
+| 🍵 **Tea** | Soft pink noise (gentle rain) | Ethereal wind chimes |
+| 🍃 **Matcha** | Airy wind sounds | Zen singing bowls |
 
-**Sound options:**
-- 🔇 **Silence** - Pure focus
-- 🌧️ **Ambiance Only** - Background atmosphere
-- 🎵 **Music Only** - Procedural lo-fi music
-- ✨ **Full Soundscape** - Music + ambiance combined
+### 🎨 Mix & Match Sounds
+- Choose your **ambiance style** independently: Café hum, Rain, or Wind
+- Choose your **music style** independently: Piano, Chimes, or Bowls  
+- Or set both to "Auto" to match your current brew
 
-All audio is **procedurally generated** - no external files, works offline, copyright-free!
+### Sound Modes
+| Mode | Description |
+|------|-------------|
+| 🔇 **Off** | No sound |
+| 🌧️ **Ambiance** | Just background atmosphere |
+| 🎹 **Music** | Just instrumental melodies |
+| ✨ **Full** | Music + ambiance layered |
 
-### 🍂 Seasonal Themes
-- Automatic decorations that change with the seasons
-- 🌸 Spring - Cherry Blossom
-- 🌻 Summer - Sunshine  
-- 🍂 Fall - Pumpkin Spice
-- ❄️ Winter - Peppermint
+### Sound Controls Location
+1. **Floating Button** (bottom left) - Always visible, quick access
+2. **Timer Tab** - Play with focus sessions
+3. **Sound Menu** - Full settings with mix & match
 
-### 🏆 Weekly & Monthly Challenges
-- Fresh challenges that rotate automatically
-- Weekly: Complete 21 habits, 15 tasks, 2 hours focus, etc.
-- Monthly: 100 habits, 14-day streak, 20 journal entries, etc.
-- Bonus XP for completing challenges!
-
-### 🤖 Daily Barista Tips
-- Personalized AI coaching each day
-- Tips adapt to your mood, patterns, and progress
-- Brew-specific advice (Coffee, Tea, or Matcha style)
-
-### 📤 Share Achievements
-- Share badges and progress to social media
-- Web Share API or clipboard fallback
-- Earn the "Social Barista" badge!
-
-### 💾 Export Your Data
-- Download all your data as JSON
-- Includes habits, tasks, moods, journal, stats
-- Full data ownership
-
-### ♿ Accessibility Mode
-- High contrast toggle in settings
-- Screen reader optimized (ARIA labels)
-- Keyboard navigation support
-
-### 📅 Year in Review
-- Complete annual journey summary
-- Total XP, badges, habits, tasks
-- Longest streak, average mood
-- Share your year!
-
-### 🎓 Interactive Tutorial
-- "Grand Tour" for new and returning users
-- Café-themed language throughout
-- Skip option always available
-
-## ☕🍵🍃 Full Feature List
+## ☕🍵🍃 Complete Feature List
 
 ### Brew-Themed Everything
 Each brew (Coffee, Tea, Matcha) has unique:
@@ -91,7 +72,7 @@ Each brew (Coffee, Tea, Matcha) has unique:
 - ⏰ Time scheduling
 
 ### Focus Timer
-- 🎵 **Brew-specific soundscapes**
+- 🎵 Independent sound playback
 - ⏱️ Custom duration (1-180 min)
 - 🎯 Start from any task
 - 📊 Focus time tracking
@@ -100,7 +81,7 @@ Each brew (Coffee, Tea, Matcha) has unique:
 - 😢😕😊😄🤩 5 mood levels
 - 📅 Calendar visualization
 - 📝 Gratitude, reflection, planning
-- 📊 Mood Insights: See how habits affect your mood!
+- 📊 Mood Insights
 
 ### Gamification
 - 🎮 XP for everything
@@ -108,10 +89,13 @@ Each brew (Coffee, Tea, Matcha) has unique:
 - 🏆 18 achievement badges
 - 🏅 Weekly/monthly challenges
 
-### Swipe Gestures
-- 👉 Swipe right to complete
-- 👈 Swipe left to delete
-- ↩️ Undo toast for mistakes
+### Additional Features
+- 🍂 Seasonal themes
+- 🤖 Daily AI barista tips
+- 📤 Share achievements
+- 💾 Export your data
+- ♿ High contrast mode
+- 📅 Year in Review
 
 ## 📱 Installation
 
@@ -119,27 +103,23 @@ Each brew (Coffee, Tea, Matcha) has unique:
 2. Tap "Add to Home Screen" or "Install"
 3. Launch from home screen
 
-## 🎵 Sound Profiles Detail
-
-### ☕ Coffee - "Cozy Café"
-- **Ambiance**: Rich brown noise, warm 400Hz filter
-- **Music**: C major scale with 7ths, ~70-90 BPM feel, medium reverb
-- **Vibe**: Urban coffee shop, jazzy, inviting
-
-### 🍵 Tea - "Serene Tea House"  
-- **Ambiance**: Pink noise (softer, rain-like), 600Hz filter
-- **Music**: Pentatonic scale, ~50-60 BPM feel, large hall reverb
-- **Vibe**: Peaceful, gentle, elegant
-
-### 🍃 Matcha - "Zen Garden"
-- **Ambiance**: Wind-like noise, very soft 300Hz filter
-- **Music**: Japanese In scale, ~30-40 BPM feel, cathedral reverb
-- **Vibe**: Meditative, minimal, contemplative
-
 ## 🔄 Version History
 
+### v6.2.0 - Independent Sound Controls
+- Floating sound button accessible from any screen
+- Sound playback independent of timer
+- Background playback toggle (off by default)
+- Sound stops when leaving app (unless background mode enabled)
+- Redesigned Sound Menu with big play/pause button
+
+### v6.1.0 - Relaxing Sounds Update
+- Much softer, more relaxing audio levels
+- Realistic piano with harmonics
+- Mix & Match sound sources
+- Double-filtered ambiance
+
 ### v6.0.0 - Grand Reopening
-- **Brew-specific soundscapes** (procedural music + ambiance)
+- Brew-specific soundscapes
 - Seasonal themes
 - Weekly & monthly challenges
 - Daily AI barista tips
@@ -148,24 +128,6 @@ Each brew (Coffee, Tea, Matcha) has unique:
 - Accessibility mode
 - Year in Review
 - Interactive tutorial
-- What's New announcement
-
-### v5.0.0 - Themed Experience
-- Brew-specific ranks, badges, messages
-- Custom timer duration
-- Mood Insights - correlate habits with mood
-
-### v4.0.0 - Feature Explosion
-- Swipe gestures
-- Recurring tasks - daily, weekdays, weekly
-- Subtasks
-- Streak freeze
-- Habit heatmap
-
-### v3.0.0 - Choose Your Brew
-- 6 themes (Coffee/Tea/Matcha × Light/Dark)
-- XP & leveling system
-- Achievement badges
 
 ---
 
