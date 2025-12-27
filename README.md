@@ -1,153 +1,154 @@
-# ☕ My Daily Brew v6.7.1 - Daily Journal Prompts!
+# ☕ My Daily Brew v7.4.0 - Ultimate Cozy Experience
 
-A cozy, comprehensive habit tracker, task manager, and daily reflection app with warm café aesthetics. Now featuring 366 unique daily journal prompts to spark your reflection!
+A comprehensive habit tracker, task manager, and daily reflection app with warm café aesthetics.
 
-## 🎉 What's New in v6.7.x
+## 🎉 What's New in v7.4.0
 
-### ✨ Daily Journal Prompts
-366 unique prompts - one for each day of the year! Each month has a theme:
+### ☕ Visual & Cozy Enhancements
+- **Coffee Cup Progress** - Watch your cup fill up as you complete tasks!
+- **Steam Animation** - Rising steam when you're over 80% done
+- **Café Sign Header** - Cute hanging sign style for your café name
+- **Daily Cozy Quotes** - Rotating inspirational quotes
+- **Streak Milestones** - Special celebrations at 7, 21, 30, 50, 100, 365 days!
+- **Seasonal Decorations** - Falling leaves, snow, petals by season
 
-| Month | Theme |
-|-------|-------|
-| January | New Beginnings & Reflection |
-| February | Love & Connection |
-| March | Growth & Change |
-| April | Creativity & Play |
-| May | Gratitude & Abundance |
-| June | Energy & Vitality |
-| July | Freedom & Adventure |
-| August | Wisdom & Learning |
-| September | Purpose & Direction |
-| October | Fears & Shadows |
-| November | Home & Belonging |
-| December | Reflection & Renewal |
+### 🛠️ Functional QoL
+- **Task Due Dates** - Multi-day scheduling with overdue indicators
+- **Habit Categories** - Morning ☀️, Evening 🌙, Health 💪, Mind 🧠, Social 💬, Creative 🎨
+- **Habit Category Filter** - Quick filter by category
+- **Pin Favorites** - Star important habits to always show first
+- **Duplicate Items** - Copy existing habits with one tap
+- **Best Streak Tracking** - Each habit remembers its all-time best
+- **Weekly Completion Rate** - See your habit consistency percentage
+- **Task Templates** - Save and reuse common task setups
+- **Timer Presets** - Named presets: Quick ⚡, Short ☕, Pomodoro 🍅, Deep 🧘, Flow 🌊
 
-The prompt appears at the top of your Journal tab with a beautiful gradient card showing the day number (e.g., "Day 362 of 366").
+### 🔔 Notifications & Reminders
+- **Daily Reminder** - Configurable "Open your café!" notification
+- **Auto Dark Mode** - Follow system preference automatically
+- **Mood Notes** - Add context to your mood tracking
 
-### 🎵 Crossfade Audio Looping
-- Smooth 3-second fade in/out on all audio
-- Seamless loop transitions (no jarring restarts)
-- Crossfade between tracks when switching
+### 📊 Stats & Insights
+- **Weekly Receipt** - Café-style summary of your week
+- **Habit Analytics** - Completion rate displayed in header
 
-### 🔊 Quieter Default Volumes
-- Music: 25% (was 50%)
-- Ambiance: 35% (was 50%)
-- Perfect for background mindfulness without overpowering
+## ✨ All Features
 
-### 🎨 Theme-Based Ambiance Defaults
-| Theme | Default Ambiance |
-|-------|------------------|
-| ☕ Coffee | 🔥 Fireplace |
-| 🍵 Tea | 🌧️ Soft Rain |
-| 🍃 Matcha | 🍃 Wind in Trees |
+### Daily Routine
+- 🌅 Daily prompts (366 unique, one per day)
+- 😊 Mood tracking with optional notes
+- 📝 Gratitude journal + reflection + planning
+- 📚 Past journal entries viewer
 
-## 🎵 Sound System
-
-### Music Tracks (6)
-| Theme | Light Mode | Dark Mode |
-|-------|------------|-----------|
-| ☕ Coffee | Café Contemplations | Elegant Background |
-| 🍵 Tea | Tea Time Piano | Minimal Lo-Fi |
-| 🍃 Matcha | Zen Garden | Japanese Lo-Fi |
-
-### Ambiance Tracks (4)
-| Sound | Icon | Best For |
-|-------|------|----------|
-| Fireplace | 🔥 | Cozy mood, Coffee theme |
-| Soft Rain | 🌧️ | Rainy mood, Tea theme |
-| Wind in Trees | 🍃 | Nature, Matcha theme |
-| Ocean Waves | 🌊 | Soothing mood |
-
-### Sound Modes
-| Mode | Description |
-|------|-------------|
-| 🔇 **Off** | No sound |
-| 🌧️ **Ambiance** | Background atmosphere only |
-| 🎹 **Music** | Instrumental melodies only |
-| ✨ **Both** | Music + ambiance layered |
-
-## ☕🍵🍃 Complete Feature List
-
-### Habit Tracking
-- ⭐ Custom emoji icons (30+)
-- 🔥 Streak tracking with protection
-- 📊 12-week habit heatmap
+### Habits
+- ⭐ Custom emoji icons
+- 🔥 Current streak + best streak tracking
+- 📌 Pin favorites to top
+- 📋 Duplicate habits
+- 🏷️ 6 categories (Morning, Evening, Health, Mind, Social, Creative)
+- 🔍 Search & filter by category
+- 📊 Weekly completion rate
 - ❄️ Weekly streak freeze
-- ↕️ Reorder with arrow buttons
 
-### Task Management  
+### Tasks  
 - 🔴🟡🟢 Priority levels
-- 🏷️ 6 categories with colors
-- 📋 Subtasks/checklists
-- 🔄 Recurring tasks (daily, weekdays, weekly)
-- ⏰ Time scheduling with notifications
+- 📅 Due dates with overdue warnings
+- 🏷️ 6 categories
+- 📋 Subtasks
+- 🔄 Recurring (daily, weekdays, weekly)
+- ⏰ Time-based reminders
+- 💾 Save as templates
 
-### Focus Timer
-- 🎵 Full soundscape integration
-- ⏱️ Custom duration (1-180 min)
-- 🎯 Start from any task
-- 📊 Focus time tracking
-- 🔔 Notification when complete
+### 🍅 Pomodoro Timer
+- Focus/Break mode toggle
+- Automatic break reminders (5min / 15min every 4th)
+- Named presets (Quick, Short, Pomodoro, Deep, Flow)
+- Ambient sound integration
+- Session counter
 
-### Mood & Journal
-- 😢😕😊😄🤩 5 mood levels
-- 📅 Calendar visualization
-- ✨ Daily journal prompts (366 unique!)
-- 📝 Gratitude, reflection, planning
-- 📊 Mood Insights
+### 🎵 Ambient Sounds
+- 6 music tracks + 4 ambiance tracks
+- Theme-matched defaults
+- Crossfade looping
+- Independent volume controls
 
-### Gamification
-- 🎮 XP for everything (exploit-proof!)
-- 📈 7 level progression
-- 🏆 18 achievement badges
-- 🏅 Weekly/monthly challenges
+### 🎮 Gamification
+- XP for completing tasks/habits
+- 7 level progression
+- 18 achievement badges
+- Weekly & monthly challenges
+- Streak milestones (7, 21, 30, 50, 100, 365 days)
 
-### Additional Features
-- 🌤️ Live weather in header
-- 🔔 Push notifications
-- 🍂 Seasonal themes
-- 🤖 Daily barista tips
-- 📤 Share achievements
-- 💾 Export data
+### 📊 Stats & Insights
+- 🧾 Weekly receipt summary
+- 📅 Year in review
+- 😊 Mood insights
+- 📈 Habit completion analytics
+
+### ⚙️ Settings
+- 🎨 3 themes × 2 modes = 6 looks
+- ☀️🌙 Quick dark/light toggle
+- 🌓 Auto dark mode (follow system)
+- ⏰ Daily reminder notifications
+- 🍂 Seasonal decorations toggle
 - ♿ High contrast mode
-- 📅 Year in Review
+- 💾 Backup & restore
+
+## ⌨️ Keyboard Shortcuts
+
+| Key | Action |
+|-----|--------|
+| H / 1 | Today tab |
+| F / 2 | Focus Timer |
+| J / 3 | Journal |
+| C / 4 | Calendar |
+| S / 5 | Stats |
+| N | Quick Add |
+| D | Toggle Dark Mode |
+| / | Focus Search |
+| ? | Show Shortcuts |
+| Esc | Close Modals |
 
 ## 📱 Installation
 
-1. Open in mobile browser (Safari/Chrome)
-2. Tap "Add to Home Screen" or "Install"
-3. Launch from home screen
-4. Enable notifications when prompted!
-
-## 🔔 Notification Setup
-
-For best results:
-1. Enable notifications when the banner appears
-2. Or go to Settings (⚙️) → Notifications → Enable
-3. Keep the app installed as a PWA for background notifications
+1. Open in mobile browser (Chrome/Safari)
+2. Tap "Add to Home Screen"
+3. Complete onboarding
+4. Enable notifications (optional)
 
 ## 🔄 Version History
 
-### v6.7.1 - Daily Journal Prompts
-- ✨ 366 unique daily prompts (themed by month)
-- 🎵 Crossfade audio looping (seamless transitions)
-- 🔊 Quieter default volumes (25% music, 35% ambiance)
-- 🎨 Theme-based ambiance defaults
+### v7.4.0 - Ultimate Cozy Experience
+- ☕ Coffee cup progress visualization
+- 🏷️ Habit categories & filtering
+- 📅 Task due dates
+- 📌 Pin favorites
+- 📋 Task templates
+- ⏰ Daily reminders
+- 🌓 Auto dark mode
+- 💬 Mood notes
+- 🎖️ Streak milestones
+- ✨ Cozy quotes
+- 🪧 Café sign header
 
-### v6.6.0 - Real Soundscapes
-- 🎵 6 music tracks + 4 ambiance tracks
-- 🔄 Auto-selection based on theme/mood/time
+### v7.3.x - Polish
+- Weekly receipt summary
+- Better template system
 
-### v6.5.1 - Task Notifications
-- ⏰ 5-minute warning before tasks are due
-- 🔔 Due-now alerts with vibration
+### v7.2.0 - QoL Update
+- Data import/restore
+- Pomodoro breaks
+- Past journal viewer
+- Best streak tracking
 
-### v6.5.0 - Notifications & Polish
-- 🌤️ Live weather display in header
-- 🔔 Push notifications for timers and task reminders
+### v7.0.0 - Polish Update
+- 74% smaller audio (69MB → 18MB)
+- Onboarding flow
+- Keyboard shortcuts
+- Accessibility improvements
 
 ---
 
 Made with ☕ warmth, 🍵 calm, and 🍃 balance.
 
-*Pull up a chair. Stay a while.*
+*Your cozy corner of productivity awaits!*
