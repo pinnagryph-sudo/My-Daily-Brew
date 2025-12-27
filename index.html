@@ -335,7 +335,7 @@
     // MAIN APP COMPONENT
     // ═══════════════════════════════════════════════════════════════
     function App() {
-      const APP_VERSION = '6.5.2';
+      const APP_VERSION = '6.6.0';
       const season = getCurrentSeason();
       const seasonDeco = seasonalDecorations[season];
 
@@ -395,14 +395,56 @@
       const [timerStartTime, setTimerStartTime] = useState(null);
       const [customTimerMins, setCustomTimerMins] = useState(25);
       const [ambientSound, setAmbientSound] = useState(() => load('ambientSound', 'off')); // 'off', 'ambiance', 'music', 'both'
-      const [soundAmbianceSource, setSoundAmbianceSource] = useState(() => load('soundAmbianceSource', 'auto')); // 'auto', 'coffee', 'tea', 'matcha'
-      const [soundMusicSource, setSoundMusicSource] = useState(() => load('soundMusicSource', 'auto')); // 'auto', 'coffee', 'tea', 'matcha'
+      const [musicTrack, setMusicTrack] = useState(() => load('musicTrack', 'auto')); // 'auto' or specific track id
+      const [ambianceTrack, setAmbianceTrack] = useState(() => load('ambianceTrack', 'auto')); // 'auto' or specific track id
       const [ambianceVolume, setAmbianceVolume] = useState(() => load('ambianceVolume', 50)); // 0-100
       const [musicVolume, setMusicVolume] = useState(() => load('musicVolume', 50)); // 0-100
-      const [soundMood, setSoundMood] = useState(() => load('soundMood', 'cozy')); // cozy, chill, upbeat, soothing, meditative, focus
+      const [soundMood, setSoundMood] = useState(() => load('soundMood', 'cozy')); // kept for ambiance mood override
       const [backgroundPlay, setBackgroundPlay] = useState(() => load('backgroundPlay', false));
       const [soundEnabled, setSoundEnabled] = useState(false); // Whether sound is currently playing
       const [showSoundMenu, setShowSoundMenu] = useState(false);
+      
+      // Audio file definitions
+      const musicTracks = {
+        'cafe-contemplations': { name: 'Café Contemplations', icon: '☕', file: 'sounds/cafe-contemplations.mp3', theme: 'coffee', mode: 'light' },
+        'elegant-background': { name: 'Elegant Background', icon: '🎹', file: 'sounds/elegant-background.mp3', theme: 'coffee', mode: 'dark' },
+        'tea-time-piano': { name: 'Tea Time Piano', icon: '🍵', file: 'sounds/tea-time-piano.mp3', theme: 'tea', mode: 'light' },
+        'minimal-lofi': { name: 'Minimal Lo-Fi', icon: '🎧', file: 'sounds/minimal-lofi.mp3', theme: 'tea', mode: 'dark' },
+        'zen-garden': { name: 'Zen Garden', icon: '🎋', file: 'sounds/zen-garden.mp3', theme: 'matcha', mode: 'light' },
+        'japanese-lofi': { name: 'Japanese Lo-Fi', icon: '🇯🇵', file: 'sounds/japanese-lofi.mp3', theme: 'matcha', mode: 'dark' },
+      };
+      
+      const ambianceTracks = {
+        'fireplace': { name: 'Fireplace', icon: '🔥', file: 'sounds/fireplace.mp3', theme: 'coffee', mood: 'cozy' },
+        'rain': { name: 'Soft Rain', icon: '🌧️', file: 'sounds/rain.mp3', theme: 'tea' },
+        'wind': { name: 'Wind in Trees', icon: '🍃', file: 'sounds/wind.mp3', theme: 'matcha' },
+        'ocean': { name: 'Ocean Waves', icon: '🌊', file: 'sounds/ocean.mp3', mood: 'soothing' },
+      };
+      
+      // Get active track based on auto-selection or manual override
+      const getActiveMusicTrack = useCallback(() => {
+        if (musicTrack !== 'auto') return musicTrack;
+        // Auto selection: theme + light/dark mode
+        const mode = isDark ? 'dark' : 'light';
+        const match = Object.entries(musicTracks).find(([id, t]) => 
+          t.theme === brewType && t.mode === mode
+        );
+        return match ? match[0] : 'cafe-contemplations';
+      }, [musicTrack, brewType, isDark]);
+      
+      const getActiveAmbianceTrack = useCallback(() => {
+        if (ambianceTrack !== 'auto') return ambianceTrack;
+        // Auto selection: mood override first, then theme
+        if (soundMood === 'cozy') return 'fireplace';
+        if (soundMood === 'soothing') return 'ocean';
+        const match = Object.entries(ambianceTracks).find(([id, t]) => t.theme === brewType && !t.mood);
+        return match ? match[0] : 'fireplace';
+      }, [ambianceTrack, brewType, soundMood]);
+      
+      // Audio refs for HTML5 Audio elements
+      const musicAudioRef = useRef(null);
+      const ambianceAudioRef = useRef(null);
+      
       const [todayJournal, setTodayJournal] = useState(() => load('journal', {})[getDateKey()] || { gratitude: '', reflection: '', tomorrow: '' });
       
       const timerRef = useRef(null);
@@ -425,8 +467,8 @@
       useEffect(() => { store('highContrast', highContrast); }, [highContrast]);
       useEffect(() => { store('cafeName', cafeName); }, [cafeName]);
       useEffect(() => { store('ambientSound', ambientSound); }, [ambientSound]);
-      useEffect(() => { store('soundAmbianceSource', soundAmbianceSource); }, [soundAmbianceSource]);
-      useEffect(() => { store('soundMusicSource', soundMusicSource); }, [soundMusicSource]);
+      useEffect(() => { store('musicTrack', musicTrack); }, [musicTrack]);
+      useEffect(() => { store('ambianceTrack', ambianceTrack); }, [ambianceTrack]);
       useEffect(() => { store('ambianceVolume', ambianceVolume); }, [ambianceVolume]);
       useEffect(() => { store('musicVolume', musicVolume); }, [musicVolume]);
       useEffect(() => { store('soundMood', soundMood); }, [soundMood]);
@@ -484,526 +526,104 @@
       }, []);
 
       // ═══════════════════════════════════════════════════════════════
-      // ENHANCED SOUNDSCAPE SYSTEM - Volume, Moods, Light/Dark
+      // AUDIO SYSTEM - HTML5 Audio with real sound files
       // ═══════════════════════════════════════════════════════════════
-      const soundRefs = useRef({ ctx: null, nodes: [], intervals: [], ambianceGain: null, musicGain: null });
-
-      // Mood configurations - affect tempo, density, brightness
-      const moodConfigs = useMemo(() => ({
-        cozy: { tempoMult: 0.85, skipChance: 0.08, brightness: 1.0, reverbMult: 0.9, desc: 'Warm & inviting', icon: '🏠' },
-        chill: { tempoMult: 1.0, skipChance: 0.12, brightness: 0.95, reverbMult: 1.0, desc: 'Laid back vibes', icon: '😌' },
-        upbeat: { tempoMult: 0.6, skipChance: 0.03, brightness: 1.15, reverbMult: 0.7, desc: 'Energetic flow', icon: '✨' },
-        soothing: { tempoMult: 1.1, skipChance: 0.15, brightness: 0.9, reverbMult: 1.1, desc: 'Gentle & calm', icon: '🌊' },
-        meditative: { tempoMult: 1.3, skipChance: 0.18, brightness: 0.85, reverbMult: 1.2, desc: 'Deep & contemplative', icon: '🧘' },
-        focus: { tempoMult: 0.75, skipChance: 0.05, brightness: 1.0, reverbMult: 0.85, desc: 'Steady & consistent', icon: '🎯' }
-      }), []);
-
-      // Light/Dark variants - light is brighter, dark is warmer/deeper
-      const lightDarkMod = useMemo(() => ({
-        filterMult: isDark ? 0.8 : 1.2,    // Dark = warmer (lower filter), Light = brighter
-        octaveShift: isDark ? 0.5 : 1.0,   // Dark = lower octave option
-        reverbMult: isDark ? 1.1 : 0.9,    // Dark = more reverb
-        gainMult: isDark ? 0.9 : 1.0       // Dark = slightly quieter
-      }), [isDark]);
-
-      // Base sound profiles - warm, uplifting, and harmonious
-      const soundProfiles = useMemo(() => ({
-        coffee: {
-          name: 'Café',
-          icon: '☕',
-          ambiance: { type: 'cafe', baseFilterFreq: 280 },
-          music: {
-            // C major - warm and familiar, coffee shop jazz feel
-            baseScale: [261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 493.88, 523.25], // C4 major
-            chords: [
-              [0, 2, 4, 7],    // Cmaj7 (C-E-G-C)
-              [3, 5, 0, 2],    // Fmaj7 (F-A-C-E)
-              [4, 6, 1, 3],    // G7 (G-B-D-F)
-              [0, 2, 4, 5],    // C6 (C-E-G-A)
-              [5, 0, 2, 4],    // Am7 (A-C-E-G)
-              [1, 3, 5, 0],    // Dm7 (D-F-A-C)
-            ],
-            baseTempo: 1400,      // Faster - more lively
-            baseNoteLength: 1.4,
-            baseReverb: 0.4,
-            warmth: 900,
-            style: 'piano'
-          }
-        },
-        tea: {
-          name: 'Rain',
-          icon: '🍵',
-          ambiance: { type: 'rain', baseFilterFreq: 450 },
-          music: {
-            // Major pentatonic - always consonant and pleasant
-            baseScale: [523.25, 587.33, 659.25, 783.99, 880.00, 1046.50], // C5 major pentatonic
-            chords: [
-              [0, 2, 4],      // Root position
-              [1, 3, 5],      // Second
-              [0, 3, 5],      // Spread voicing
-              [2, 4, 0],      // Inversion
-            ],
-            baseTempo: 1800,      // Faster chimes
-            baseNoteLength: 1.6,
-            baseReverb: 0.5,
-            warmth: 1200,
-            style: 'chimes'
-          }
-        },
-        matcha: {
-          name: 'Wind',
-          icon: '🍃',
-          ambiance: { type: 'wind', baseFilterFreq: 220 },
-          music: {
-            // Perfect intervals for zen harmony - octaves and fifths
-            baseScale: [261.63, 329.63, 392.00, 523.25, 659.25, 783.99], // Consonant pitches
-            chords: [
-              [0, 2, 3],      // Root + fifth + octave
-              [1, 3, 4],      // Third + octave + higher
-              [0, 3],         // Octave
-              [2, 4],         // Fifth + higher third
-            ],
-            baseTempo: 2800,      // Faster bowls
-            baseNoteLength: 2.5,
-            baseReverb: 0.55,
-            warmth: 600,
-            style: 'bowls'
-          }
-        }
-      }), []);
-
-      // Get active profiles with mood and light/dark adjustments
-      const activeAmbianceProfile = useMemo(() => {
-        const source = soundAmbianceSource === 'auto' ? brewType : soundAmbianceSource;
-        const base = soundProfiles[source];
-        const mood = moodConfigs[soundMood];
-        return {
-          ...base,
-          ambiance: {
-            ...base.ambiance,
-            filterFreq: base.ambiance.baseFilterFreq * lightDarkMod.filterMult * mood.brightness
-          }
-        };
-      }, [soundAmbianceSource, brewType, soundProfiles, soundMood, moodConfigs, lightDarkMod]);
       
-      const activeMusicProfile = useMemo(() => {
-        const source = soundMusicSource === 'auto' ? brewType : soundMusicSource;
-        const base = soundProfiles[source];
-        const mood = moodConfigs[soundMood];
-        return {
-          ...base,
-          music: {
-            ...base.music,
-            scale: base.music.baseScale.map(f => f * (isDark && Math.random() > 0.7 ? lightDarkMod.octaveShift : 1)),
-            chords: base.music.chords,
-            tempo: base.music.baseTempo * mood.tempoMult,
-            noteLength: base.music.baseNoteLength * mood.tempoMult * 0.8,
-            reverb: Math.min(0.95, base.music.baseReverb * mood.reverbMult * lightDarkMod.reverbMult),
-            skipChance: Math.max(0.05, mood.skipChance - 0.1), // Less skipping for fuller sound
-            warmth: base.music.warmth * lightDarkMod.filterMult
-          }
-        };
-      }, [soundMusicSource, brewType, soundProfiles, soundMood, moodConfigs, lightDarkMod, isDark]);
-
-      // Update volumes in real-time
+      // Update music volume
       useEffect(() => {
-        if (soundRefs.current.ambianceGain) {
-          const baseGain = 0.06 * lightDarkMod.gainMult;
-          soundRefs.current.ambianceGain.gain.value = baseGain * (ambianceVolume / 100);
-        }
-      }, [ambianceVolume, lightDarkMod.gainMult]);
-
-      useEffect(() => {
-        if (soundRefs.current.musicGain) {
-          soundRefs.current.musicGain.gain.value = musicVolume / 100;
+        if (musicAudioRef.current) {
+          musicAudioRef.current.volume = musicVolume / 100;
         }
       }, [musicVolume]);
-
-      // Enhanced ambiance with more life
-      const createAmbiance = useCallback((ctx, profile, gainNode) => {
-        const bufferSize = 4 * ctx.sampleRate; // Longer buffer for more variation
-        const noiseBuffer = ctx.createBuffer(2, bufferSize, ctx.sampleRate); // Stereo
-        
-        for (let channel = 0; channel < 2; channel++) {
-          const output = noiseBuffer.getChannelData(channel);
-          
-          if (profile.ambiance.type === 'cafe') {
-            // Café ambiance: warm brown noise + subtle "life" modulation
-            let lastOut = 0;
-            for (let i = 0; i < bufferSize; i++) {
-              const white = Math.random() * 2 - 1;
-              output[i] = (lastOut + (0.02 * white)) / 1.02;
-              lastOut = output[i];
-              // Add subtle "crowd murmur" modulation
-              const murmur = Math.sin(i / ctx.sampleRate * 0.5 + channel) * 0.15 + 
-                            Math.sin(i / ctx.sampleRate * 0.23) * 0.1;
-              output[i] *= (1.8 + murmur);
-            }
-          } else if (profile.ambiance.type === 'rain') {
-            // Rain: pink noise + occasional "droplet" emphasis
-            let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
-            for (let i = 0; i < bufferSize; i++) {
-              const white = Math.random() * 2 - 1;
-              b0 = 0.99886 * b0 + white * 0.0555179;
-              b1 = 0.99332 * b1 + white * 0.0750759;
-              b2 = 0.96900 * b2 + white * 0.1538520;
-              b3 = 0.86650 * b3 + white * 0.3104856;
-              b4 = 0.55000 * b4 + white * 0.5329522;
-              b5 = -0.7616 * b5 - white * 0.0168980;
-              // Rain intensity varies
-              const rainMod = Math.sin(i / ctx.sampleRate * 0.08) * 0.2 + 0.9;
-              output[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.18 * rainMod;
-              b6 = white * 0.115926;
-            }
-          } else if (profile.ambiance.type === 'wind') {
-            // Wind through trees: modulated with "gusts"
-            let lastOut = 0;
-            for (let i = 0; i < bufferSize; i++) {
-              const white = Math.random() * 2 - 1;
-              // Multi-layered wind modulation
-              const gust1 = Math.sin(i / ctx.sampleRate * 0.15) * 0.3;
-              const gust2 = Math.sin(i / ctx.sampleRate * 0.07 + 1.5) * 0.2;
-              const rustling = Math.sin(i / ctx.sampleRate * 2.5) * 0.05;
-              output[i] = (lastOut + (0.012 * white)) / 1.012;
-              lastOut = output[i];
-              output[i] *= (1.2 + gust1 + gust2 + rustling);
-            }
+      
+      // Update ambiance volume
+      useEffect(() => {
+        if (ambianceAudioRef.current) {
+          ambianceAudioRef.current.volume = ambianceVolume / 100;
+        }
+      }, [ambianceVolume]);
+      
+      // Main audio playback effect
+      useEffect(() => {
+        // Stop all audio if sound is disabled or mode is off
+        if (!soundEnabled || ambientSound === 'off') {
+          if (musicAudioRef.current) {
+            musicAudioRef.current.pause();
+            musicAudioRef.current = null;
           }
+          if (ambianceAudioRef.current) {
+            ambianceAudioRef.current.pause();
+            ambianceAudioRef.current = null;
+          }
+          return;
         }
         
-        const noise = ctx.createBufferSource();
-        noise.buffer = noiseBuffer;
-        noise.loop = true;
-        
-        // Triple filter for ultra-smooth sound
-        const filter1 = ctx.createBiquadFilter();
-        filter1.type = 'lowpass';
-        filter1.frequency.value = profile.ambiance.filterFreq;
-        filter1.Q.value = 0.4;
-        
-        const filter2 = ctx.createBiquadFilter();
-        filter2.type = 'lowpass';
-        filter2.frequency.value = profile.ambiance.filterFreq * 1.3;
-        filter2.Q.value = 0.3;
-        
-        const filter3 = ctx.createBiquadFilter();
-        filter3.type = 'highpass';
-        filter3.frequency.value = 40; // Remove sub-bass rumble
-        filter3.Q.value = 0.5;
-        
-        noise.connect(filter1);
-        filter1.connect(filter2);
-        filter2.connect(filter3);
-        filter3.connect(gainNode);
-        noise.start();
-        
-        return { noise, filters: [filter1, filter2, filter3] };
-      }, []);
-
-      // Create lush reverb
-      const createReverb = useCallback((ctx, decay, isDarkMode) => {
-        const length = ctx.sampleRate * (isDarkMode ? 5 : 4);
-        const impulse = ctx.createBuffer(2, length, ctx.sampleRate);
-        for (let c = 0; c < 2; c++) {
-          const channel = impulse.getChannelData(c);
-          for (let i = 0; i < length; i++) {
-            const stereoOffset = c === 0 ? 0 : Math.random() * 0.002;
-            channel[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / length, decay * 2.2 + stereoOffset);
-          }
-        }
-        const convolver = ctx.createConvolver();
-        convolver.buffer = impulse;
-        return convolver;
-      }, []);
-
-      // Enhanced piano with more harmonics and realistic envelope
-      const playPianoNote = useCallback((ctx, freq, profile, destination, mood) => {
-        const now = ctx.currentTime;
-        const noteLen = profile.music.noteLength;
-        const brightness = moodConfigs[mood].brightness;
-        
-        const masterGain = ctx.createGain();
-        const attackTime = 0.006 + Math.random() * 0.004; // Slight variation
-        const peakGain = 0.065 * brightness;
-        
-        masterGain.gain.setValueAtTime(0, now);
-        masterGain.gain.linearRampToValueAtTime(peakGain, now + attackTime);
-        masterGain.gain.exponentialRampToValueAtTime(peakGain * 0.5, now + 0.15);
-        masterGain.gain.exponentialRampToValueAtTime(peakGain * 0.25, now + noteLen * 0.4);
-        masterGain.gain.exponentialRampToValueAtTime(0.001, now + noteLen);
-        
-        const filter = ctx.createBiquadFilter();
-        filter.type = 'lowpass';
-        filter.frequency.setValueAtTime(profile.music.warmth * brightness, now);
-        filter.frequency.exponentialRampToValueAtTime(profile.music.warmth * 0.5, now + noteLen * 0.7);
-        filter.Q.value = 0.5;
-        
-        // Rich harmonics for authentic piano
-        const harmonics = [
-          { ratio: 1, gain: 1.0, decay: 1.0 },
-          { ratio: 2, gain: 0.45, decay: 0.9 },
-          { ratio: 3, gain: 0.22, decay: 0.8 },
-          { ratio: 4, gain: 0.12, decay: 0.7 },
-          { ratio: 5, gain: 0.06, decay: 0.6 },
-          { ratio: 6, gain: 0.03, decay: 0.5 },
-        ];
-        
-        harmonics.forEach(h => {
-          if (freq * h.ratio < 8000) { // Don't exceed hearing range
-            const osc = ctx.createOscillator();
-            const oscGain = ctx.createGain();
-            osc.type = 'sine';
-            osc.frequency.value = freq * h.ratio * (1 + (Math.random() - 0.5) * 0.001); // Slight detune for richness
-            oscGain.gain.setValueAtTime(h.gain, now);
-            oscGain.gain.exponentialRampToValueAtTime(h.gain * h.decay * 0.3, now + noteLen * 0.6);
-            
-            osc.connect(oscGain);
-            oscGain.connect(filter);
-            osc.start(now);
-            osc.stop(now + noteLen + 0.2);
-          }
-        });
-        
-        filter.connect(masterGain);
-        masterGain.connect(destination);
-      }, [moodConfigs]);
-
-      // Enhanced chimes with shimmer and resonance
-      const playChimeNote = useCallback((ctx, freq, profile, destination, mood) => {
-        const now = ctx.currentTime;
-        const noteLen = profile.music.noteLength;
-        const brightness = moodConfigs[mood].brightness;
-        
-        // Main tone
-        const osc = ctx.createOscillator();
-        const gainNode = ctx.createGain();
-        osc.type = 'sine';
-        osc.frequency.value = freq;
-        gainNode.gain.setValueAtTime(0.05 * brightness, now);
-        gainNode.gain.exponentialRampToValueAtTime(0.001, now + noteLen);
-        
-        // Shimmer overtones
-        const shimmerFreqs = [2.0, 3.01, 4.02]; // Slightly inharmonic for bell-like quality
-        shimmerFreqs.forEach((mult, i) => {
-          const shimmer = ctx.createOscillator();
-          const shimmerGain = ctx.createGain();
-          shimmer.type = 'sine';
-          shimmer.frequency.value = freq * mult;
-          shimmerGain.gain.setValueAtTime(0.015 / (i + 1), now);
-          shimmerGain.gain.exponentialRampToValueAtTime(0.001, now + noteLen * (0.6 - i * 0.1));
-          shimmer.connect(shimmerGain);
-          shimmerGain.connect(destination);
-          shimmer.start(now);
-          shimmer.stop(now + noteLen);
-        });
-        
-        osc.connect(gainNode);
-        gainNode.connect(destination);
-        osc.start(now);
-        osc.stop(now + noteLen + 0.1);
-      }, [moodConfigs]);
-
-      // Enhanced singing bowls with complex beating
-      const playBowlNote = useCallback((ctx, freq, profile, destination, mood) => {
-        const now = ctx.currentTime;
-        const noteLen = profile.music.noteLength * 1.2;
-        
-        // Multiple oscillators with slight detuning for rich beating
-        const detunes = [0, 1.001, 1.003, 0.998];
-        detunes.forEach((detune, i) => {
-          const osc = ctx.createOscillator();
-          const gainNode = ctx.createGain();
-          osc.type = 'sine';
-          osc.frequency.value = freq * detune;
+        // Handle music
+        if (ambientSound === 'music' || ambientSound === 'both') {
+          const trackId = getActiveMusicTrack();
+          const track = musicTracks[trackId];
           
-          const attackTime = 0.8 + i * 0.2;
-          const peakGain = 0.04 / (i + 1);
-          
-          gainNode.gain.setValueAtTime(0, now);
-          gainNode.gain.linearRampToValueAtTime(peakGain, now + attackTime);
-          gainNode.gain.setValueAtTime(peakGain, now + attackTime + 0.5);
-          gainNode.gain.exponentialRampToValueAtTime(0.001, now + noteLen);
-          
-          osc.connect(gainNode);
-          gainNode.connect(destination);
-          osc.start(now);
-          osc.stop(now + noteLen + 0.2);
-        });
-        
-        // Add subtle high harmonic for "singing" quality
-        const harmonic = ctx.createOscillator();
-        const harmonicGain = ctx.createGain();
-        harmonic.type = 'sine';
-        harmonic.frequency.value = freq * 3;
-        harmonicGain.gain.setValueAtTime(0, now);
-        harmonicGain.gain.linearRampToValueAtTime(0.008, now + 1.5);
-        harmonicGain.gain.exponentialRampToValueAtTime(0.001, now + noteLen * 0.7);
-        harmonic.connect(harmonicGain);
-        harmonicGain.connect(destination);
-        harmonic.start(now);
-        harmonic.stop(now + noteLen);
-      }, []);
-
-      const playNote = useCallback((ctx, freq, profile, destination, mood) => {
-        if (profile.music.style === 'piano') {
-          playPianoNote(ctx, freq, profile, destination, mood);
-        } else if (profile.music.style === 'chimes') {
-          playChimeNote(ctx, freq, profile, destination, mood);
-        } else if (profile.music.style === 'bowls') {
-          playBowlNote(ctx, freq, profile, destination, mood);
-        }
-      }, [playPianoNote, playChimeNote, playBowlNote]);
-
-      const startMusic = useCallback((ctx, profile, reverb, musicGainNode, mood) => {
-        const dryGain = ctx.createGain();
-        const wetGain = ctx.createGain();
-        dryGain.gain.value = 1 - profile.music.reverb;
-        wetGain.gain.value = profile.music.reverb;
-        
-        dryGain.connect(musicGainNode);
-        wetGain.connect(reverb);
-        reverb.connect(musicGainNode);
-        
-        const merger = ctx.createGain();
-        merger.connect(dryGain);
-        merger.connect(wetGain);
-        
-        const scale = profile.music.scale;
-        const chords = profile.music.chords || [[0, 2, 4]];
-        let chordIndex = 0;
-        let beatInChord = 0;
-        const beatsPerChord = 4; // Play 4 notes before changing chord
-        
-        const playMusicalPhrase = () => {
-          // Skip sometimes based on mood
-          if (Math.random() < profile.music.skipChance) return;
-          
-          const currentChord = chords[chordIndex];
-          
-          if (profile.music.style === 'piano') {
-            // Play chord tones melodically with occasional full chords
-            if (beatInChord === 0 && Math.random() > 0.4) {
-              // Play full chord on downbeat
-              currentChord.forEach((noteIdx, i) => {
-                const freq = scale[noteIdx % scale.length];
-                setTimeout(() => playNote(ctx, freq, profile, merger, mood), i * 30);
-              });
-            } else {
-              // Play single note from chord, occasionally with harmony
-              const noteIdx = currentChord[beatInChord % currentChord.length];
-              const freq = scale[noteIdx % scale.length];
-              playNote(ctx, freq, profile, merger, mood);
-              
-              // Sometimes add a third above for warmth
-              if (Math.random() > 0.6) {
-                const harmonyIdx = currentChord[(beatInChord + 1) % currentChord.length];
-                setTimeout(() => playNote(ctx, scale[harmonyIdx % scale.length], profile, merger, mood), 50);
+          if (track) {
+            // Create new audio if needed or if track changed
+            if (!musicAudioRef.current || musicAudioRef.current.dataset.trackId !== trackId) {
+              if (musicAudioRef.current) {
+                musicAudioRef.current.pause();
               }
+              const audio = new Audio(track.file);
+              audio.loop = true;
+              audio.volume = musicVolume / 100;
+              audio.dataset.trackId = trackId;
+              audio.play().catch(e => console.log('Music autoplay blocked:', e));
+              musicAudioRef.current = audio;
             }
-          } else if (profile.music.style === 'chimes') {
-            // Chimes play arpeggios
-            const noteIdx = currentChord[beatInChord % currentChord.length];
-            playNote(ctx, scale[noteIdx % scale.length], profile, merger, mood);
-            
-            // Add shimmer note
-            if (Math.random() > 0.5) {
-              const shimmerIdx = currentChord[(beatInChord + 2) % currentChord.length];
-              setTimeout(() => playNote(ctx, scale[shimmerIdx % scale.length] * 2, profile, merger, mood), 100);
-            }
-          } else if (profile.music.style === 'bowls') {
-            // Bowls play intervals (dyads) - perfect consonance
-            currentChord.forEach((noteIdx, i) => {
-              const freq = scale[noteIdx % scale.length];
-              setTimeout(() => playNote(ctx, freq, profile, merger, mood), i * 200);
-            });
           }
+        } else {
+          // Stop music if mode doesn't include it
+          if (musicAudioRef.current) {
+            musicAudioRef.current.pause();
+            musicAudioRef.current = null;
+          }
+        }
+        
+        // Handle ambiance
+        if (ambientSound === 'ambiance' || ambientSound === 'both') {
+          const trackId = getActiveAmbianceTrack();
+          const track = ambianceTracks[trackId];
           
-          // Advance beat
-          beatInChord++;
-          if (beatInChord >= beatsPerChord) {
-            beatInChord = 0;
-            // Move to next chord in progression
-            chordIndex = (chordIndex + 1) % chords.length;
+          if (track) {
+            // Create new audio if needed or if track changed
+            if (!ambianceAudioRef.current || ambianceAudioRef.current.dataset.trackId !== trackId) {
+              if (ambianceAudioRef.current) {
+                ambianceAudioRef.current.pause();
+              }
+              const audio = new Audio(track.file);
+              audio.loop = true;
+              audio.volume = ambianceVolume / 100;
+              audio.dataset.trackId = trackId;
+              audio.play().catch(e => console.log('Ambiance autoplay blocked:', e));
+              ambianceAudioRef.current = audio;
+            }
+          }
+        } else {
+          // Stop ambiance if mode doesn't include it
+          if (ambianceAudioRef.current) {
+            ambianceAudioRef.current.pause();
+            ambianceAudioRef.current = null;
+          }
+        }
+        
+        // Cleanup on unmount
+        return () => {
+          if (musicAudioRef.current) {
+            musicAudioRef.current.pause();
+            musicAudioRef.current = null;
+          }
+          if (ambianceAudioRef.current) {
+            ambianceAudioRef.current.pause();
+            ambianceAudioRef.current = null;
           }
         };
-        
-        // Start after brief delay
-        setTimeout(playMusicalPhrase, 400);
-        
-        // Schedule notes with slight humanization
-        const interval = setInterval(() => {
-          const variance = profile.music.tempo * 0.15; // Less variance for steadier rhythm
-          const delay = Math.random() * variance;
-          setTimeout(playMusicalPhrase, delay);
-        }, profile.music.tempo);
-        
-        return { interval, merger, dryGain, wetGain };
-      }, [playNote]);
-
-      const startSoundscape = useCallback(() => {
-        if (soundRefs.current.ctx) return;
-        
-        try {
-          const ctx = new (window.AudioContext || window.webkitAudioContext)();
-          soundRefs.current.ctx = ctx;
-          
-          const nodes = [];
-          const intervals = [];
-          
-          // Master gains for volume control
-          const ambianceGainNode = ctx.createGain();
-          const musicGainNode = ctx.createGain();
-          const baseAmbianceGain = 0.06 * lightDarkMod.gainMult;
-          ambianceGainNode.gain.value = baseAmbianceGain * (ambianceVolume / 100);
-          musicGainNode.gain.value = musicVolume / 100;
-          ambianceGainNode.connect(ctx.destination);
-          musicGainNode.connect(ctx.destination);
-          
-          soundRefs.current.ambianceGain = ambianceGainNode;
-          soundRefs.current.musicGain = musicGainNode;
-          
-          // Create reverb
-          const reverb = createReverb(ctx, activeMusicProfile.music.reverb, isDark);
-          nodes.push(reverb);
-          
-          // Start ambiance
-          if (ambientSound === 'ambiance' || ambientSound === 'both') {
-            const ambianceNodes = createAmbiance(ctx, activeAmbianceProfile, ambianceGainNode);
-            nodes.push(ambianceNodes);
-          }
-          
-          // Start music
-          if (ambientSound === 'music' || ambientSound === 'both') {
-            const musicNodes = startMusic(ctx, activeMusicProfile, reverb, musicGainNode, soundMood);
-            nodes.push(musicNodes);
-            intervals.push(musicNodes.interval);
-          }
-          
-          soundRefs.current.nodes = nodes;
-          soundRefs.current.intervals = intervals;
-        } catch(e) { console.log('Audio not supported:', e); }
-      }, [ambientSound, activeAmbianceProfile, activeMusicProfile, ambianceVolume, musicVolume, soundMood, isDark, lightDarkMod, createAmbiance, createReverb, startMusic]);
-
-      const stopSoundscape = useCallback(() => {
-        if (soundRefs.current.ctx) {
-          try {
-            soundRefs.current.intervals.forEach(i => clearInterval(i));
-            soundRefs.current.ctx.close();
-          } catch(e) {}
-          soundRefs.current = { ctx: null, nodes: [], intervals: [], ambianceGain: null, musicGain: null };
-        }
-      }, []);
-
-      // Restart when major settings change (not volume)
-      useEffect(() => {
-        if (soundEnabled && ambientSound !== 'off') {
-          stopSoundscape();
-          setTimeout(startSoundscape, 100);
-        } else {
-          stopSoundscape();
-        }
-        return () => stopSoundscape();
-      }, [soundEnabled, ambientSound, soundAmbianceSource, soundMusicSource, soundMood, brewType, isDark, startSoundscape, stopSoundscape]);
+      }, [soundEnabled, ambientSound, getActiveMusicTrack, getActiveAmbianceTrack, musicVolume, ambianceVolume]);
 
       // Handle visibility change (pause when leaving app)
       useEffect(() => {
@@ -1723,8 +1343,8 @@
                       <span style={{ fontSize: '1.1rem' }}>{ambientSound === 'off' ? '🔇' : ambientSound === 'ambiance' ? '🌧️' : ambientSound === 'music' ? '🎹' : '✨'}</span>
                       <span className="bt" style={{ fontSize: '0.8rem' }}>
                         {ambientSound === 'off' ? 'Sound Off' : 
-                         ambientSound === 'ambiance' ? `${activeAmbianceProfile.name.split(' ')[0]} Ambiance` :
-                         ambientSound === 'music' ? `${activeMusicProfile.music.style === 'piano' ? 'Piano' : activeMusicProfile.music.style === 'chimes' ? 'Chimes' : 'Bowls'}` :
+                         ambientSound === 'ambiance' ? (ambianceTracks[getActiveAmbianceTrack()]?.name || 'Ambiance') :
+                         ambientSound === 'music' ? (musicTracks[getActiveMusicTrack()]?.name || 'Music') :
                          'Full Soundscape'}
                       </span>
                       <span style={{ fontSize: '0.7rem', opacity: 0.7 }}>▼</span>
@@ -1764,10 +1384,9 @@
                   <div style={{ ...s.card, textAlign: 'center', background: theme.accentLight }} className="pulse">
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', flexWrap: 'wrap' }}>
                       <p className="bt" style={{ fontSize: '0.8rem', color: theme.accent }}>
-                        🎵 {ambientSound === 'ambiance' && `${activeAmbianceProfile.icon} ${activeAmbianceProfile.name.split(' ')[0]} ambiance`}
-                        {ambientSound === 'music' && `${activeMusicProfile.icon} ${activeMusicProfile.music.style === 'piano' ? 'Soft piano' : activeMusicProfile.music.style === 'chimes' ? 'Gentle chimes' : 'Zen bowls'}`}
-                        {ambientSound === 'both' && `${activeAmbianceProfile.icon} ambiance + ${activeMusicProfile.icon} ${activeMusicProfile.music.style}`}
-                        {' '}playing...
+                        🎵 {ambientSound === 'ambiance' && `${ambianceTracks[getActiveAmbianceTrack()]?.icon} ${ambianceTracks[getActiveAmbianceTrack()]?.name} playing...`}
+                        {ambientSound === 'music' && `${musicTracks[getActiveMusicTrack()]?.icon} ${musicTracks[getActiveMusicTrack()]?.name} playing...`}
+                        {ambientSound === 'both' && `${ambianceTracks[getActiveAmbianceTrack()]?.icon} + ${musicTracks[getActiveMusicTrack()]?.icon} playing...`}
                       </p>
                     </div>
                   </div>
@@ -2462,34 +2081,35 @@
                   </div>
                 )}
 
-                {/* Mood Presets */}
-                {ambientSound !== 'off' && (
+                {/* Mood Presets - for ambiance override */}
+                {(ambientSound === 'ambiance' || ambientSound === 'both') && (
                   <div style={{ marginBottom: '14px' }}>
-                    <p className="bt" style={{ fontSize: '0.75rem', color: theme.textSecondary, marginBottom: '8px' }}>Mood:</p>
+                    <p className="bt" style={{ fontSize: '0.75rem', color: theme.textSecondary, marginBottom: '8px' }}>Ambiance Mood:</p>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '6px' }}>
-                      {Object.entries(moodConfigs).map(([key, config]) => (
+                      {[
+                        { id: 'cozy', icon: '🔥', name: 'Cozy', desc: 'Warm fireplace' },
+                        { id: 'chill', icon: '🌧️', name: 'Rainy', desc: 'Soft rain' },
+                        { id: 'soothing', icon: '🌊', name: 'Ocean', desc: 'Gentle waves' },
+                      ].map(mood => (
                         <button 
-                          key={key}
-                          onClick={() => setSoundMood(key)}
+                          key={mood.id}
+                          onClick={() => setSoundMood(mood.id)}
                           style={{
                             padding: '10px 6px',
                             borderRadius: '10px',
-                            border: soundMood === key ? `2px solid ${theme.accent}` : `1px solid ${theme.cardBorder}`,
-                            background: soundMood === key ? theme.accentLight : 'transparent',
+                            border: soundMood === mood.id ? `2px solid ${theme.accent}` : `1px solid ${theme.cardBorder}`,
+                            background: soundMood === mood.id ? theme.accentLight : 'transparent',
                             cursor: 'pointer',
                             textAlign: 'center'
                           }}
                         >
-                          <span style={{ fontSize: '1.2rem', display: 'block' }}>{config.icon}</span>
-                          <span className="bt" style={{ fontSize: '0.7rem', color: theme.text, fontWeight: soundMood === key ? 600 : 400 }}>
-                            {key.charAt(0).toUpperCase() + key.slice(1)}
+                          <span style={{ fontSize: '1.2rem', display: 'block' }}>{mood.icon}</span>
+                          <span className="bt" style={{ fontSize: '0.7rem', color: theme.text, fontWeight: soundMood === mood.id ? 600 : 400 }}>
+                            {mood.name}
                           </span>
                         </button>
                       ))}
                     </div>
-                    <p className="bt" style={{ fontSize: '0.6rem', color: theme.textMuted, textAlign: 'center', marginTop: '6px' }}>
-                      {moodConfigs[soundMood].desc}
-                    </p>
                   </div>
                 )}
                 
@@ -2521,68 +2141,87 @@
                   ))}
                 </div>
 
-                {/* Sound Sources (Mix & Match) */}
+                {/* Track Selection */}
                 {ambientSound !== 'off' && (
                   <div style={{ background: theme.progressBg, borderRadius: '12px', padding: '14px', marginBottom: '14px' }}>
-                    <p className="bt" style={{ fontSize: '0.8rem', fontWeight: 600, color: theme.text, marginBottom: '10px' }}>🎨 Sound Sources</p>
+                    <p className="bt" style={{ fontSize: '0.8rem', fontWeight: 600, color: theme.text, marginBottom: '10px' }}>🎨 Track Selection</p>
                     
+                    {/* Ambiance Track */}
                     {(ambientSound === 'ambiance' || ambientSound === 'both') && (
-                      <div style={{ marginBottom: ambientSound === 'both' ? '10px' : 0 }}>
-                        <p className="bt" style={{ fontSize: '0.65rem', color: theme.textSecondary, marginBottom: '5px' }}>Ambiance Style:</p>
-                        <div style={{ display: 'flex', gap: '5px' }}>
-                          {[
-                            { id: 'auto', label: '✨ Auto' },
-                            { id: 'coffee', label: '☕ Café' },
-                            { id: 'tea', label: '🍵 Rain' },
-                            { id: 'matcha', label: '🍃 Wind' },
-                          ].map(opt => (
+                      <div style={{ marginBottom: ambientSound === 'both' ? '12px' : 0 }}>
+                        <p className="bt" style={{ fontSize: '0.65rem', color: theme.textSecondary, marginBottom: '6px' }}>Ambiance:</p>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
+                          <button 
+                            onClick={() => setAmbianceTrack('auto')}
+                            style={{
+                              padding: '8px 12px',
+                              borderRadius: '8px',
+                              border: ambianceTrack === 'auto' ? `2px solid ${theme.accent}` : `1px solid ${theme.cardBorder}`,
+                              background: ambianceTrack === 'auto' ? theme.accentLight : 'transparent',
+                              cursor: 'pointer',
+                              fontSize: '0.65rem',
+                              color: theme.text,
+                              fontFamily: "'Lora',serif"
+                            }}
+                          >✨ Auto</button>
+                          {Object.entries(ambianceTracks).map(([id, track]) => (
                             <button 
-                              key={opt.id}
-                              onClick={() => setSoundAmbianceSource(opt.id)}
+                              key={id}
+                              onClick={() => setAmbianceTrack(id)}
                               style={{
-                                flex: 1,
-                                padding: '8px 2px',
+                                padding: '8px 12px',
                                 borderRadius: '8px',
-                                border: soundAmbianceSource === opt.id ? `2px solid ${theme.accent}` : `1px solid ${theme.cardBorder}`,
-                                background: soundAmbianceSource === opt.id ? theme.accentLight : 'transparent',
+                                border: ambianceTrack === id ? `2px solid ${theme.accent}` : `1px solid ${theme.cardBorder}`,
+                                background: ambianceTrack === id ? theme.accentLight : 'transparent',
                                 cursor: 'pointer',
                                 fontSize: '0.65rem',
                                 color: theme.text,
                                 fontFamily: "'Lora',serif"
                               }}
-                            >{opt.label}</button>
+                            >{track.icon} {track.name}</button>
                           ))}
                         </div>
                       </div>
                     )}
                     
+                    {/* Music Track */}
                     {(ambientSound === 'music' || ambientSound === 'both') && (
                       <div>
-                        <p className="bt" style={{ fontSize: '0.65rem', color: theme.textSecondary, marginBottom: '5px' }}>Music Style:</p>
-                        <div style={{ display: 'flex', gap: '5px' }}>
-                          {[
-                            { id: 'auto', label: '✨ Auto' },
-                            { id: 'coffee', label: '☕ Piano' },
-                            { id: 'tea', label: '🍵 Chimes' },
-                            { id: 'matcha', label: '🍃 Bowls' },
-                          ].map(opt => (
+                        <p className="bt" style={{ fontSize: '0.65rem', color: theme.textSecondary, marginBottom: '6px' }}>Music:</p>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
+                          <button 
+                            onClick={() => setMusicTrack('auto')}
+                            style={{
+                              padding: '8px 12px',
+                              borderRadius: '8px',
+                              border: musicTrack === 'auto' ? `2px solid ${theme.accent}` : `1px solid ${theme.cardBorder}`,
+                              background: musicTrack === 'auto' ? theme.accentLight : 'transparent',
+                              cursor: 'pointer',
+                              fontSize: '0.65rem',
+                              color: theme.text,
+                              fontFamily: "'Lora',serif"
+                            }}
+                          >✨ Auto</button>
+                          {Object.entries(musicTracks).map(([id, track]) => (
                             <button 
-                              key={opt.id}
-                              onClick={() => setSoundMusicSource(opt.id)}
+                              key={id}
+                              onClick={() => setMusicTrack(id)}
                               style={{
-                                flex: 1,
-                                padding: '8px 2px',
+                                padding: '8px 12px',
                                 borderRadius: '8px',
-                                border: soundMusicSource === opt.id ? `2px solid ${theme.accent}` : `1px solid ${theme.cardBorder}`,
-                                background: soundMusicSource === opt.id ? theme.accentLight : 'transparent',
+                                border: musicTrack === id ? `2px solid ${theme.accent}` : `1px solid ${theme.cardBorder}`,
+                                background: musicTrack === id ? theme.accentLight : 'transparent',
                                 cursor: 'pointer',
                                 fontSize: '0.65rem',
                                 color: theme.text,
                                 fontFamily: "'Lora',serif"
                               }}
-                            >{opt.label}</button>
+                            >{track.icon} {track.name}</button>
                           ))}
                         </div>
+                        <p className="bt" style={{ fontSize: '0.55rem', color: theme.textMuted, marginTop: '6px' }}>
+                          Auto: {isDark ? 'Dark mode tracks' : 'Light mode tracks'} based on theme
+                        </p>
                       </div>
                     )}
                   </div>
@@ -2625,10 +2264,10 @@
                 {soundEnabled && ambientSound !== 'off' && (
                   <div style={{ textAlign: 'center', marginBottom: '14px', padding: '10px', background: 'rgba(74,222,128,0.1)', borderRadius: '10px', border: '1px solid rgba(74,222,128,0.3)' }}>
                     <p className="bt" style={{ fontSize: '0.7rem', color: '#4ade80' }}>
-                      🎵 {moodConfigs[soundMood].icon} {soundMood.charAt(0).toUpperCase() + soundMood.slice(1)} • {' '}
-                      {ambientSound === 'ambiance' && `${activeAmbianceProfile.icon} ${activeAmbianceProfile.name}`}
-                      {ambientSound === 'music' && `${activeMusicProfile.icon} ${activeMusicProfile.music.style}`}
-                      {ambientSound === 'both' && `${activeAmbianceProfile.icon} + ${activeMusicProfile.icon}`}
+                      🎵 Now Playing: {' '}
+                      {ambientSound === 'ambiance' && `${ambianceTracks[getActiveAmbianceTrack()]?.icon} ${ambianceTracks[getActiveAmbianceTrack()]?.name}`}
+                      {ambientSound === 'music' && `${musicTracks[getActiveMusicTrack()]?.icon} ${musicTracks[getActiveMusicTrack()]?.name}`}
+                      {ambientSound === 'both' && `${ambianceTracks[getActiveAmbianceTrack()]?.icon} ${ambianceTracks[getActiveAmbianceTrack()]?.name} + ${musicTracks[getActiveMusicTrack()]?.icon} ${musicTracks[getActiveMusicTrack()]?.name}`}
                     </p>
                   </div>
                 )}

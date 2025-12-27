@@ -1,53 +1,47 @@
-# ☕ My Daily Brew v6.5.1 - Grand Reopening!
+# ☕ My Daily Brew v6.6.0 - Real Soundscapes!
 
-A cozy, comprehensive habit tracker, task manager, and daily reflection app with warm café aesthetics. Now with live weather, push notifications, improved music, and a safer UI!
+A cozy, comprehensive habit tracker, task manager, and daily reflection app with warm café aesthetics. Now featuring real ambient sounds and lo-fi music!
 
-## 🎉 What's New in v6.5
+## 🎉 What's New in v6.6.0
+
+### 🎵 Real Sound System
+Replaced synthesized sounds with high-quality royalty-free audio tracks!
+
+**Music Tracks (6):**
+| Theme | Light Mode | Dark Mode |
+|-------|------------|-----------|
+| ☕ Coffee | Café Contemplations | Elegant Background |
+| 🍵 Tea | Tea Time Piano | Minimal Lo-Fi |
+| 🍃 Matcha | Zen Garden | Japanese Lo-Fi |
+
+**Ambiance Tracks (4):**
+| Sound | Icon | Best For |
+|-------|------|----------|
+| Fireplace | 🔥 | Cozy mood, Coffee theme |
+| Soft Rain | 🌧️ | Rainy mood, Tea theme |
+| Wind in Trees | 🍃 | Nature, Matcha theme |
+| Ocean Waves | 🌊 | Soothing mood |
+
+**How Auto Mode Works:**
+- Music: Automatically selects based on theme + light/dark mode
+- Ambiance: Selects based on mood (Cozy→Fireplace, Soothing→Ocean) or theme
+
+**Manual Selection:**
+- Users can override auto-selection and pick any track they prefer
+- All 10 tracks available to mix and match!
+
+## Previous Features
 
 ### 🌤️ Live Weather
 - Current temperature displays next to the date in the header
 - Weather icon shows conditions (☀️🌧️❄️⛈️ etc.)
 - Uses Open-Meteo API (free, no key required)
-- Auto-refreshes every 30 minutes
-- Requires location permission
 
 ### 🔔 Push Notifications
-- **5-Minute Warning**: Get notified 5 minutes before tasks are due
-- **Due Now Alert**: Notified again when the task time arrives (with vibration)
-- **Timer Complete**: Get notified when your focus session ends (works in background!)
-- **Smart Tracking**: Won't send duplicate notifications for the same task
-- **Test Button**: Verify notifications work from Settings
-- **Notification Prompt**: New users see a friendly banner to enable notifications
-
-### 🎵 Improved Music
-Testers said the old music was "too slow and creepy" - here's what changed:
-
-| Sound | Old Tempo | New Tempo | Improvement |
-|-------|-----------|-----------|-------------|
-| Piano | 1800ms | 1400ms | 22% faster |
-| Chimes | 2200ms | 1800ms | 18% faster |
-| Bowls | 3500ms | 2800ms | 20% faster |
-
-**Better Harmonies:**
-- Piano now uses jazz 7th chords (Cmaj7, Fmaj7, G7, Am7, Dm7)
-- Pentatonic scales for naturally pleasant melodies
-- Lower skip chance = more continuous music
-- Richer, warmer sound overall
-
-### 🔒 XP Exploit Prevention
-- Each habit/task can only award XP once per day
-- Re-checking and unchecking won't give duplicate XP
-- Progress still tracked accurately
-
-### 🗑️ Safer Delete Actions
-- **No more swipe-to-delete** - prevents accidental deletions
-- Swipe right = complete (habits & tasks)
-- Delete button (🗑️) now shows confirmation modal
-- "Are you sure?" prompt before any deletion
-- 4-second undo toast after deletion
-
-## 🏠 6 Mood Presets
-Each mood changes tempo, density, reverb, and brightness:
+- 5-minute warning before tasks are due
+- Due-now alerts with vibration
+- Timer complete notifications
+- Test button in Settings
 
 | Mood | Icon | Speed | Description |
 |------|------|-------|-------------|

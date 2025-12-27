@@ -1,6 +1,6 @@
 // Service Worker for My Daily Brew PWA
 // Version-based caching for easy updates
-const CACHE_VERSION = 'v6.5.2';
+const CACHE_VERSION = 'v6.6.0';
 const CACHE_NAME = `daily-brew-${CACHE_VERSION}`;
 
 // Assets to cache for offline use
@@ -18,6 +18,20 @@ const STATIC_ASSETS = [
   './icons/icon-192.png',
   './icons/icon-384.png',
   './icons/icon-512.png'
+];
+
+// Sound files - cached on first use (not precached due to size)
+const SOUND_FILES = [
+  './sounds/cafe-contemplations.mp3',
+  './sounds/elegant-background.mp3',
+  './sounds/tea-time-piano.mp3',
+  './sounds/minimal-lofi.mp3',
+  './sounds/zen-garden.mp3',
+  './sounds/japanese-lofi.mp3',
+  './sounds/fireplace.mp3',
+  './sounds/rain.mp3',
+  './sounds/wind.mp3',
+  './sounds/ocean.mp3'
 ];
 
 // External resources to cache
