@@ -1,168 +1,174 @@
-# ☕ My Daily Brew
+# ☕ My Daily Brew v6.0 - Grand Reopening!
 
-A cozy habit tracker and daily schedule app with a warm café aesthetic. Built as a Progressive Web App (PWA) for offline use with notification reminders.
+A cozy, comprehensive habit tracker, task manager, and daily reflection app with warm café aesthetics. Now with brew-specific soundscapes, challenges, AI coaching, and so much more!
 
-![Daily Brew Screenshot](icons/icon-512.png)
+## 🎉 What's New in v6.0 - The Grand Reopening
 
-## Features
+We've been renovating! Here's everything that's new:
 
-- 📅 **Daily Overview** - See all your habits and tasks at a glance
-- ⭐ **Habit Tracking** - Track daily rituals with streak counting
-- ✓ **Task Management** - Prioritize tasks with high/medium/low levels
-- 🔔 **Reminder Notifications** - Get alerted at scheduled times for your tasks
-- ⏱️ **Focus Timer** - Pomodoro-style timer with preset and custom durations
-- 📆 **Calendar View** - Monthly overview of your mood and activity history
-- 📊 **Statistics** - Track mood trends, habit streaks, and task completion rates
-- 😊 **Mood Tracker** - Log your daily mood and see patterns over time
-- ☀️🌙 **Light & Dark Brew** - Toggle between light and dark themes
-- 📱 **Mobile Optimized** - Works great on phones and tablets
-- 🔌 **Offline Support** - Use the app without internet
-- 📲 **Installable** - Add to home screen for app-like experience
-- 🔋 **Battery Conscious** - Only checks for updates when opening the app
-- 💾 **Persistent Data** - Your data is saved locally
+### 🎵 Brew-Specific Soundscapes (NEW!)
+Each brew has its own unique audio experience:
 
-## New in v2.0
+| Brew | Ambiance | Music Style |
+|------|----------|-------------|
+| ☕ **Coffee** | Warm brown noise (café hum) | Jazzy lo-fi piano, swing chords |
+| 🍵 **Tea** | Soft pink noise (rain-like) | Gentle wind chimes, ethereal |
+| 🍃 **Matcha** | Airy wind sounds | Zen singing bowls, Japanese scale |
 
-### 🌙 Dark Brew Mode
-Switch between Light Brew (warm beige theme) and Dark Brew (cozy dark theme) using the toggle button in the header. Your preference is saved automatically.
+**Sound options:**
+- 🔇 **Silence** - Pure focus
+- 🌧️ **Ambiance Only** - Background atmosphere
+- 🎵 **Music Only** - Procedural lo-fi music
+- ✨ **Full Soundscape** - Music + ambiance combined
 
-### ⏱️ Focus Timer
-- Preset durations: 5, 15, 25, 45 minutes
-- Start timer directly from any incomplete task
-- Get notified when your focus session ends
-- Pause and reset functionality
+All audio is **procedurally generated** - no external files, works offline, copyright-free!
 
-### 📆 Calendar View
-- Monthly calendar showing your tracked days
-- Mood emoji indicators for each day
-- Navigate between months
-- Visual mood legend
+### 🍂 Seasonal Themes
+- Automatic decorations that change with the seasons
+- 🌸 Spring - Cherry Blossom
+- 🌻 Summer - Sunshine  
+- 🍂 Fall - Pumpkin Spice
+- ❄️ Winter - Peppermint
 
-### 📊 Statistics Dashboard
-- Average mood for the month
-- Mood distribution chart
-- Habit streak rankings
-- Task completion by priority level
+### 🏆 Weekly & Monthly Challenges
+- Fresh challenges that rotate automatically
+- Weekly: Complete 21 habits, 15 tasks, 2 hours focus, etc.
+- Monthly: 100 habits, 14-day streak, 20 journal entries, etc.
+- Bonus XP for completing challenges!
 
-### 😊 Mood Tracking
-- Quick daily mood logging (5 levels from 😢 to 🤩)
-- Mood history saved with timestamps
-- Integrated into calendar and statistics
+### 🤖 Daily Barista Tips
+- Personalized AI coaching each day
+- Tips adapt to your mood, patterns, and progress
+- Brew-specific advice (Coffee, Tea, or Matcha style)
 
-## Deployment to GitHub Pages
+### 📤 Share Achievements
+- Share badges and progress to social media
+- Web Share API or clipboard fallback
+- Earn the "Social Barista" badge!
 
-### Quick Setup
+### 💾 Export Your Data
+- Download all your data as JSON
+- Includes habits, tasks, moods, journal, stats
+- Full data ownership
 
-1. **Create a new GitHub repository**
-   - Go to github.com and create a new repository
-   - Name it something like `daily-brew` or `my-daily-brew`
+### ♿ Accessibility Mode
+- High contrast toggle in settings
+- Screen reader optimized (ARIA labels)
+- Keyboard navigation support
 
-2. **Upload the files**
-   ```bash
-   # Initialize git in this folder
-   git init
-   
-   # Add all files
-   git add .
-   
-   # Commit
-   git commit -m "Initial commit - My Daily Brew PWA"
-   
-   # Add your GitHub repo as remote
-   git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git
-   
-   # Push to GitHub
-   git branch -M main
-   git push -u origin main
-   ```
+### 📅 Year in Review
+- Complete annual journey summary
+- Total XP, badges, habits, tasks
+- Longest streak, average mood
+- Share your year!
 
-3. **Enable GitHub Pages**
-   - Go to your repository on GitHub
-   - Click **Settings** → **Pages**
-   - Under "Source", select **Deploy from a branch**
-   - Select **main** branch and **/ (root)** folder
-   - Click **Save**
+### 🎓 Interactive Tutorial
+- "Grand Tour" for new and returning users
+- Café-themed language throughout
+- Skip option always available
 
-4. **Access your app**
-   - Your app will be live at: `https://YOUR_USERNAME.github.io/YOUR_REPO_NAME/`
-   - It may take a few minutes for the first deployment
+## ☕🍵🍃 Full Feature List
 
-### File Structure
+### Brew-Themed Everything
+Each brew (Coffee, Tea, Matcha) has unique:
+- **7 Ranks**: From "Coffee Bean" to "Café Owner"
+- **18 Badges**: With brew-specific names
+- **Messages**: Empty states, celebrations, tips
+- **Soundscapes**: Unique ambiance + music
 
-```
-daily-brew-pwa/
-├── index.html          # Main app file
-├── sw.js               # Service worker for offline support
-├── manifest.json       # PWA manifest for installation
-├── README.md           # This file
-├── generate_icons.py   # Icon generation script (optional)
-└── icons/
-    ├── icon-32.png
-    ├── icon-72.png
-    ├── icon-96.png
-    ├── icon-128.png
-    ├── icon-144.png
-    ├── icon-152.png
-    ├── icon-192.png
-    ├── icon-384.png
-    ├── icon-512.png
-    ├── screenshot-wide.png
-    └── screenshot-narrow.png
-```
+### Habit Tracking
+- ⭐ Custom emoji icons (30+)
+- 🔥 Streak tracking with protection
+- 📊 12-week habit heatmap
+- ❄️ Weekly streak freeze
+- ↕️ Drag to reorder
 
-## How Updates Work
+### Task Management  
+- 🔴🟡🟢 Priority levels
+- 🏷️ 6 categories with colors
+- 📋 Subtasks/checklists
+- 🔄 Recurring tasks: Daily, Weekdays, or Weekly
+- ⏰ Time scheduling
 
-The app is designed to be battery-conscious:
+### Focus Timer
+- 🎵 **Brew-specific soundscapes**
+- ⏱️ Custom duration (1-180 min)
+- 🎯 Start from any task
+- 📊 Focus time tracking
 
-1. **On first visit**: All assets are cached for offline use
-2. **On subsequent visits**: The app checks for updates only when you open it (not in the background)
-3. **When an update is found**: A toast notification appears asking if you want to refresh
-4. **Offline mode**: The app works completely offline using cached assets
+### Mood & Journal
+- 😢😕😊😄🤩 5 mood levels
+- 📅 Calendar visualization
+- 📝 Gratitude, reflection, planning
+- 📊 Mood Insights: See how habits affect your mood!
 
-## Updating the App
+### Gamification
+- 🎮 XP for everything
+- 📈 7 level progression
+- 🏆 18 achievement badges
+- 🏅 Weekly/monthly challenges
 
-To push updates to users:
+### Swipe Gestures
+- 👉 Swipe right to complete
+- 👈 Swipe left to delete
+- ↩️ Undo toast for mistakes
 
-1. Make your changes to `index.html`
-2. Update the `CACHE_VERSION` in `sw.js` (e.g., change `v1.1.0` to `v1.1.1`)
-3. Commit and push to GitHub
-4. Users will see the update notification next time they open the app
+## 📱 Installation
 
-```javascript
-// In sw.js, update this line:
-const CACHE_VERSION = 'v1.1.1';  // Increment version number
-```
+1. Open in mobile browser (Safari/Chrome)
+2. Tap "Add to Home Screen" or "Install"
+3. Launch from home screen
 
-## Customization
+## 🎵 Sound Profiles Detail
 
-### Changing Colors
+### ☕ Coffee - "Cozy Café"
+- **Ambiance**: Rich brown noise, warm 400Hz filter
+- **Music**: C major scale with 7ths, ~70-90 BPM feel, medium reverb
+- **Vibe**: Urban coffee shop, jazzy, inviting
 
-The app uses these café-themed colors (defined in `index.html`):
+### 🍵 Tea - "Serene Tea House"  
+- **Ambiance**: Pink noise (softer, rain-like), 600Hz filter
+- **Music**: Pentatonic scale, ~50-60 BPM feel, large hall reverb
+- **Vibe**: Peaceful, gentle, elegant
 
-- Background: `#F5E6D3` (warm beige)
-- Card background: `#FDFBF7` (cream)
-- Primary brown: `#5D4037`
-- Medium brown: `#8B7355`
-- Accent: `#C4A77D`
+### 🍃 Matcha - "Zen Garden"
+- **Ambiance**: Wind-like noise, very soft 300Hz filter
+- **Music**: Japanese In scale, ~30-40 BPM feel, cathedral reverb
+- **Vibe**: Meditative, minimal, contemplative
 
-### Changing Fonts
+## 🔄 Version History
 
-The app uses Google Fonts:
-- **Caveat** - Handwritten style for titles
-- **Cormorant Garamond** - Elegant serif for headings
-- **Lora** - Readable serif for body text
+### v6.0.0 - Grand Reopening
+- **Brew-specific soundscapes** (procedural music + ambiance)
+- Seasonal themes
+- Weekly & monthly challenges
+- Daily AI barista tips
+- Share achievements
+- Export data
+- Accessibility mode
+- Year in Review
+- Interactive tutorial
+- What's New announcement
 
-## Browser Support
+### v5.0.0 - Themed Experience
+- Brew-specific ranks, badges, messages
+- Custom timer duration
+- Mood Insights - correlate habits with mood
 
-- ✅ Chrome/Edge (full PWA support)
-- ✅ Firefox (partial PWA support)
-- ✅ Safari iOS (Add to Home Screen)
-- ✅ Samsung Internet
+### v4.0.0 - Feature Explosion
+- Swipe gestures
+- Recurring tasks - daily, weekdays, weekly
+- Subtasks
+- Streak freeze
+- Habit heatmap
 
-## License
-
-MIT License - Feel free to use and modify!
+### v3.0.0 - Choose Your Brew
+- 6 themes (Coffee/Tea/Matcha × Light/Dark)
+- XP & leveling system
+- Achievement badges
 
 ---
 
-Made with ☕ and warmth
+Made with ☕ warmth, 🍵 calm, and 🍃 balance.
+
+*Pull up a chair. Stay a while.*
