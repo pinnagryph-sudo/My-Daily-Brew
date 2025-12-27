@@ -1,20 +1,56 @@
-# ☕ My Daily Brew v6.6.0 - Real Soundscapes!
+# ☕ My Daily Brew v6.7.1 - Daily Journal Prompts!
 
-A cozy, comprehensive habit tracker, task manager, and daily reflection app with warm café aesthetics. Now featuring real ambient sounds and lo-fi music!
+A cozy, comprehensive habit tracker, task manager, and daily reflection app with warm café aesthetics. Now featuring 366 unique daily journal prompts to spark your reflection!
 
-## 🎉 What's New in v6.6.0
+## 🎉 What's New in v6.7.x
 
-### 🎵 Real Sound System
-Replaced synthesized sounds with high-quality royalty-free audio tracks!
+### ✨ Daily Journal Prompts
+366 unique prompts - one for each day of the year! Each month has a theme:
 
-**Music Tracks (6):**
+| Month | Theme |
+|-------|-------|
+| January | New Beginnings & Reflection |
+| February | Love & Connection |
+| March | Growth & Change |
+| April | Creativity & Play |
+| May | Gratitude & Abundance |
+| June | Energy & Vitality |
+| July | Freedom & Adventure |
+| August | Wisdom & Learning |
+| September | Purpose & Direction |
+| October | Fears & Shadows |
+| November | Home & Belonging |
+| December | Reflection & Renewal |
+
+The prompt appears at the top of your Journal tab with a beautiful gradient card showing the day number (e.g., "Day 362 of 366").
+
+### 🎵 Crossfade Audio Looping
+- Smooth 3-second fade in/out on all audio
+- Seamless loop transitions (no jarring restarts)
+- Crossfade between tracks when switching
+
+### 🔊 Quieter Default Volumes
+- Music: 25% (was 50%)
+- Ambiance: 35% (was 50%)
+- Perfect for background mindfulness without overpowering
+
+### 🎨 Theme-Based Ambiance Defaults
+| Theme | Default Ambiance |
+|-------|------------------|
+| ☕ Coffee | 🔥 Fireplace |
+| 🍵 Tea | 🌧️ Soft Rain |
+| 🍃 Matcha | 🍃 Wind in Trees |
+
+## 🎵 Sound System
+
+### Music Tracks (6)
 | Theme | Light Mode | Dark Mode |
 |-------|------------|-----------|
 | ☕ Coffee | Café Contemplations | Elegant Background |
 | 🍵 Tea | Tea Time Piano | Minimal Lo-Fi |
 | 🍃 Matcha | Zen Garden | Japanese Lo-Fi |
 
-**Ambiance Tracks (4):**
+### Ambiance Tracks (4)
 | Sound | Icon | Best For |
 |-------|------|----------|
 | Fireplace | 🔥 | Cozy mood, Coffee theme |
@@ -22,65 +58,13 @@ Replaced synthesized sounds with high-quality royalty-free audio tracks!
 | Wind in Trees | 🍃 | Nature, Matcha theme |
 | Ocean Waves | 🌊 | Soothing mood |
 
-**How Auto Mode Works:**
-- Music: Automatically selects based on theme + light/dark mode
-- Ambiance: Selects based on mood (Cozy→Fireplace, Soothing→Ocean) or theme
-
-**Manual Selection:**
-- Users can override auto-selection and pick any track they prefer
-- All 10 tracks available to mix and match!
-
-## Previous Features
-
-### 🌤️ Live Weather
-- Current temperature displays next to the date in the header
-- Weather icon shows conditions (☀️🌧️❄️⛈️ etc.)
-- Uses Open-Meteo API (free, no key required)
-
-### 🔔 Push Notifications
-- 5-minute warning before tasks are due
-- Due-now alerts with vibration
-- Timer complete notifications
-- Test button in Settings
-
-| Mood | Icon | Speed | Description |
-|------|------|-------|-------------|
-| **Cozy** | 🏠 | Lively | Warm & inviting |
-| **Chill** | 😌 | Normal | Laid back vibes |
-| **Upbeat** | ✨ | Fast | Energetic flow |
-| **Soothing** | 🌊 | Relaxed | Gentle & calm |
-| **Meditative** | 🧘 | Slow | Deep & contemplative |
-| **Focus** | 🎯 | Steady | Consistent rhythm |
-
-## 🌙 Light/Dark Sound Adaptation
-Your sounds automatically adapt to your color theme:
-
-| Setting | Light Mode ☀️ | Dark Mode 🌙 |
-|---------|---------------|--------------|
-| **Filter** | Brighter, airy | Warmer, deeper |
-| **Reverb** | Less | More spacious |
-| **Octave** | Normal | Occasional lower notes |
-| **Volume** | Normal | Slightly softer |
-
-## 🎵 Complete Sound System
-
 ### Sound Modes
 | Mode | Description |
 |------|-------------|
 | 🔇 **Off** | No sound |
 | 🌧️ **Ambiance** | Background atmosphere only |
 | 🎹 **Music** | Instrumental melodies only |
-| ✨ **Full** | Music + ambiance layered |
-
-### Sound Sources (Mix & Match)
-- **Ambiance**: ☕ Café, 🍵 Rain, 🍃 Wind, or ✨ Auto (matches brew)
-- **Music**: ☕ Piano, 🍵 Chimes, 🍃 Bowls, or ✨ Auto (matches brew)
-
-### Controls
-- **Sound Button** (header): Quick access from any screen
-- **Volume Sliders**: Real-time adjustment for ambiance & music
-- **Mood Selector**: 6 preset vibes
-- **Background Play Toggle**: Keep playing when you leave app
+| ✨ **Both** | Music + ambiance layered |
 
 ## ☕🍵🍃 Complete Feature List
 
@@ -108,6 +92,7 @@ Your sounds automatically adapt to your color theme:
 ### Mood & Journal
 - 😢😕😊😄🤩 5 mood levels
 - 📅 Calendar visualization
+- ✨ Daily journal prompts (366 unique!)
 - 📝 Gratitude, reflection, planning
 - 📊 Mood Insights
 
@@ -141,34 +126,25 @@ For best results:
 2. Or go to Settings (⚙️) → Notifications → Enable
 3. Keep the app installed as a PWA for background notifications
 
-**Note**: Web notifications work best when the app is open or in the background. For critical reminders, also set alarms in your phone's clock app.
-
 ## 🔄 Version History
 
-### v6.5.1 - Improved Task Notifications
+### v6.7.1 - Daily Journal Prompts
+- ✨ 366 unique daily prompts (themed by month)
+- 🎵 Crossfade audio looping (seamless transitions)
+- 🔊 Quieter default volumes (25% music, 35% ambiance)
+- 🎨 Theme-based ambiance defaults
+
+### v6.6.0 - Real Soundscapes
+- 🎵 6 music tracks + 4 ambiance tracks
+- 🔄 Auto-selection based on theme/mood/time
+
+### v6.5.1 - Task Notifications
 - ⏰ 5-minute warning before tasks are due
 - 🔔 Due-now alerts with vibration
-- 🧪 Test notification button in Settings
-- 🚫 No duplicate notifications (smart tracking)
-- ✅ Checks every 30 seconds for better accuracy
 
 ### v6.5.0 - Notifications & Polish
 - 🌤️ Live weather display in header
 - 🔔 Push notifications for timers and task reminders
-- 🎵 Faster, more harmonious music
-- 🔒 XP exploit prevention
-- 🗑️ Delete confirmation modals (no accidental swipes)
-- 📱 Notification prompt banner for new users
-
-### v6.3.0 - Enhanced Soundscape
-- Volume sliders for ambiance & music
-- 6 mood presets (Cozy, Chill, Upbeat, Soothing, Meditative, Focus)
-- Light/dark sound adaptation
-
-### v6.0.0 - Grand Reopening
-- Brew-specific soundscapes
-- Seasonal themes
-- Challenges & achievements
 
 ---
 
