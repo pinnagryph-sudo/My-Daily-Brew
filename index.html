@@ -791,7 +791,6 @@
       const [activeTab, setActiveTab] = useState('today');
       const [habits, setHabits] = useState(() => load('habits', [{ id: 1, name: 'Drink water', icon: '💧', completed: false, streak: 0, history: {} }]));
       const [tasks, setTasks] = useState(() => load('tasks', []));
-      const [taskTemplates, setTaskTemplates] = useState(() => load('taskTemplates', []));
       const [taskTemplates, setTaskTemplates] = useState(() => load('taskTemplates', [
         { id: 1, name: 'Morning Routine', tasks: [{ text: 'Make bed', priority: 'low' }, { text: 'Drink water', priority: 'medium' }, { text: 'Exercise', priority: 'high' }] },
         { id: 2, name: 'Weekly Review', tasks: [{ text: 'Review goals', priority: 'high' }, { text: 'Plan next week', priority: 'high' }, { text: 'Clean workspace', priority: 'medium' }] }
