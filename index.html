@@ -174,6 +174,390 @@
     };
 
     // ═══════════════════════════════════════════════════════════════
+    // DAILY JOURNAL PROMPTS - 366 unique prompts for the year
+    // ═══════════════════════════════════════════════════════════════
+    const journalPrompts = [
+      // January - New Beginnings & Reflection (1-31)
+      "What word do you want to define this year?",
+      "What's one habit you'd like to build this year?",
+      "Describe your ideal ordinary day.",
+      "What are you most looking forward to?",
+      "What lesson from last year do you want to remember?",
+      "Who do you want to spend more time with?",
+      "What would you do if you knew you couldn't fail?",
+      "What's something you've been putting off?",
+      "Describe a place where you feel completely at peace.",
+      "What does success mean to you right now?",
+      "What's a small joy you experienced recently?",
+      "If you could master any skill instantly, what would it be?",
+      "What boundaries do you need to set or maintain?",
+      "Write about someone who believed in you.",
+      "What are you curious about lately?",
+      "What does your inner critic say? How can you respond kindly?",
+      "Describe your relationship with rest.",
+      "What's something you're proud of that no one knows about?",
+      "What would you tell your younger self?",
+      "What makes you feel most alive?",
+      "What's a fear you'd like to overcome?",
+      "Describe a moment of unexpected kindness.",
+      "What does your ideal morning look like?",
+      "What are you holding onto that you need to let go?",
+      "Who has shaped who you are today?",
+      "What's something you believe that most people don't?",
+      "Describe a challenge that made you stronger.",
+      "What brings you comfort on hard days?",
+      "What's your favorite way to show love?",
+      "If today was your last, what would you regret not doing?",
+      "What intention do you want to set for February?",
+      // February - Love & Connection (32-59)
+      "What does love mean to you?",
+      "Write about a friendship that changed you.",
+      "How do you show yourself compassion?",
+      "What's the kindest thing someone has done for you?",
+      "Describe your perfect date (with anyone or alone).",
+      "What do you love about your home?",
+      "Who makes you laugh the hardest?",
+      "What's a relationship you'd like to improve?",
+      "How do you feel about vulnerability?",
+      "Write a love letter to your body.",
+      "What's a tradition you cherish?",
+      "Describe someone you admire and why.",
+      "What does self-care look like for you?",
+      "What's the best advice you've received about relationships?",
+      "How do you handle conflict?",
+      "What makes you feel truly seen?",
+      "Write about a time you forgave someone.",
+      "What do you need more of in your relationships?",
+      "Describe your love language in action.",
+      "What's something nice you can do for someone tomorrow?",
+      "How has your idea of love evolved?",
+      "What boundaries protect your peace?",
+      "Write about a mentor or role model.",
+      "What do you love about yourself?",
+      "How do you reconnect after an argument?",
+      "What does unconditional love feel like?",
+      "Describe a moment of deep connection.",
+      "What are you grateful for in your relationships?",
+      // March - Growth & Change (60-90)
+      "What area of your life needs attention?",
+      "Describe a time you surprised yourself.",
+      "What's growing in your life right now?",
+      "What do you need to prune or let go?",
+      "How do you handle change?",
+      "What's a belief you've outgrown?",
+      "Describe your relationship with failure.",
+      "What would you try if judgment didn't exist?",
+      "What's one thing you can improve this week?",
+      "How do you celebrate small wins?",
+      "What's something difficult you're grateful for?",
+      "Describe a turning point in your life.",
+      "What are you learning right now?",
+      "How do you stay motivated?",
+      "What's holding you back from your potential?",
+      "Write about a risk that paid off.",
+      "What does courage look like for you today?",
+      "How have you changed in the last year?",
+      "What skill would improve your daily life?",
+      "Describe your growth mindset (or fixed mindset).",
+      "What's a mistake that taught you something valuable?",
+      "How do you handle uncertainty?",
+      "What are you ready to begin?",
+      "Write about someone who inspires your growth.",
+      "What does progress look like in your life?",
+      "How do you push through resistance?",
+      "What are you becoming?",
+      "Describe a moment of breakthrough.",
+      "What do you want to be known for?",
+      "How will you nurture your growth this spring?",
+      "What seeds are you planting for the future?",
+      // April - Creativity & Play (91-120)
+      "When did you last do something just for fun?",
+      "What creative outlet calls to you?",
+      "Describe your inner child.",
+      "What did you love doing as a kid?",
+      "How can you add more play to your life?",
+      "What inspires your creativity?",
+      "Write about a time you made something you were proud of.",
+      "What's blocking your creative expression?",
+      "Describe your ideal creative space.",
+      "What would you create if you had unlimited resources?",
+      "How do you feel about making mistakes in creative work?",
+      "What art, music, or media moves you?",
+      "Write a short story about your day (make it dramatic!).",
+      "What's a creative skill you'd like to develop?",
+      "How does creativity help you process emotions?",
+      "Describe something beautiful you saw recently.",
+      "What does your imagination show you?",
+      "How can you make boring tasks more fun?",
+      "Write about a creative person you admire.",
+      "What hobby have you always wanted to try?",
+      "How do you balance productivity and play?",
+      "Describe a moment of flow state.",
+      "What would you do with an unexpected free day?",
+      "How does nature inspire you?",
+      "What's something silly that makes you happy?",
+      "Write about the colors of your current mood.",
+      "How can you express yourself more authentically?",
+      "What childhood game would you play again?",
+      "Describe your creative dreams.",
+      "How will you make space for joy this month?",
+      // May - Gratitude & Abundance (121-151)
+      "List 10 simple pleasures in your life.",
+      "What's something free that brings you joy?",
+      "Write about a person you're thankful for.",
+      "What's working well in your life right now?",
+      "How do you practice gratitude daily?",
+      "What's a luxury you once dreamed of that you now have?",
+      "Describe abundance beyond money.",
+      "What are you taking for granted?",
+      "Write a thank you letter you'll never send.",
+      "What's the best thing about today?",
+      "How has your definition of wealth changed?",
+      "What do you have enough of?",
+      "Describe a gift that meant the world to you.",
+      "What privilege are you grateful for?",
+      "How do you share your abundance with others?",
+      "What's a memory that makes you smile?",
+      "What modern convenience amazes you?",
+      "Write about something you're grateful to have learned.",
+      "What's a challenge you're now thankful for?",
+      "How do you find gratitude on hard days?",
+      "What's the best compliment you've received?",
+      "Describe a meal that brought you joy.",
+      "What are you grateful for about your body?",
+      "Write about a place that fills your cup.",
+      "What's something beautiful about your life story?",
+      "How has gratitude changed your perspective?",
+      "What opportunity are you thankful for?",
+      "Describe the abundance in your ordinary day.",
+      "What are you grateful for that money can't buy?",
+      "How will you spread gratitude this summer?",
+      "What makes your life rich?",
+      // June - Energy & Vitality (152-181)
+      "How does your body feel right now?",
+      "What gives you energy?",
+      "What drains your energy?",
+      "Describe your ideal relationship with exercise.",
+      "How do you honor your body's needs?",
+      "What does feeling healthy mean to you?",
+      "Write about a time you felt physically powerful.",
+      "How do you fuel yourself (food, rest, movement)?",
+      "What's one healthy habit you want to strengthen?",
+      "How does nature affect your energy?",
+      "Describe your sleep routine.",
+      "What physical activity brings you joy?",
+      "How do you listen to your body's signals?",
+      "What's your relationship with rest?",
+      "Write about movement that feels like celebration.",
+      "How do you recharge when depleted?",
+      "What does your body need more of?",
+      "Describe how stress shows up in your body.",
+      "What energizes you in the morning?",
+      "How do you wind down at night?",
+      "What's one thing you love about your body?",
+      "How has your energy changed over the years?",
+      "What environment makes you feel most alive?",
+      "Write about a moment of physical joy.",
+      "How do you balance activity and rest?",
+      "What does vitality look like for you?",
+      "How do you care for your future self?",
+      "Describe your ideal summer day.",
+      "What wellness practice serves you best?",
+      "How will you honor your energy this month?",
+      // July - Freedom & Adventure (182-212)
+      "What does freedom mean to you?",
+      "Describe an adventure you dream of taking.",
+      "What's the most spontaneous thing you've done?",
+      "Where would you go if you could go anywhere?",
+      "What rules would you break?",
+      "Write about a time you stepped outside your comfort zone.",
+      "What's on your bucket list?",
+      "How do you define adventure in daily life?",
+      "What's something wild you've always wanted to try?",
+      "Describe a perfect road trip.",
+      "What freedom do you take for granted?",
+      "How do you balance security and adventure?",
+      "Write about a travel memory.",
+      "What's the bravest thing you've ever done?",
+      "How do you find adventure without leaving home?",
+      "What cultural experience would you love to have?",
+      "Describe your relationship with spontaneity.",
+      "What's holding you back from an adventure?",
+      "Write about someone who lives adventurously.",
+      "What would you do with a month of total freedom?",
+      "How do you handle the unknown?",
+      "What's an adventure you can plan for this year?",
+      "Describe feeling completely free.",
+      "What small adventure can you take this week?",
+      "How do you create space for exploration?",
+      "What have you discovered about yourself through travel?",
+      "Write about a place you want to return to.",
+      "What does your spirit of adventure look like?",
+      "How can you bring more adventure into ordinary days?",
+      "What freedom are you working toward?",
+      "What adventure awaits you?",
+      // August - Wisdom & Learning (213-243)
+      "What's the most important thing you've learned this year?",
+      "Who is the wisest person you know?",
+      "What subject fascinates you?",
+      "Write about a book that changed you.",
+      "What life lesson took you too long to learn?",
+      "How do you approach learning new things?",
+      "What would you teach others?",
+      "Describe a moment of sudden understanding.",
+      "What do you wish you had studied?",
+      "How do you learn best?",
+      "Write about a teacher who impacted you.",
+      "What wisdom would you share with a younger generation?",
+      "How do you stay curious?",
+      "What mistake taught you the most?",
+      "Describe your relationship with knowledge.",
+      "What question do you keep asking yourself?",
+      "How has your thinking evolved?",
+      "Write about a documentary or article that moved you.",
+      "What's something you recently changed your mind about?",
+      "How do you handle being wrong?",
+      "What's a skill you're currently developing?",
+      "Describe wisdom vs. intelligence.",
+      "What do you want to understand better?",
+      "How do you apply what you learn?",
+      "Write about a hard-won insight.",
+      "What's the best thing about lifelong learning?",
+      "How do you share knowledge with others?",
+      "What would you study if time and money were unlimited?",
+      "Describe a moment of growth mindset.",
+      "What learning goal do you have for fall?",
+      "What has experience taught you?",
+      // September - Purpose & Direction (244-273)
+      "What gives your life meaning?",
+      "Describe your sense of purpose.",
+      "What impact do you want to have?",
+      "How do you define a meaningful life?",
+      "Write about a time you felt purposeful.",
+      "What cause matters most to you?",
+      "How do you align your actions with your values?",
+      "What legacy do you want to leave?",
+      "Describe your vision for the next 5 years.",
+      "What would you do if you knew it would work?",
+      "How do you find direction when lost?",
+      "Write about someone living their purpose.",
+      "What's your personal mission?",
+      "How do you balance purpose and presence?",
+      "What does fulfillment feel like?",
+      "Write about a meaningful project or goal.",
+      "How do you stay focused on what matters?",
+      "What distracts you from your purpose?",
+      "Describe a moment when everything made sense.",
+      "What would your ideal contribution be?",
+      "How do you want to be remembered?",
+      "Write about finding meaning in small things.",
+      "What's the next right step for you?",
+      "How do you reconnect with your why?",
+      "What brings you a sense of purpose daily?",
+      "Describe your north star.",
+      "How has your purpose evolved?",
+      "What meaningful goal are you working toward?",
+      "Write about purpose in ordinary moments.",
+      "How will you pursue meaning this fall?",
+      // October - Fears & Shadows (274-304)
+      "What fear have you overcome?",
+      "Write about something that scares you.",
+      "How do you face the unknown?",
+      "What's your relationship with darkness?",
+      "Describe a fear that's actually protecting you.",
+      "What would you do if you weren't afraid?",
+      "How do you comfort yourself when anxious?",
+      "Write about a nightmare and what it might mean.",
+      "What's hiding in your shadow?",
+      "How do you find courage?",
+      "What fear is holding you back?",
+      "Describe making peace with uncertainty.",
+      "What's the worst that could happen? Really?",
+      "How do you transform fear into action?",
+      "Write about facing something difficult.",
+      "What do you avoid thinking about?",
+      "How has fear shaped your choices?",
+      "What would brave you do?",
+      "Describe a time fear was a teacher.",
+      "What's on the other side of your fear?",
+      "How do you sit with discomfort?",
+      "Write about something you've been denying.",
+      "What part of yourself needs acceptance?",
+      "How do you build courage daily?",
+      "What's a healthy fear vs. an unhealthy one?",
+      "Describe your relationship with change.",
+      "What are you afraid to want?",
+      "How do you face your shadows?",
+      "Write about growth through discomfort.",
+      "What fear can you release before November?",
+      "What truth have you been avoiding?",
+      // November - Home & Belonging (305-334)
+      "What does home mean to you?",
+      "Describe where you feel you belong.",
+      "What traditions give you comfort?",
+      "Write about your roots.",
+      "How do you create home wherever you are?",
+      "What does your ideal home feel like?",
+      "Who are your chosen family?",
+      "Describe a meal that feels like home.",
+      "What makes you feel like you belong?",
+      "How do you cultivate community?",
+      "Write about a place that shaped you.",
+      "What objects make a space feel like yours?",
+      "How do you welcome others into your life?",
+      "Describe the feeling of returning home.",
+      "What traditions do you want to create?",
+      "How do you find belonging in new places?",
+      "Write about someone who feels like home.",
+      "What does sanctuary mean to you?",
+      "How do you nurture your sense of belonging?",
+      "What's your relationship with your hometown?",
+      "Describe your inner home.",
+      "What makes you feel rooted?",
+      "How do you handle feeling like an outsider?",
+      "Write about chosen family.",
+      "What does hospitality mean to you?",
+      "How do you create belonging for others?",
+      "What's the heart of your home?",
+      "Describe a community you're part of.",
+      "What makes you grateful for your home?",
+      "How will you cultivate warmth this season?",
+      // December - Reflection & Renewal (335-366)
+      "What was this year's biggest lesson?",
+      "Describe a highlight from each month.",
+      "What are you most proud of this year?",
+      "Write about a challenge you overcame.",
+      "What surprised you about this year?",
+      "How have you grown?",
+      "What relationships deepened this year?",
+      "Describe a moment of joy from this year.",
+      "What do you want to leave behind?",
+      "How did your priorities shift?",
+      "Write about a risk you took.",
+      "What brought unexpected happiness?",
+      "How did you take care of yourself?",
+      "What goal did you achieve?",
+      "Describe a moment of peace this year.",
+      "What do you want more of next year?",
+      "How did you show up for others?",
+      "Write about something that didn't go as planned.",
+      "What are you ready to release?",
+      "How did you practice gratitude?",
+      "What new habit stuck?",
+      "Describe your year in three words.",
+      "What do you appreciate about yourself?",
+      "How did you handle difficult moments?",
+      "Write a letter to next year's you.",
+      "What do you want to remember about this year?",
+      "How did you find moments of stillness?",
+      "What are you hopeful about?",
+      "Describe the person you're becoming.",
+      "What's your intention for the new year?",
+      "How will you celebrate how far you've come?",
+      "What's the first thing you want to do next year?"
+    ];
+
+    // ═══════════════════════════════════════════════════════════════
     // CHALLENGES SYSTEM
     // ═══════════════════════════════════════════════════════════════
     const weeklyChallengeDefs = [
@@ -335,7 +719,7 @@
     // MAIN APP COMPONENT
     // ═══════════════════════════════════════════════════════════════
     function App() {
-      const APP_VERSION = '6.6.0';
+      const APP_VERSION = '6.7.0';
       const season = getCurrentSeason();
       const seasonDeco = seasonalDecorations[season];
 
@@ -397,8 +781,8 @@
       const [ambientSound, setAmbientSound] = useState(() => load('ambientSound', 'off')); // 'off', 'ambiance', 'music', 'both'
       const [musicTrack, setMusicTrack] = useState(() => load('musicTrack', 'auto')); // 'auto' or specific track id
       const [ambianceTrack, setAmbianceTrack] = useState(() => load('ambianceTrack', 'auto')); // 'auto' or specific track id
-      const [ambianceVolume, setAmbianceVolume] = useState(() => load('ambianceVolume', 50)); // 0-100
-      const [musicVolume, setMusicVolume] = useState(() => load('musicVolume', 50)); // 0-100
+      const [ambianceVolume, setAmbianceVolume] = useState(() => load('ambianceVolume', 35)); // 0-100
+      const [musicVolume, setMusicVolume] = useState(() => load('musicVolume', 25)); // 0-100
       const [soundMood, setSoundMood] = useState(() => load('soundMood', 'cozy')); // kept for ambiance mood override
       const [backgroundPlay, setBackgroundPlay] = useState(() => load('backgroundPlay', false));
       const [soundEnabled, setSoundEnabled] = useState(false); // Whether sound is currently playing
@@ -434,18 +818,30 @@
       
       const getActiveAmbianceTrack = useCallback(() => {
         if (ambianceTrack !== 'auto') return ambianceTrack;
-        // Auto selection: mood override first, then theme
+        // Auto selection: mood override first, then theme-based defaults
         if (soundMood === 'cozy') return 'fireplace';
         if (soundMood === 'soothing') return 'ocean';
-        const match = Object.entries(ambianceTracks).find(([id, t]) => t.theme === brewType && !t.mood);
-        return match ? match[0] : 'fireplace';
+        // Theme-based defaults: coffee→fireplace, tea→rain, matcha→wind
+        if (brewType === 'coffee') return 'fireplace';
+        if (brewType === 'tea') return 'rain';
+        if (brewType === 'matcha') return 'wind';
+        return 'fireplace';
       }, [ambianceTrack, brewType, soundMood]);
       
       // Audio refs for HTML5 Audio elements
       const musicAudioRef = useRef(null);
       const ambianceAudioRef = useRef(null);
       
-      const [todayJournal, setTodayJournal] = useState(() => load('journal', {})[getDateKey()] || { gratitude: '', reflection: '', tomorrow: '' });
+      const [todayJournal, setTodayJournal] = useState(() => load('journal', {})[getDateKey()] || { gratitude: '', reflection: '', tomorrow: '', promptResponse: '' });
+      
+      // Get today's journal prompt (0-365 based on day of year)
+      const getDayOfYear = (date) => {
+        const start = new Date(date.getFullYear(), 0, 0);
+        const diff = date - start;
+        const oneDay = 1000 * 60 * 60 * 24;
+        return Math.floor(diff / oneDay) - 1; // 0-indexed
+      };
+      const todayPrompt = journalPrompts[getDayOfYear(new Date())] || journalPrompts[0];
       
       const timerRef = useRef(null);
 
@@ -526,20 +922,143 @@
       }, []);
 
       // ═══════════════════════════════════════════════════════════════
-      // AUDIO SYSTEM - HTML5 Audio with real sound files
+      // AUDIO SYSTEM - HTML5 Audio with crossfade looping
       // ═══════════════════════════════════════════════════════════════
       
-      // Update music volume
+      const FADE_DURATION = 3000; // 3 seconds for fade in/out
+      const CROSSFADE_BUFFER = 4; // Start crossfade 4 seconds before end
+      
+      // Refs for managing crossfade
+      const musicNextRef = useRef(null); // For crossfade overlap
+      const ambianceNextRef = useRef(null);
+      const fadeIntervalsRef = useRef({ music: null, ambiance: null, musicNext: null, ambianceNext: null });
+      
+      // Fade audio volume smoothly
+      const fadeAudio = useCallback((audio, fromVol, toVol, duration, onComplete) => {
+        if (!audio) return null;
+        const steps = 30;
+        const stepTime = duration / steps;
+        const volStep = (toVol - fromVol) / steps;
+        let currentStep = 0;
+        
+        const interval = setInterval(() => {
+          currentStep++;
+          const newVol = Math.max(0, Math.min(1, fromVol + (volStep * currentStep)));
+          try { audio.volume = newVol; } catch(e) {}
+          
+          if (currentStep >= steps) {
+            clearInterval(interval);
+            if (onComplete) onComplete();
+          }
+        }, stepTime);
+        
+        return interval;
+      }, []);
+      
+      // Setup crossfade looping for an audio element
+      const setupCrossfadeLoop = useCallback((audio, file, targetVolume, type) => {
+        if (!audio) return;
+        
+        const handleTimeUpdate = () => {
+          if (!audio || audio.paused) return;
+          
+          const timeLeft = audio.duration - audio.currentTime;
+          const nextRef = type === 'music' ? musicNextRef : ambianceNextRef;
+          
+          // Start crossfade when approaching end
+          if (timeLeft <= CROSSFADE_BUFFER && timeLeft > CROSSFADE_BUFFER - 0.5 && !nextRef.current) {
+            // Create next audio for seamless loop
+            const nextAudio = new Audio(file);
+            nextAudio.volume = 0;
+            nextAudio.play().catch(() => {});
+            nextRef.current = nextAudio;
+            
+            // Fade out current
+            fadeIntervalsRef.current[type] = fadeAudio(audio, targetVolume, 0, FADE_DURATION, () => {
+              audio.pause();
+              audio.currentTime = 0;
+            });
+            
+            // Fade in next
+            fadeIntervalsRef.current[type + 'Next'] = fadeAudio(nextAudio, 0, targetVolume, FADE_DURATION, () => {
+              // Swap refs - next becomes current
+              if (type === 'music') {
+                musicAudioRef.current = nextAudio;
+                musicNextRef.current = null;
+              } else {
+                ambianceAudioRef.current = nextAudio;
+                ambianceNextRef.current = null;
+              }
+              // Setup crossfade on the new current
+              setupCrossfadeLoop(nextAudio, file, targetVolume, type);
+            });
+          }
+        };
+        
+        audio.addEventListener('timeupdate', handleTimeUpdate);
+        audio.dataset.hasCrossfade = 'true';
+        
+        return () => audio.removeEventListener('timeupdate', handleTimeUpdate);
+      }, [fadeAudio]);
+      
+      // Start audio with fade in
+      const startAudioWithFade = useCallback((file, targetVolume, type) => {
+        const audio = new Audio(file);
+        audio.volume = 0;
+        audio.loop = false; // We handle looping manually for crossfade
+        
+        audio.play().then(() => {
+          // Fade in
+          fadeAudio(audio, 0, targetVolume, FADE_DURATION);
+          // Setup crossfade loop
+          setupCrossfadeLoop(audio, file, targetVolume, type);
+        }).catch(e => console.log(`${type} autoplay blocked:`, e));
+        
+        return audio;
+      }, [fadeAudio, setupCrossfadeLoop]);
+      
+      // Stop audio with fade out
+      const stopAudioWithFade = useCallback((audioRef, nextRef, type) => {
+        // Clear any existing fade intervals
+        if (fadeIntervalsRef.current[type]) clearInterval(fadeIntervalsRef.current[type]);
+        if (fadeIntervalsRef.current[type + 'Next']) clearInterval(fadeIntervalsRef.current[type + 'Next']);
+        
+        const audio = audioRef.current;
+        const next = nextRef?.current;
+        
+        if (audio) {
+          fadeAudio(audio, audio.volume, 0, FADE_DURATION / 2, () => {
+            audio.pause();
+            audioRef.current = null;
+          });
+        }
+        if (next) {
+          fadeAudio(next, next.volume, 0, FADE_DURATION / 2, () => {
+            next.pause();
+            nextRef.current = null;
+          });
+        }
+      }, [fadeAudio]);
+      
+      // Update music volume (apply to both current and next if crossfading)
       useEffect(() => {
-        if (musicAudioRef.current) {
-          musicAudioRef.current.volume = musicVolume / 100;
+        const vol = musicVolume / 100;
+        if (musicAudioRef.current && !fadeIntervalsRef.current.music) {
+          musicAudioRef.current.volume = vol;
+        }
+        if (musicNextRef.current && !fadeIntervalsRef.current.musicNext) {
+          musicNextRef.current.volume = vol;
         }
       }, [musicVolume]);
       
       // Update ambiance volume
       useEffect(() => {
-        if (ambianceAudioRef.current) {
-          ambianceAudioRef.current.volume = ambianceVolume / 100;
+        const vol = ambianceVolume / 100;
+        if (ambianceAudioRef.current && !fadeIntervalsRef.current.ambiance) {
+          ambianceAudioRef.current.volume = vol;
+        }
+        if (ambianceNextRef.current && !fadeIntervalsRef.current.ambianceNext) {
+          ambianceNextRef.current.volume = vol;
         }
       }, [ambianceVolume]);
       
@@ -547,14 +1066,8 @@
       useEffect(() => {
         // Stop all audio if sound is disabled or mode is off
         if (!soundEnabled || ambientSound === 'off') {
-          if (musicAudioRef.current) {
-            musicAudioRef.current.pause();
-            musicAudioRef.current = null;
-          }
-          if (ambianceAudioRef.current) {
-            ambianceAudioRef.current.pause();
-            ambianceAudioRef.current = null;
-          }
+          stopAudioWithFade(musicAudioRef, musicNextRef, 'music');
+          stopAudioWithFade(ambianceAudioRef, ambianceNextRef, 'ambiance');
           return;
         }
         
@@ -566,22 +1079,22 @@
           if (track) {
             // Create new audio if needed or if track changed
             if (!musicAudioRef.current || musicAudioRef.current.dataset.trackId !== trackId) {
+              // Fade out old track if exists
               if (musicAudioRef.current) {
-                musicAudioRef.current.pause();
+                stopAudioWithFade(musicAudioRef, musicNextRef, 'music');
               }
-              const audio = new Audio(track.file);
-              audio.loop = true;
-              audio.volume = musicVolume / 100;
-              audio.dataset.trackId = trackId;
-              audio.play().catch(e => console.log('Music autoplay blocked:', e));
-              musicAudioRef.current = audio;
+              // Start new track with fade in
+              setTimeout(() => {
+                const audio = startAudioWithFade(track.file, musicVolume / 100, 'music');
+                audio.dataset.trackId = trackId;
+                musicAudioRef.current = audio;
+              }, musicAudioRef.current ? FADE_DURATION / 2 : 0);
             }
           }
         } else {
           // Stop music if mode doesn't include it
           if (musicAudioRef.current) {
-            musicAudioRef.current.pause();
-            musicAudioRef.current = null;
+            stopAudioWithFade(musicAudioRef, musicNextRef, 'music');
           }
         }
         
@@ -593,37 +1106,38 @@
           if (track) {
             // Create new audio if needed or if track changed
             if (!ambianceAudioRef.current || ambianceAudioRef.current.dataset.trackId !== trackId) {
+              // Fade out old track if exists
               if (ambianceAudioRef.current) {
-                ambianceAudioRef.current.pause();
+                stopAudioWithFade(ambianceAudioRef, ambianceNextRef, 'ambiance');
               }
-              const audio = new Audio(track.file);
-              audio.loop = true;
-              audio.volume = ambianceVolume / 100;
-              audio.dataset.trackId = trackId;
-              audio.play().catch(e => console.log('Ambiance autoplay blocked:', e));
-              ambianceAudioRef.current = audio;
+              // Start new track with fade in
+              setTimeout(() => {
+                const audio = startAudioWithFade(track.file, ambianceVolume / 100, 'ambiance');
+                audio.dataset.trackId = trackId;
+                ambianceAudioRef.current = audio;
+              }, ambianceAudioRef.current ? FADE_DURATION / 2 : 0);
             }
           }
         } else {
           // Stop ambiance if mode doesn't include it
           if (ambianceAudioRef.current) {
-            ambianceAudioRef.current.pause();
-            ambianceAudioRef.current = null;
+            stopAudioWithFade(ambianceAudioRef, ambianceNextRef, 'ambiance');
           }
         }
         
         // Cleanup on unmount
         return () => {
-          if (musicAudioRef.current) {
-            musicAudioRef.current.pause();
-            musicAudioRef.current = null;
-          }
-          if (ambianceAudioRef.current) {
-            ambianceAudioRef.current.pause();
-            ambianceAudioRef.current = null;
-          }
+          // Clear all intervals
+          Object.values(fadeIntervalsRef.current).forEach(i => i && clearInterval(i));
+          // Stop all audio immediately on unmount
+          [musicAudioRef, musicNextRef, ambianceAudioRef, ambianceNextRef].forEach(ref => {
+            if (ref.current) {
+              ref.current.pause();
+              ref.current = null;
+            }
+          });
         };
-      }, [soundEnabled, ambientSound, getActiveMusicTrack, getActiveAmbianceTrack, musicVolume, ambianceVolume]);
+      }, [soundEnabled, ambientSound, getActiveMusicTrack, getActiveAmbianceTrack, startAudioWithFade, stopAudioWithFade]);
 
       // Handle visibility change (pause when leaving app)
       useEffect(() => {
@@ -1397,6 +1911,24 @@
             {/* JOURNAL TAB */}
             {activeTab === 'journal' && (
               <div className="fade">
+                {/* Daily Prompt Card */}
+                <div style={{ ...s.card, background: `linear-gradient(135deg, ${theme.cardBg}, ${theme.accent}15)`, border: `1px solid ${theme.accent}30`, marginBottom: '16px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+                    <span style={{ fontSize: '1.3rem' }}>✨</span>
+                    <h2 className="hw" style={{ fontSize: '1.1rem', color: theme.accent, margin: 0 }}>Today's Prompt</h2>
+                    <span className="bt" style={{ fontSize: '0.65rem', color: theme.textMuted, marginLeft: 'auto' }}>Day {getDayOfYear(new Date()) + 1} of 366</span>
+                  </div>
+                  <p className="bt" style={{ fontSize: '0.95rem', color: theme.text, fontStyle: 'italic', marginBottom: '12px', lineHeight: 1.5 }}>"{todayPrompt}"</p>
+                  <textarea 
+                    value={todayJournal.promptResponse || ''} 
+                    onChange={e => setTodayJournal({ ...todayJournal, promptResponse: e.target.value })} 
+                    onBlur={saveJournal} 
+                    placeholder="Take a moment to reflect..." 
+                    style={{ ...s.input, minHeight: '90px', resize: 'vertical', fontSize: '0.9rem', background: theme.inputBg }} 
+                    aria-label="Prompt response"
+                  />
+                </div>
+                
                 <div style={s.card}>
                   <h2 className="hw" style={{ fontSize: '1.3rem', color: theme.text, marginBottom: '12px' }}>📝 Daily Reflection</h2>
                   <div style={{ marginBottom: '12px' }}>
