@@ -335,7 +335,7 @@
     // MAIN APP COMPONENT
     // ═══════════════════════════════════════════════════════════════
     function App() {
-      const APP_VERSION = '6.5.1';
+      const APP_VERSION = '6.5.2';
       const season = getCurrentSeason();
       const seasonDeco = seasonalDecorations[season];
 
@@ -1083,16 +1083,28 @@
           triggerCelebration(messages.timerDone);
           if ('vibrate' in navigator) navigator.vibrate([200, 100, 200]);
           
-          // Send notification (works even when tab is in background)
+          // Send notification via service worker (works better on mobile/background)
           if ('Notification' in window && Notification.permission === 'granted') {
-            try {
-              new Notification('My Daily Brew', {
-                body: `${messages.timerDone} ${elapsed} minutes of focus earned you ${elapsed} XP!`,
-                icon: '/icons/icon-192.png',
-                tag: 'timer-complete',
-                requireInteraction: true
-              });
-            } catch (e) { /* Notification failed silently */ }
+            (async () => {
+              try {
+                if ('serviceWorker' in navigator) {
+                  const reg = await navigator.serviceWorker.ready;
+                  await reg.showNotification('My Daily Brew ☕', {
+                    body: `${messages.timerDone} ${elapsed} minutes of focus earned you ${elapsed} XP!`,
+                    icon: '/icons/icon-192.png',
+                    tag: 'timer-complete',
+                    requireInteraction: true,
+                    vibrate: [200, 100, 200]
+                  });
+                } else {
+                  new Notification('My Daily Brew', {
+                    body: `${messages.timerDone} ${elapsed} minutes of focus earned you ${elapsed} XP!`,
+                    icon: '/icons/icon-192.png',
+                    tag: 'timer-complete'
+                  });
+                }
+              } catch (e) { console.log('Timer notification failed:', e); }
+            })();
           }
         }
         return () => clearTimeout(timerRef.current);
@@ -1118,10 +1130,27 @@
       
       useEffect(() => { store('notifiedTasks', notifiedTasks); }, [notifiedTasks]);
       
+      // Helper function to send notifications (uses service worker when available)
+      const sendNotification = async (title, options) => {
+        try {
+          if ('serviceWorker' in navigator) {
+            const reg = await navigator.serviceWorker.ready;
+            await reg.showNotification(title, options);
+            return true;
+          } else {
+            new Notification(title, options);
+            return true;
+          }
+        } catch (e) {
+          console.log('Notification failed:', e);
+          return false;
+        }
+      };
+      
       useEffect(() => {
         if (!('Notification' in window) || Notification.permission !== 'granted') return;
         
-        const checkTaskReminders = () => {
+        const checkTaskReminders = async () => {
           const now = new Date();
           const currentMinutes = now.getHours() * 60 + now.getMinutes();
           
@@ -1138,16 +1167,16 @@
             return currentMinutes >= taskMinutes && currentMinutes <= taskMinutes + 5;
           });
           
-          dueTasks.forEach(task => {
-            try {
-              new Notification('Task Reminder ☕', {
-                body: `Time to: ${task.text}`,
-                icon: '/icons/icon-192.png',
-                tag: `task-${task.id}-${getDateKey()}`,
-                requireInteraction: true,
-                vibrate: [200, 100, 200]
-              });
-              
+          dueTasks.forEach(async (task) => {
+            const sent = await sendNotification('Task Reminder ☕', {
+              body: `Time to: ${task.text}`,
+              icon: '/icons/icon-192.png',
+              tag: `task-${task.id}-${getDateKey()}`,
+              requireInteraction: true,
+              vibrate: [200, 100, 200]
+            });
+            
+            if (sent) {
               // Mark as notified
               setNotifiedTasks(prev => ({
                 ...prev,
@@ -1156,8 +1185,7 @@
               
               // Also vibrate if supported
               if ('vibrate' in navigator) navigator.vibrate([200, 100, 200]);
-              
-            } catch (e) { console.log('Notification failed:', e); }
+            }
           });
           
           // Also check for upcoming tasks (5 min warning)
@@ -1173,20 +1201,20 @@
             return currentMinutes >= taskMinutes - 5 && currentMinutes < taskMinutes;
           });
           
-          upcomingTasks.forEach(task => {
-            try {
-              new Notification('Upcoming Task ⏰', {
-                body: `In 5 minutes: ${task.text}`,
-                icon: '/icons/icon-192.png',
-                tag: `upcoming-${task.id}-${getDateKey()}`,
-                silent: true // Don't vibrate for upcoming, just notify
-              });
-              
+          upcomingTasks.forEach(async (task) => {
+            const sent = await sendNotification('Upcoming Task ⏰', {
+              body: `In 5 minutes: ${task.text}`,
+              icon: '/icons/icon-192.png',
+              tag: `upcoming-${task.id}-${getDateKey()}`,
+              silent: true // Don't vibrate for upcoming, just notify
+            });
+            
+            if (sent) {
               setNotifiedTasks(prev => ({
                 ...prev,
                 ids: [...prev.ids, `upcoming-${task.id}`]
               }));
-            } catch (e) { /* Silent fail for upcoming */ }
+            }
           });
         };
         
@@ -2158,17 +2186,32 @@
                           </div>
                         </div>
                         <button 
-                          onClick={() => {
+                          onClick={async () => {
                             try {
-                              new Notification('Test Notification 🧪', { 
-                                body: 'Great! Notifications are working. You\'ll be reminded 5 min before tasks and when they\'re due.', 
-                                icon: '/icons/icon-192.png',
-                                tag: 'test-notification'
-                              });
+                              // Try service worker notification first (works better on mobile)
+                              if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+                                const reg = await navigator.serviceWorker.ready;
+                                await reg.showNotification('Test Notification 🧪', { 
+                                  body: 'Great! Notifications are working. You\'ll be reminded 5 min before tasks and when they\'re due.', 
+                                  icon: '/icons/icon-192.png',
+                                  tag: 'test-notification',
+                                  vibrate: [100, 50, 100]
+                                });
+                                triggerCelebration('✅ Test sent!');
+                              } else {
+                                // Fallback to regular notification
+                                const notif = new Notification('Test Notification 🧪', { 
+                                  body: 'Great! Notifications are working.', 
+                                  icon: '/icons/icon-192.png',
+                                  tag: 'test-notification'
+                                });
+                                triggerCelebration('✅ Test sent!');
+                              }
                               if ('vibrate' in navigator) navigator.vibrate([100, 50, 100]);
-                              triggerCelebration('✅ Test sent!');
                             } catch (e) {
-                              triggerCelebration('❌ Test failed');
+                              console.error('Notification error:', e);
+                              // Show what went wrong
+                              alert('Notification failed: ' + e.message + '\n\nTry: 1) Refresh the page, 2) Re-enable notifications in browser settings, 3) Make sure you\'re using HTTPS');
                             }
                           }}
                           style={{ ...s.btnSecondary, width: '100%', fontSize: '0.8rem', padding: '10px' }}
