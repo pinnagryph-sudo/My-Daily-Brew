@@ -1,4 +1,4 @@
-# ☕ My Daily Brew v6.5 - Grand Reopening!
+# ☕ My Daily Brew v6.5.1 - Grand Reopening!
 
 A cozy, comprehensive habit tracker, task manager, and daily reflection app with warm café aesthetics. Now with live weather, push notifications, improved music, and a safer UI!
 
@@ -12,10 +12,12 @@ A cozy, comprehensive habit tracker, task manager, and daily reflection app with
 - Requires location permission
 
 ### 🔔 Push Notifications
+- **5-Minute Warning**: Get notified 5 minutes before tasks are due
+- **Due Now Alert**: Notified again when the task time arrives (with vibration)
 - **Timer Complete**: Get notified when your focus session ends (works in background!)
-- **Task Reminders**: Notifications fire at scheduled task times
+- **Smart Tracking**: Won't send duplicate notifications for the same task
+- **Test Button**: Verify notifications work from Settings
 - **Notification Prompt**: New users see a friendly banner to enable notifications
-- **Settings Panel**: Clear status display (enabled/blocked/prompt to enable)
 
 ### 🎵 Improved Music
 Testers said the old music was "too slow and creepy" - here's what changed:
@@ -148,6 +150,13 @@ For best results:
 **Note**: Web notifications work best when the app is open or in the background. For critical reminders, also set alarms in your phone's clock app.
 
 ## 🔄 Version History
+
+### v6.5.1 - Improved Task Notifications
+- ⏰ 5-minute warning before tasks are due
+- 🔔 Due-now alerts with vibration
+- 🧪 Test notification button in Settings
+- 🚫 No duplicate notifications (smart tracking)
+- ✅ Checks every 30 seconds for better accuracy
 
 ### v6.5.0 - Notifications & Polish
 - 🌤️ Live weather display in header

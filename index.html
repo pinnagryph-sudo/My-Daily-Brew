@@ -335,7 +335,7 @@
     // MAIN APP COMPONENT
     // ═══════════════════════════════════════════════════════════════
     function App() {
-      const APP_VERSION = '6.5.0';
+      const APP_VERSION = '6.5.1';
       const season = getCurrentSeason();
       const seasonDeco = seasonalDecorations[season];
 
@@ -1108,18 +1108,34 @@
         }
       }, [gameStats, badges]);
 
-      // Task reminder notifications (check every minute)
+      // Task reminder notifications - improved system
+      const [notifiedTasks, setNotifiedTasks] = useState(() => {
+        const saved = load('notifiedTasks', { date: null, ids: [] });
+        // Reset if it's a new day
+        if (saved.date !== getDateKey()) return { date: getDateKey(), ids: [] };
+        return saved;
+      });
+      
+      useEffect(() => { store('notifiedTasks', notifiedTasks); }, [notifiedTasks]);
+      
       useEffect(() => {
         if (!('Notification' in window) || Notification.permission !== 'granted') return;
         
         const checkTaskReminders = () => {
           const now = new Date();
-          const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+          const currentMinutes = now.getHours() * 60 + now.getMinutes();
           
-          // Find tasks that are due now (within the same minute)
+          // Find tasks that are due now or slightly overdue (within 5 min window)
           const dueTasks = tasks.filter(t => {
             if (!t.time || t.done) return false;
-            return t.time === currentTime;
+            // Already notified today?
+            if (notifiedTasks.ids.includes(t.id)) return false;
+            
+            const [hours, mins] = t.time.split(':').map(Number);
+            const taskMinutes = hours * 60 + mins;
+            
+            // Notify if task is due now or up to 5 minutes ago (in case we missed it)
+            return currentMinutes >= taskMinutes && currentMinutes <= taskMinutes + 5;
           });
           
           dueTasks.forEach(task => {
@@ -1127,18 +1143,58 @@
               new Notification('Task Reminder ☕', {
                 body: `Time to: ${task.text}`,
                 icon: '/icons/icon-192.png',
-                tag: `task-${task.id}`,
-                requireInteraction: true
+                tag: `task-${task.id}-${getDateKey()}`,
+                requireInteraction: true,
+                vibrate: [200, 100, 200]
               });
-            } catch (e) { /* Notification failed silently */ }
+              
+              // Mark as notified
+              setNotifiedTasks(prev => ({
+                ...prev,
+                ids: [...prev.ids, task.id]
+              }));
+              
+              // Also vibrate if supported
+              if ('vibrate' in navigator) navigator.vibrate([200, 100, 200]);
+              
+            } catch (e) { console.log('Notification failed:', e); }
+          });
+          
+          // Also check for upcoming tasks (5 min warning)
+          const upcomingTasks = tasks.filter(t => {
+            if (!t.time || t.done) return false;
+            const warningId = `upcoming-${t.id}`;
+            if (notifiedTasks.ids.includes(warningId)) return false;
+            
+            const [hours, mins] = t.time.split(':').map(Number);
+            const taskMinutes = hours * 60 + mins;
+            
+            // 5 minute warning
+            return currentMinutes >= taskMinutes - 5 && currentMinutes < taskMinutes;
+          });
+          
+          upcomingTasks.forEach(task => {
+            try {
+              new Notification('Upcoming Task ⏰', {
+                body: `In 5 minutes: ${task.text}`,
+                icon: '/icons/icon-192.png',
+                tag: `upcoming-${task.id}-${getDateKey()}`,
+                silent: true // Don't vibrate for upcoming, just notify
+              });
+              
+              setNotifiedTasks(prev => ({
+                ...prev,
+                ids: [...prev.ids, `upcoming-${task.id}`]
+              }));
+            } catch (e) { /* Silent fail for upcoming */ }
           });
         };
         
-        // Check immediately and then every minute
+        // Check every 30 seconds for better accuracy
         checkTaskReminders();
-        const interval = setInterval(checkTaskReminders, 60000);
+        const interval = setInterval(checkTaskReminders, 30000);
         return () => clearInterval(interval);
-      }, [tasks]);
+      }, [tasks, notifiedTasks]);
 
       // Request notification permission on first load
       useEffect(() => {
@@ -2096,11 +2152,29 @@
                       <div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 12px', background: 'rgba(74,222,128,0.15)', borderRadius: '8px', marginBottom: '8px' }}>
                           <span style={{ fontSize: '1.2rem' }}>✅</span>
-                          <div>
+                          <div style={{ flex: 1 }}>
                             <p className="bt" style={{ fontSize: '0.8rem', color: '#4ade80', fontWeight: 600 }}>Notifications enabled!</p>
-                            <p className="bt" style={{ fontSize: '0.65rem', color: theme.textSecondary }}>You'll receive timer & task reminders</p>
+                            <p className="bt" style={{ fontSize: '0.65rem', color: theme.textSecondary }}>Timer alerts + task reminders (5 min warning & when due)</p>
                           </div>
                         </div>
+                        <button 
+                          onClick={() => {
+                            try {
+                              new Notification('Test Notification 🧪', { 
+                                body: 'Great! Notifications are working. You\'ll be reminded 5 min before tasks and when they\'re due.', 
+                                icon: '/icons/icon-192.png',
+                                tag: 'test-notification'
+                              });
+                              if ('vibrate' in navigator) navigator.vibrate([100, 50, 100]);
+                              triggerCelebration('✅ Test sent!');
+                            } catch (e) {
+                              triggerCelebration('❌ Test failed');
+                            }
+                          }}
+                          style={{ ...s.btnSecondary, width: '100%', fontSize: '0.8rem', padding: '10px' }}
+                        >
+                          🧪 Send Test Notification
+                        </button>
                       </div>
                     ) : Notification.permission === 'denied' ? (
                       <div style={{ padding: '8px 12px', background: 'rgba(239,68,68,0.1)', borderRadius: '8px' }}>
