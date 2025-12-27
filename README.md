@@ -1,61 +1,80 @@
-# ☕ My Daily Brew v6.2 - Grand Reopening!
+# ☕ My Daily Brew v6.3 - Grand Reopening!
 
-A cozy, comprehensive habit tracker, task manager, and daily reflection app with warm café aesthetics. Now with relaxing brew-specific soundscapes, independent sound controls, and more!
+A cozy, comprehensive habit tracker, task manager, and daily reflection app with warm café aesthetics. Now with fully customizable soundscapes featuring volume control, mood presets, and light/dark audio adaptation!
 
-## 🎉 What's New in v6.2
+## 🎉 What's New in v6.3
 
-### 🎵 Floating Sound Button (NEW!)
-- Sound controls now accessible from **any screen** via floating button (bottom left)
-- No need to go to the Timer tab to control sounds
-- Visual indicator shows when sound is playing
+### 🎚️ Volume Sliders
+- **Ambiance Volume** (0-100%): Control background sounds independently
+- **Music Volume** (0-100%): Control instrumental melodies independently
+- Real-time adjustment - no need to restart sounds!
 
-### 🔄 Background Playback Toggle (NEW!)
-- By default, sound **stops when you leave the app**
-- Enable "Play in Background" to keep music going
-- Your preference is saved
+### 🏠 6 Mood Presets
+Each mood changes tempo, density, reverb, and brightness:
 
-### ⏯️ Independent Sound Playback (NEW!)
-- Sound no longer requires the timer to be running
-- Play café sounds anytime, even while browsing habits
-- Big play/pause button in Sound Menu
+| Mood | Icon | Tempo | Description |
+|------|------|-------|-------------|
+| **Cozy** | 🏠 | Normal | Warm & inviting |
+| **Chill** | 😌 | Slower | Laid back vibes |
+| **Upbeat** | ✨ | Faster | Energetic flow |
+| **Soothing** | 🌊 | Slow | Gentle & calm |
+| **Meditative** | 🧘 | Very slow | Deep & contemplative |
+| **Focus** | 🎯 | Steady | Consistent rhythm |
 
-## 🎵 Sound Features
+### 🌙 Light/Dark Sound Adaptation
+Your sounds automatically adapt to your color theme:
 
-### Brew-Specific Soundscapes
-Each brew has its own unique, ultra-relaxing audio experience:
+| Setting | Light Mode ☀️ | Dark Mode 🌙 |
+|---------|---------------|--------------|
+| **Filter** | Brighter, airy | Warmer, deeper |
+| **Reverb** | Less | More spacious |
+| **Octave** | Normal | Occasional lower notes |
+| **Volume** | Normal | Slightly softer |
 
-| Brew | Ambiance | Music Style |
-|------|----------|-------------|
-| ☕ **Coffee** | Gentle brown noise (soft café hum) | Warm piano with harmonics |
-| 🍵 **Tea** | Soft pink noise (gentle rain) | Ethereal wind chimes |
-| 🍃 **Matcha** | Airy wind sounds | Zen singing bowls |
+### 🎵 More Authentic Sounds
 
-### 🎨 Mix & Match Sounds
-- Choose your **ambiance style** independently: Café hum, Rain, or Wind
-- Choose your **music style** independently: Piano, Chimes, or Bowls  
-- Or set both to "Auto" to match your current brew
+**Piano (Coffee):**
+- 6 harmonics for rich timbre
+- Realistic ADSR envelope
+- Occasional 3-note chords with fifths
+- Natural variation in attack timing
+
+**Chimes (Tea):**
+- Multiple shimmer overtones
+- Slightly inharmonic for bell-like quality
+- Individual decay rates per harmonic
+
+**Singing Bowls (Matcha):**
+- 4 detuned oscillators for complex beating
+- High "singing" harmonic
+- Ultra-long attack and decay
+
+**Ambiance:**
+- **Café**: Brown noise + subtle crowd murmur modulation
+- **Rain**: Pink noise + rain intensity variation
+- **Wind**: Multi-layered gusts + rustling leaves
+
+## 🎵 Complete Sound System
 
 ### Sound Modes
 | Mode | Description |
 |------|-------------|
 | 🔇 **Off** | No sound |
-| 🌧️ **Ambiance** | Just background atmosphere |
-| 🎹 **Music** | Just instrumental melodies |
+| 🌧️ **Ambiance** | Background atmosphere only |
+| 🎹 **Music** | Instrumental melodies only |
 | ✨ **Full** | Music + ambiance layered |
 
-### Sound Controls Location
-1. **Floating Button** (bottom left) - Always visible, quick access
-2. **Timer Tab** - Play with focus sessions
-3. **Sound Menu** - Full settings with mix & match
+### Sound Sources (Mix & Match)
+- **Ambiance**: ☕ Café, 🍵 Rain, 🍃 Wind, or ✨ Auto (matches brew)
+- **Music**: ☕ Piano, 🍵 Chimes, 🍃 Bowls, or ✨ Auto (matches brew)
+
+### Controls
+- **Floating Button** (bottom left): Quick access from any screen
+- **Volume Sliders**: Real-time adjustment
+- **Mood Selector**: 6 preset vibes
+- **Background Play Toggle**: Keep playing when you leave app
 
 ## ☕🍵🍃 Complete Feature List
-
-### Brew-Themed Everything
-Each brew (Coffee, Tea, Matcha) has unique:
-- **7 Ranks**: From "Coffee Bean" to "Café Owner"
-- **18 Badges**: With brew-specific names
-- **Messages**: Empty states, celebrations, tips
-- **Soundscapes**: Unique ambiance + music
 
 ### Habit Tracking
 - ⭐ Custom emoji icons (30+)
@@ -68,11 +87,11 @@ Each brew (Coffee, Tea, Matcha) has unique:
 - 🔴🟡🟢 Priority levels
 - 🏷️ 6 categories with colors
 - 📋 Subtasks/checklists
-- 🔄 Recurring tasks: Daily, Weekdays, or Weekly
+- 🔄 Recurring tasks
 - ⏰ Time scheduling
 
 ### Focus Timer
-- 🎵 Independent sound playback
+- 🎵 Full soundscape integration
 - ⏱️ Custom duration (1-180 min)
 - 🎯 Start from any task
 - 📊 Focus time tracking
@@ -91,9 +110,9 @@ Each brew (Coffee, Tea, Matcha) has unique:
 
 ### Additional Features
 - 🍂 Seasonal themes
-- 🤖 Daily AI barista tips
+- 🤖 Daily barista tips
 - 📤 Share achievements
-- 💾 Export your data
+- 💾 Export data
 - ♿ High contrast mode
 - 📅 Year in Review
 
@@ -105,29 +124,27 @@ Each brew (Coffee, Tea, Matcha) has unique:
 
 ## 🔄 Version History
 
-### v6.2.0 - Independent Sound Controls
-- Floating sound button accessible from any screen
-- Sound playback independent of timer
-- Background playback toggle (off by default)
-- Sound stops when leaving app (unless background mode enabled)
-- Redesigned Sound Menu with big play/pause button
+### v6.3.0 - Enhanced Soundscape
+- Volume sliders for ambiance & music
+- 6 mood presets (Cozy, Chill, Upbeat, Soothing, Meditative, Focus)
+- Light/dark sound adaptation
+- Richer, more authentic audio synthesis
+- Stereo ambiance with natural modulation
 
-### v6.1.0 - Relaxing Sounds Update
-- Much softer, more relaxing audio levels
-- Realistic piano with harmonics
-- Mix & Match sound sources
-- Double-filtered ambiance
+### v6.2.0 - Independent Sound Controls
+- Floating sound button
+- Sound playback independent of timer
+- Background playback toggle
+
+### v6.1.0 - Relaxing Sounds
+- Softer audio levels
+- Realistic piano harmonics
+- Mix & match sound sources
 
 ### v6.0.0 - Grand Reopening
 - Brew-specific soundscapes
 - Seasonal themes
-- Weekly & monthly challenges
-- Daily AI barista tips
-- Share achievements
-- Export data
-- Accessibility mode
-- Year in Review
-- Interactive tutorial
+- Challenges & achievements
 
 ---
 
