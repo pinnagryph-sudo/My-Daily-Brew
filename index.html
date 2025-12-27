@@ -1,0 +1,1810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#5D4037">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="brown-translucent">
+  <meta name="apple-mobile-web-app-title" content="Daily Brew">
+  <meta name="description" content="A cozy habit tracker and daily schedule app">
+  
+  <title>My Daily Brew</title>
+  
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/icon-32.png">
+  <link rel="icon" type="image/x-icon" href="icons/favicon.ico">
+  
+  <!-- Preload fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Cormorant+Garamond:wght@400;500;600;700&family=Lora:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      margin: 0;
+      padding: 0;
+    }
+    
+    html, body, #root {
+      height: 100%;
+      width: 100%;
+      overflow-x: hidden;
+    }
+    
+    body {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      background: linear-gradient(180deg, #F5E6D3 0%, #FDFBF7 50%, #F5E6D3 100%);
+      min-height: 100vh;
+      min-height: -webkit-fill-available;
+    }
+    
+    /* Install Banner Styles */
+    .install-banner {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(145deg, #5D4037 0%, #4E342E 100%);
+      color: #FFF8F0;
+      padding: 16px;
+      padding-bottom: max(16px, env(safe-area-inset-bottom));
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      z-index: 1000;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.2);
+      transform: translateY(100%);
+      transition: transform 0.3s ease;
+    }
+    
+    .install-banner.show {
+      transform: translateY(0);
+    }
+    
+    .install-banner-content {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+    }
+    
+    .install-banner-icon {
+      font-size: 32px;
+    }
+    
+    .install-banner-text h3 {
+      font-family: 'Caveat', cursive;
+      font-size: 18px;
+      margin-bottom: 2px;
+    }
+    
+    .install-banner-text p {
+      font-family: 'Lora', serif;
+      font-size: 12px;
+      opacity: 0.8;
+    }
+    
+    .install-btn {
+      background: linear-gradient(145deg, #C4A77D 0%, #A8956D 100%);
+      color: #3E2723;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 12px;
+      font-family: 'Lora', serif;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    
+    .install-btn:active {
+      transform: scale(0.95);
+    }
+    
+    .close-banner {
+      background: none;
+      border: none;
+      color: #FFF8F0;
+      font-size: 24px;
+      cursor: pointer;
+      padding: 4px;
+      opacity: 0.7;
+    }
+    
+    /* Update notification */
+    .update-toast {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-100px);
+      background: linear-gradient(145deg, #5D4037 0%, #4E342E 100%);
+      color: #FFF8F0;
+      padding: 12px 20px;
+      border-radius: 12px;
+      font-family: 'Lora', serif;
+      font-size: 14px;
+      z-index: 1001;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: transform 0.3s ease;
+    }
+    
+    .update-toast.show {
+      transform: translateX(-50%) translateY(0);
+    }
+    
+    .update-toast button {
+      background: #C4A77D;
+      color: #3E2723;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    
+    /* Loading screen */
+    .loading-screen {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(180deg, #F5E6D3 0%, #FDFBF7 50%, #F5E6D3 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+    }
+    
+    .loading-screen.hidden {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    
+    .loading-icon {
+      font-size: 48px;
+      animation: steam 1.5s ease-in-out infinite;
+    }
+    
+    @keyframes steam {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    
+    .loading-text {
+      font-family: 'Caveat', cursive;
+      font-size: 24px;
+      color: #5D4037;
+      margin-top: 16px;
+    }
+    
+    /* Notification permission banner */
+    .notification-banner {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(145deg, #D4A574 0%, #C4946A 100%);
+      color: #3E2723;
+      padding: 12px 16px;
+      padding-top: max(12px, env(safe-area-inset-top));
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      z-index: 1000;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      transform: translateY(-100%);
+      transition: transform 0.3s ease;
+    }
+    
+    .notification-banner.show {
+      transform: translateY(0);
+    }
+    
+    .notification-banner-content {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+    }
+    
+    .notification-banner-content span:first-child {
+      font-size: 24px;
+    }
+    
+    .notification-banner-content p {
+      font-family: 'Lora', serif;
+      font-size: 13px;
+      line-height: 1.3;
+    }
+    
+    .notification-banner button {
+      background: #5D4037;
+      color: #FFF8F0;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-family: 'Lora', serif;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    
+    .notification-banner .close-banner {
+      color: #5D4037;
+      opacity: 0.6;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  
+  <!-- Loading Screen -->
+  <div class="loading-screen" id="loadingScreen">
+    <div class="loading-icon">☕</div>
+    <div class="loading-text">Brewing your day...</div>
+  </div>
+  
+  <!-- Notification Permission Banner -->
+  <div class="notification-banner" id="notificationBanner">
+    <div class="notification-banner-content">
+      <span>🔔</span>
+      <p>Enable notifications to get reminders for your tasks!</p>
+    </div>
+    <button id="enableNotificationsBtn">Enable</button>
+    <button class="close-banner" id="closeNotificationBanner">×</button>
+  </div>
+  
+  <!-- Install Banner -->
+  <div class="install-banner" id="installBanner">
+    <div class="install-banner-content">
+      <span class="install-banner-icon">☕</span>
+      <div class="install-banner-text">
+        <h3>Install Daily Brew</h3>
+        <p>Add to home screen for offline access</p>
+      </div>
+    </div>
+    <button class="install-btn" id="installBtn">Install</button>
+    <button class="close-banner" id="closeBanner">×</button>
+  </div>
+  
+  <!-- Update Toast -->
+  <div class="update-toast" id="updateToast">
+    <span>✨ Update available!</span>
+    <button id="updateBtn">Refresh</button>
+  </div>
+
+  <script type="text/babel" data-type="module">
+    const { useState, useEffect, useCallback } = React;
+
+    const STORAGE_KEY = 'dailyBrewData';
+    const REMINDERS_KEY = 'dailyBrewReminders';
+    const ONBOARDING_KEY = 'dailyBrewOnboardingSeen';
+
+    const habitIcons = {
+      water: '☕',
+      exercise: '🚶',
+      reading: '📖',
+      sleep: '🌙',
+      healthy: '🥐',
+      study: '📝',
+      creative: '🎨',
+      mindful: '🍃',
+      social: '💬',
+      clean: '✨'
+    };
+
+    const defaultHabits = [
+      { id: 1, name: 'Drink 8 glasses of water', icon: 'water', completed: false, streak: 5 },
+      { id: 2, name: '30 min exercise', icon: 'exercise', completed: false, streak: 12 },
+      { id: 3, name: 'Read for 20 minutes', icon: 'reading', completed: true, streak: 8 },
+      { id: 4, name: 'Sleep by 10 PM', icon: 'sleep', completed: false, streak: 3 },
+    ];
+
+    const defaultTasks = [
+      { id: 1, text: 'Finish math homework', time: '16:00', priority: 'high', done: false, reminder: true },
+      { id: 2, text: 'Practice guitar', time: '17:30', priority: 'medium', done: false, reminder: false },
+      { id: 3, text: 'Call grandma', time: '18:00', priority: 'low', done: true, reminder: false },
+    ];
+
+    const priorityStyles = {
+      high: { bg: '#8B4513', text: '#FFF8F0' },
+      medium: { bg: '#D2B48C', text: '#5D4037' },
+      low: { bg: '#F5E6D3', text: '#8B7355' }
+    };
+
+    // Notification helper functions
+    const notificationSupported = () => 'Notification' in window && 'serviceWorker' in navigator;
+    
+    const getNotificationPermission = () => {
+      if (!notificationSupported()) return 'unsupported';
+      return Notification.permission;
+    };
+
+    const requestNotificationPermission = async () => {
+      if (!notificationSupported()) return 'unsupported';
+      const permission = await Notification.requestPermission();
+      return permission;
+    };
+
+    const scheduleNotification = async (task) => {
+      if (getNotificationPermission() !== 'granted') return;
+      if (!task.time || task.time === 'Anytime' || task.done) return;
+      
+      // Parse time and create date for today
+      const [hours, minutes] = task.time.split(':').map(Number);
+      const now = new Date();
+      const notifyTime = new Date();
+      notifyTime.setHours(hours, minutes, 0, 0);
+      
+      // If time has passed today, don't schedule
+      if (notifyTime <= now) return;
+      
+      const delay = notifyTime.getTime() - now.getTime();
+      
+      // Store the reminder
+      const reminders = JSON.parse(localStorage.getItem(REMINDERS_KEY) || '{}');
+      reminders[task.id] = {
+        taskId: task.id,
+        taskText: task.text,
+        time: task.time,
+        notifyAt: notifyTime.getTime(),
+        priority: task.priority
+      };
+      localStorage.setItem(REMINDERS_KEY, JSON.stringify(reminders));
+      
+      // Schedule with setTimeout (works when app is open)
+      const timeoutId = setTimeout(() => {
+        showNotification(task);
+      }, delay);
+      
+      // Store timeout ID for potential cancellation
+      window.reminderTimeouts = window.reminderTimeouts || {};
+      if (window.reminderTimeouts[task.id]) {
+        clearTimeout(window.reminderTimeouts[task.id]);
+      }
+      window.reminderTimeouts[task.id] = timeoutId;
+      
+      // Also notify service worker
+      if (navigator.serviceWorker.controller) {
+        navigator.serviceWorker.controller.postMessage({
+          type: 'SCHEDULE_NOTIFICATION',
+          payload: reminders[task.id]
+        });
+      }
+    };
+
+    const cancelNotification = (taskId) => {
+      // Clear timeout
+      if (window.reminderTimeouts && window.reminderTimeouts[taskId]) {
+        clearTimeout(window.reminderTimeouts[taskId]);
+        delete window.reminderTimeouts[taskId];
+      }
+      
+      // Remove from storage
+      const reminders = JSON.parse(localStorage.getItem(REMINDERS_KEY) || '{}');
+      delete reminders[taskId];
+      localStorage.setItem(REMINDERS_KEY, JSON.stringify(reminders));
+      
+      // Notify service worker
+      if (navigator.serviceWorker.controller) {
+        navigator.serviceWorker.controller.postMessage({
+          type: 'CANCEL_NOTIFICATION',
+          payload: { taskId }
+        });
+      }
+    };
+
+    const showNotification = async (task) => {
+      if (getNotificationPermission() !== 'granted') return;
+      
+      const priorityEmoji = {
+        high: '🔴',
+        medium: '🟡', 
+        low: '🟢'
+      };
+      
+      try {
+        const registration = await navigator.serviceWorker.ready;
+        await registration.showNotification('☕ Daily Brew Reminder', {
+          body: `${priorityEmoji[task.priority]} ${task.text}`,
+          icon: 'icons/icon-192.png',
+          badge: 'icons/icon-96.png',
+          tag: `task-${task.id}`,
+          renotify: true,
+          requireInteraction: true,
+          vibrate: [200, 100, 200, 100, 200],
+          actions: [
+            { action: 'complete', title: '✓ Done' },
+            { action: 'snooze', title: '⏰ +10 min' }
+          ],
+          data: {
+            taskId: task.id,
+            url: self.location.href
+          }
+        });
+        
+        // Remove from scheduled reminders
+        const reminders = JSON.parse(localStorage.getItem(REMINDERS_KEY) || '{}');
+        delete reminders[task.id];
+        localStorage.setItem(REMINDERS_KEY, JSON.stringify(reminders));
+      } catch (error) {
+        console.error('Failed to show notification:', error);
+        // Fallback to basic notification
+        new Notification('☕ Daily Brew Reminder', {
+          body: `${priorityEmoji[task.priority]} ${task.text}`,
+          icon: 'icons/icon-192.png',
+          tag: `task-${task.id}`
+        });
+      }
+    };
+
+    // Check and reschedule pending reminders
+    const checkPendingReminders = (tasks) => {
+      const reminders = JSON.parse(localStorage.getItem(REMINDERS_KEY) || '{}');
+      const now = Date.now();
+      
+      Object.values(reminders).forEach(reminder => {
+        const task = tasks.find(t => t.id === reminder.taskId);
+        if (!task || task.done) {
+          cancelNotification(reminder.taskId);
+          return;
+        }
+        
+        if (reminder.notifyAt <= now) {
+          // Time has passed, show notification now
+          showNotification(task);
+        } else {
+          // Reschedule
+          scheduleNotification(task);
+        }
+      });
+    };
+
+    // Format time for display
+    const formatTime = (time24) => {
+      if (!time24 || time24 === 'Anytime') return 'Anytime';
+      const [hours, minutes] = time24.split(':').map(Number);
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      const hours12 = hours % 12 || 12;
+      return `${hours12}:${minutes.toString().padStart(2, '0')} ${ampm}`;
+    };
+
+    // Load data from localStorage
+    function loadData() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          const data = JSON.parse(saved);
+          return {
+            habits: data.habits || defaultHabits,
+            tasks: data.tasks || defaultTasks,
+            lastDate: data.lastDate || null
+          };
+        }
+      } catch (e) {
+        console.error('Failed to load data:', e);
+      }
+      return { habits: defaultHabits, tasks: defaultTasks, lastDate: null };
+    }
+
+    // Save data to localStorage
+    function saveData(habits, tasks) {
+      try {
+        const today = new Date().toDateString();
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({
+          habits,
+          tasks,
+          lastDate: today
+        }));
+      } catch (e) {
+        console.error('Failed to save data:', e);
+      }
+    }
+
+    function HabitTracker() {
+      const [data, setData] = useState(() => loadData());
+      const [habits, setHabits] = useState(data.habits);
+      const [tasks, setTasks] = useState(data.tasks);
+      const [activeTab, setActiveTab] = useState('today');
+      const [newTask, setNewTask] = useState('');
+      const [newTaskTime, setNewTaskTime] = useState('');
+      const [newTaskPriority, setNewTaskPriority] = useState('medium');
+      const [newTaskReminder, setNewTaskReminder] = useState(true);
+      const [newHabit, setNewHabit] = useState('');
+      const [newHabitIcon, setNewHabitIcon] = useState('water');
+      const [showAddHabit, setShowAddHabit] = useState(false);
+      const [showAddTask, setShowAddTask] = useState(false);
+      const [notificationStatus, setNotificationStatus] = useState(getNotificationPermission());
+      const [showOnboarding, setShowOnboarding] = useState(() => {
+        return !localStorage.getItem(ONBOARDING_KEY);
+      });
+      const [onboardingStep, setOnboardingStep] = useState(0);
+
+      // Reset completed status on new day
+      useEffect(() => {
+        const today = new Date().toDateString();
+        if (data.lastDate && data.lastDate !== today) {
+          setHabits(prev => prev.map(h => ({ ...h, completed: false })));
+          setTasks(prev => prev.map(t => ({ ...t, done: false })));
+          // Clear old reminders
+          localStorage.setItem(REMINDERS_KEY, '{}');
+        }
+      }, []);
+
+      // Save whenever habits or tasks change
+      useEffect(() => {
+        saveData(habits, tasks);
+      }, [habits, tasks]);
+
+      // Check pending reminders on mount and when tasks change
+      useEffect(() => {
+        if (notificationStatus === 'granted') {
+          checkPendingReminders(tasks);
+        }
+      }, [tasks, notificationStatus]);
+
+      // Schedule reminders for tasks with reminders enabled
+      useEffect(() => {
+        if (notificationStatus === 'granted') {
+          tasks.forEach(task => {
+            if (task.reminder && !task.done && task.time && task.time !== 'Anytime') {
+              scheduleNotification(task);
+            }
+          });
+        }
+      }, [notificationStatus]);
+
+      // Listen for notification permission changes
+      useEffect(() => {
+        const checkPermission = () => {
+          setNotificationStatus(getNotificationPermission());
+        };
+        
+        // Check when app becomes visible
+        document.addEventListener('visibilitychange', () => {
+          if (document.visibilityState === 'visible') {
+            checkPermission();
+            if (getNotificationPermission() === 'granted') {
+              checkPendingReminders(tasks);
+            }
+          }
+        });
+        
+        return () => {
+          document.removeEventListener('visibilitychange', checkPermission);
+        };
+      }, [tasks]);
+
+      const today = new Date();
+      const dayName = today.toLocaleDateString('en-US', { weekday: 'long' });
+      const dateStr = today.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
+
+      const toggleHabit = (id) => {
+        setHabits(habits.map(h => 
+          h.id === id ? { ...h, completed: !h.completed, streak: !h.completed ? h.streak + 1 : Math.max(0, h.streak - 1) } : h
+        ));
+      };
+
+      const toggleTask = (id) => {
+        setTasks(tasks.map(t => {
+          if (t.id === id) {
+            const newDone = !t.done;
+            if (newDone) {
+              cancelNotification(id);
+            } else if (t.reminder && t.time) {
+              scheduleNotification({ ...t, done: false });
+            }
+            return { ...t, done: newDone };
+          }
+          return t;
+        }));
+      };
+
+      const toggleReminder = (id) => {
+        setTasks(tasks.map(t => {
+          if (t.id === id) {
+            const newReminder = !t.reminder;
+            if (newReminder && !t.done && t.time && t.time !== 'Anytime') {
+              scheduleNotification({ ...t, reminder: true });
+            } else {
+              cancelNotification(id);
+            }
+            return { ...t, reminder: newReminder };
+          }
+          return t;
+        }));
+      };
+
+      const addTask = () => {
+        if (newTask.trim()) {
+          const task = {
+            id: Date.now(),
+            text: newTask,
+            time: newTaskTime || 'Anytime',
+            priority: newTaskPriority,
+            done: false,
+            reminder: newTaskReminder && newTaskTime !== ''
+          };
+          
+          setTasks([...tasks, task]);
+          
+          if (task.reminder && task.time && task.time !== 'Anytime' && notificationStatus === 'granted') {
+            scheduleNotification(task);
+          }
+          
+          setNewTask('');
+          setNewTaskTime('');
+          setNewTaskPriority('medium');
+          setNewTaskReminder(true);
+          setShowAddTask(false);
+        }
+      };
+
+      const addHabit = () => {
+        if (newHabit.trim()) {
+          setHabits([...habits, {
+            id: Date.now(),
+            name: newHabit,
+            icon: newHabitIcon,
+            completed: false,
+            streak: 0
+          }]);
+          setNewHabit('');
+          setNewHabitIcon('water');
+          setShowAddHabit(false);
+        }
+      };
+
+      const deleteTask = (id) => {
+        cancelNotification(id);
+        setTasks(tasks.filter(t => t.id !== id));
+      };
+
+      const deleteHabit = (id) => {
+        setHabits(habits.filter(h => h.id !== id));
+      };
+
+      const dismissOnboarding = () => {
+        localStorage.setItem(ONBOARDING_KEY, 'true');
+        setShowOnboarding(false);
+      };
+
+      const nextOnboardingStep = () => {
+        if (onboardingStep < 3) {
+          setOnboardingStep(onboardingStep + 1);
+        } else {
+          dismissOnboarding();
+        }
+      };
+
+      const prevOnboardingStep = () => {
+        if (onboardingStep > 0) {
+          setOnboardingStep(onboardingStep - 1);
+        }
+      };
+
+      const completedHabits = habits.filter(h => h.completed).length;
+      const completedTasks = tasks.filter(t => t.done).length;
+      const totalProgress = Math.round(((completedHabits + completedTasks) / (habits.length + tasks.length)) * 100) || 0;
+
+      return (
+        <div style={{ 
+          minHeight: '100vh',
+          width: '100%',
+          overflowX: 'hidden',
+          background: 'linear-gradient(180deg, #F5E6D3 0%, #FDFBF7 50%, #F5E6D3 100%)',
+          fontFamily: "'Cormorant Garamond', Georgia, serif"
+        }}>
+          <style>{`
+            .cafe-card {
+              background: linear-gradient(145deg, #FDFBF7 0%, #FBF7F0 100%);
+              border: 1px solid #E8DCC8;
+              box-shadow: 0 4px 20px rgba(139, 115, 85, 0.1), 
+                          0 1px 3px rgba(139, 115, 85, 0.08);
+            }
+            
+            .cafe-card:active {
+              transform: scale(0.98);
+            }
+            
+            .cafe-input {
+              background: #FDFBF7;
+              border: 1px solid #D4C4A8;
+              transition: all 0.2s ease;
+            }
+            
+            .cafe-input:focus {
+              border-color: #8B7355;
+              box-shadow: 0 0 0 3px rgba(139, 115, 85, 0.15);
+              outline: none;
+            }
+            
+            .cafe-btn {
+              background: linear-gradient(145deg, #8B7355 0%, #6B5344 100%);
+              color: #FFF8F0;
+              transition: all 0.2s ease;
+            }
+            
+            .cafe-btn:active {
+              transform: scale(0.95);
+              box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+            }
+            
+            .tab-pill {
+              transition: all 0.3s ease;
+            }
+            
+            .tab-active {
+              background: linear-gradient(145deg, #8B7355 0%, #6B5344 100%);
+              color: #FFF8F0;
+              box-shadow: 0 4px 12px rgba(107, 83, 68, 0.3);
+            }
+            
+            .check-circle {
+              transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+            
+            .check-circle.checked {
+              background: linear-gradient(145deg, #8B7355 0%, #6B5344 100%);
+              animation: gentlePop 0.3s ease;
+            }
+            
+            @keyframes gentlePop {
+              0%, 100% { transform: scale(1); }
+              50% { transform: scale(1.15); }
+            }
+            
+            .progress-bar {
+              background: linear-gradient(90deg, #C4A77D 0%, #8B7355 50%, #6B5344 100%);
+              transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+            
+            .streak-badge {
+              background: linear-gradient(145deg, #D4A574 0%, #C4946A 100%);
+            }
+            
+            .handwritten {
+              font-family: 'Caveat', cursive;
+            }
+            
+            .body-text {
+              font-family: 'Lora', Georgia, serif;
+            }
+            
+            .decorative-line {
+              height: 1px;
+              background: linear-gradient(90deg, transparent 0%, #C4A77D 50%, transparent 100%);
+            }
+            
+            .scroll-container {
+              -webkit-overflow-scrolling: touch;
+              scroll-behavior: smooth;
+            }
+            
+            .hide-scrollbar {
+              -ms-overflow-style: none;
+              scrollbar-width: none;
+            }
+            .hide-scrollbar::-webkit-scrollbar {
+              display: none;
+            }
+            
+            .reminder-toggle {
+              width: 28px;
+              height: 28px;
+              border-radius: 8px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-size: 14px;
+              border: none;
+              cursor: pointer;
+              transition: all 0.2s ease;
+              flex-shrink: 0;
+            }
+            
+            .reminder-toggle.active {
+              background: linear-gradient(145deg, #D4A574 0%, #C4946A 100%);
+              color: white;
+            }
+            
+            .reminder-toggle.inactive {
+              background: #F0E6D8;
+              color: #C4A77D;
+            }
+            
+            .reminder-checkbox {
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              cursor: pointer;
+              user-select: none;
+            }
+            
+            .reminder-checkbox input {
+              width: 18px;
+              height: 18px;
+              accent-color: #8B7355;
+            }
+            
+            /* Onboarding Modal Styles */
+            .onboarding-overlay {
+              position: fixed;
+              inset: 0;
+              background: rgba(93, 64, 55, 0.85);
+              backdrop-filter: blur(8px);
+              z-index: 2000;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              padding: 20px;
+              animation: fadeIn 0.3s ease;
+            }
+            
+            @keyframes fadeIn {
+              from { opacity: 0; }
+              to { opacity: 1; }
+            }
+            
+            .onboarding-modal {
+              background: linear-gradient(145deg, #FDFBF7 0%, #F5E6D3 100%);
+              border-radius: 24px;
+              max-width: 360px;
+              width: 100%;
+              max-height: 80vh;
+              overflow-y: auto;
+              box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+              animation: slideUp 0.4s ease;
+            }
+            
+            @keyframes slideUp {
+              from { 
+                opacity: 0;
+                transform: translateY(30px);
+              }
+              to { 
+                opacity: 1;
+                transform: translateY(0);
+              }
+            }
+            
+            .onboarding-header {
+              padding: 24px 24px 16px;
+              text-align: center;
+              border-bottom: 1px solid #E8DCC8;
+            }
+            
+            .onboarding-icon {
+              font-size: 48px;
+              margin-bottom: 12px;
+            }
+            
+            .onboarding-content {
+              padding: 20px 24px;
+            }
+            
+            .onboarding-step-indicator {
+              display: flex;
+              justify-content: center;
+              gap: 8px;
+              margin-bottom: 20px;
+            }
+            
+            .step-dot {
+              width: 8px;
+              height: 8px;
+              border-radius: 50%;
+              background: #D4C4A8;
+              transition: all 0.3s ease;
+            }
+            
+            .step-dot.active {
+              background: #8B7355;
+              width: 24px;
+              border-radius: 4px;
+            }
+            
+            .onboarding-illustration {
+              background: #FFF8F0;
+              border: 2px dashed #D4C4A8;
+              border-radius: 16px;
+              padding: 16px;
+              margin-bottom: 16px;
+              text-align: center;
+            }
+            
+            .onboarding-footer {
+              padding: 16px 24px 24px;
+              display: flex;
+              gap: 12px;
+            }
+            
+            .onboarding-btn {
+              flex: 1;
+              padding: 14px 20px;
+              border-radius: 12px;
+              font-family: 'Lora', serif;
+              font-weight: 600;
+              font-size: 15px;
+              cursor: pointer;
+              transition: all 0.2s ease;
+              border: none;
+            }
+            
+            .onboarding-btn.primary {
+              background: linear-gradient(145deg, #8B7355 0%, #6B5344 100%);
+              color: #FFF8F0;
+            }
+            
+            .onboarding-btn.secondary {
+              background: transparent;
+              border: 2px solid #D4C4A8;
+              color: #8B7355;
+            }
+            
+            .onboarding-btn:active {
+              transform: scale(0.97);
+            }
+            
+            .onboarding-skip {
+              position: absolute;
+              top: 16px;
+              right: 16px;
+              background: rgba(255,255,255,0.2);
+              border: none;
+              color: #FFF8F0;
+              font-family: 'Lora', serif;
+              font-size: 13px;
+              padding: 8px 16px;
+              border-radius: 20px;
+              cursor: pointer;
+            }
+            
+            .feature-item {
+              display: flex;
+              align-items: flex-start;
+              gap: 12px;
+              margin-bottom: 12px;
+            }
+            
+            .feature-icon {
+              font-size: 20px;
+              line-height: 1.4;
+            }
+            
+            .feature-text {
+              font-family: 'Lora', serif;
+              font-size: 14px;
+              color: #5D4037;
+              line-height: 1.5;
+            }
+          `}</style>
+
+          <div className="scroll-container hide-scrollbar" style={{ 
+            maxWidth: '28rem',
+            margin: '0 auto',
+            minHeight: '100vh',
+            display: 'flex',
+            flexDirection: 'column',
+            padding: '24px 16px',
+            paddingLeft: 'max(16px, env(safe-area-inset-left))',
+            paddingRight: 'max(16px, env(safe-area-inset-right))',
+            paddingBottom: 'max(100px, env(safe-area-inset-bottom))'
+          }}>
+            
+            {/* Header */}
+            <header style={{ textAlign: 'center', marginBottom: '24px', position: 'relative' }}>
+              <div style={{ display: 'inline-block', marginBottom: '8px' }}>
+                <span style={{ fontSize: '2.5rem' }}>☕</span>
+              </div>
+              <h1 className="handwritten" style={{ fontSize: '3rem', fontWeight: 'bold', color: '#5D4037', letterSpacing: '1px' }}>
+                My Daily Brew
+              </h1>
+              <p className="body-text" style={{ fontSize: '1rem', marginTop: '8px', color: '#8B7355' }}>
+                {dayName}, {dateStr}
+              </p>
+              <div className="decorative-line" style={{ width: '8rem', margin: '16px auto 0' }} />
+            </header>
+
+            {/* Progress Card */}
+            <div className="cafe-card" style={{ borderRadius: '1rem', padding: '20px', marginBottom: '20px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                <div>
+                  <p className="body-text" style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#8B7355' }}>
+                    Today's Progress
+                  </p>
+                  <p style={{ fontSize: '2.5rem', fontWeight: '600', marginTop: '4px', color: '#5D4037' }}>
+                    {totalProgress}%
+                  </p>
+                </div>
+                <div className="body-text" style={{ textAlign: 'right' }}>
+                  <p style={{ fontSize: '0.875rem', color: '#8B7355' }}>
+                    <span style={{ color: '#6B5344', fontWeight: 600 }}>{completedHabits}</span>/{habits.length} habits
+                  </p>
+                  <p style={{ fontSize: '0.875rem', color: '#8B7355' }}>
+                    <span style={{ color: '#6B5344', fontWeight: 600 }}>{completedTasks}</span>/{tasks.length} tasks
+                  </p>
+                </div>
+              </div>
+              <div style={{ height: '12px', borderRadius: '9999px', overflow: 'hidden', background: '#F0E6D8' }}>
+                <div className="progress-bar" style={{ height: '100%', borderRadius: '9999px', width: `${totalProgress}%` }} />
+              </div>
+            </div>
+
+            {/* Tab Navigation */}
+            <div style={{ display: 'flex', gap: '8px', marginBottom: '20px', padding: '4px', borderRadius: '12px', background: 'rgba(212, 196, 168, 0.3)' }}>
+              {[
+                { id: 'today', label: 'Today', icon: '📅' },
+                { id: 'habits', label: 'Habits', icon: '⭐' },
+                { id: 'tasks', label: 'Tasks', icon: '✓' }
+              ].map(tab => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`tab-pill body-text ${activeTab === tab.id ? 'tab-active' : ''}`}
+                  style={{
+                    flex: 1,
+                    padding: '12px 8px',
+                    borderRadius: '12px',
+                    border: 'none',
+                    fontWeight: 500,
+                    fontSize: '0.875rem',
+                    cursor: 'pointer',
+                    color: activeTab !== tab.id ? '#8B7355' : undefined,
+                    background: activeTab !== tab.id ? 'transparent' : undefined
+                  }}
+                >
+                  <span style={{ marginRight: '4px' }}>{tab.icon}</span> {tab.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Main Content */}
+            <div style={{ flex: 1 }}>
+              
+              {/* Habits Section */}
+              {(activeTab === 'today' || activeTab === 'habits') && (
+                <section style={{ marginBottom: '24px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+                    <h2 style={{ fontSize: '1.25rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px', color: '#5D4037' }}>
+                      <span>⭐</span> Daily Rituals
+                    </h2>
+                    <button 
+                      onClick={() => setShowAddHabit(!showAddHabit)}
+                      className="cafe-btn"
+                      style={{
+                        width: '40px',
+                        height: '40px',
+                        borderRadius: '12px',
+                        fontSize: '1.25rem',
+                        fontWeight: 300,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        border: 'none',
+                        cursor: 'pointer',
+                        boxShadow: '0 4px 12px rgba(107, 83, 68, 0.25)'
+                      }}
+                    >
+                      +
+                    </button>
+                  </div>
+
+                  {showAddHabit && (
+                    <div className="cafe-card" style={{ borderRadius: '1rem', padding: '16px', marginBottom: '16px' }}>
+                      <p className="handwritten" style={{ fontSize: '1.125rem', marginBottom: '12px', color: '#6B5344' }}>Choose an icon:</p>
+                      <div style={{ display: 'flex', gap: '8px', marginBottom: '16px', flexWrap: 'wrap' }}>
+                        {Object.entries(habitIcons).map(([key, icon]) => (
+                          <button
+                            key={key}
+                            onClick={() => setNewHabitIcon(key)}
+                            style={{
+                              width: '44px',
+                              height: '44px',
+                              borderRadius: '12px',
+                              fontSize: '1.25rem',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              border: 'none',
+                              cursor: 'pointer',
+                              transition: 'all 0.2s',
+                              background: newHabitIcon === key ? 'linear-gradient(145deg, #8B7355 0%, #6B5344 100%)' : '#F5E6D3',
+                              boxShadow: newHabitIcon === key ? '0 4px 12px rgba(107, 83, 68, 0.3)' : 'none'
+                            }}
+                          >
+                            {icon}
+                          </button>
+                        ))}
+                      </div>
+                      <input
+                        type="text"
+                        value={newHabit}
+                        onChange={(e) => setNewHabit(e.target.value)}
+                        placeholder="New habit name..."
+                        className="cafe-input body-text"
+                        style={{ width: '100%', padding: '12px 16px', borderRadius: '12px', fontSize: '1rem', marginBottom: '12px', color: '#5D4037' }}
+                        onKeyPress={(e) => e.key === 'Enter' && addHabit()}
+                      />
+                      <button
+                        onClick={addHabit}
+                        className="cafe-btn body-text"
+                        style={{ width: '100%', padding: '12px', borderRadius: '12px', border: 'none', fontWeight: 600, cursor: 'pointer' }}
+                      >
+                        Add Habit
+                      </button>
+                    </div>
+                  )}
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    {habits.map(habit => (
+                      <div 
+                        key={habit.id} 
+                        className="cafe-card"
+                        style={{
+                          borderRadius: '1rem',
+                          padding: '16px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '16px',
+                          borderColor: habit.completed ? '#A8C5A0' : undefined
+                        }}
+                      >
+                        <button
+                          onClick={() => toggleHabit(habit.id)}
+                          className={`check-circle ${habit.completed ? 'checked' : ''}`}
+                          style={{
+                            width: '48px',
+                            height: '48px',
+                            borderRadius: '12px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '1.25rem',
+                            border: 'none',
+                            cursor: 'pointer',
+                            background: !habit.completed ? '#F5E6D3' : undefined,
+                            border: !habit.completed ? '2px solid #D4C4A8' : 'none'
+                          }}
+                        >
+                          {habit.completed ? <span style={{ color: '#FFF8F0' }}>✓</span> : habitIcons[habit.icon]}
+                        </button>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <p 
+                            className="body-text"
+                            style={{
+                              fontWeight: 500,
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap',
+                              textDecoration: habit.completed ? 'line-through' : 'none',
+                              color: habit.completed ? '#A8A8A8' : '#5D4037'
+                            }}
+                          >
+                            {habit.name}
+                          </p>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
+                            <span 
+                              className="streak-badge body-text"
+                              style={{ fontSize: '0.75rem', padding: '2px 8px', borderRadius: '9999px', fontWeight: 500, color: '#FFF8F0' }}
+                            >
+                              🔥 {habit.streak} days
+                            </span>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => deleteHabit(habit.id)}
+                          style={{
+                            width: '32px',
+                            height: '32px',
+                            borderRadius: '8px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '1.25rem',
+                            color: '#C4A77D',
+                            background: 'transparent',
+                            border: 'none',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              )}
+
+              {/* Tasks Section */}
+              {(activeTab === 'today' || activeTab === 'tasks') && (
+                <section>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+                    <h2 style={{ fontSize: '1.25rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px', color: '#5D4037' }}>
+                      <span>✓</span> To-Do List
+                    </h2>
+                    <button 
+                      onClick={() => setShowAddTask(!showAddTask)}
+                      className="cafe-btn"
+                      style={{
+                        width: '40px',
+                        height: '40px',
+                        borderRadius: '12px',
+                        fontSize: '1.25rem',
+                        fontWeight: 300,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        border: 'none',
+                        cursor: 'pointer',
+                        boxShadow: '0 4px 12px rgba(107, 83, 68, 0.25)'
+                      }}
+                    >
+                      +
+                    </button>
+                  </div>
+
+                  {showAddTask && (
+                    <div className="cafe-card" style={{ borderRadius: '1rem', padding: '16px', marginBottom: '16px' }}>
+                      <input
+                        type="text"
+                        value={newTask}
+                        onChange={(e) => setNewTask(e.target.value)}
+                        placeholder="What needs to be done?"
+                        className="cafe-input body-text"
+                        style={{ width: '100%', padding: '12px 16px', borderRadius: '12px', fontSize: '1rem', marginBottom: '12px', color: '#5D4037' }}
+                        onKeyPress={(e) => e.key === 'Enter' && addTask()}
+                      />
+                      <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
+                        <input
+                          type="time"
+                          value={newTaskTime}
+                          onChange={(e) => setNewTaskTime(e.target.value)}
+                          className="cafe-input body-text"
+                          style={{ flex: 1, padding: '8px 12px', borderRadius: '12px', color: '#5D4037' }}
+                        />
+                        <select
+                          value={newTaskPriority}
+                          onChange={(e) => setNewTaskPriority(e.target.value)}
+                          className="cafe-input body-text"
+                          style={{ flex: 1, padding: '8px 12px', borderRadius: '12px', color: '#5D4037' }}
+                        >
+                          <option value="high">High</option>
+                          <option value="medium">Medium</option>
+                          <option value="low">Low</option>
+                        </select>
+                      </div>
+                      <label className="reminder-checkbox body-text" style={{ marginBottom: '12px', display: 'flex', color: '#6B5344', fontSize: '0.9rem' }}>
+                        <input
+                          type="checkbox"
+                          checked={newTaskReminder}
+                          onChange={(e) => setNewTaskReminder(e.target.checked)}
+                          disabled={!newTaskTime}
+                        />
+                        <span>🔔 Remind me at this time</span>
+                        {notificationStatus !== 'granted' && newTaskReminder && (
+                          <span style={{ fontSize: '0.75rem', color: '#C4946A', marginLeft: '8px' }}>(requires permission)</span>
+                        )}
+                      </label>
+                      <button
+                        onClick={addTask}
+                        className="cafe-btn body-text"
+                        style={{ width: '100%', padding: '12px', borderRadius: '12px', border: 'none', fontWeight: 600, cursor: 'pointer' }}
+                      >
+                        Add Task
+                      </button>
+                    </div>
+                  )}
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    {tasks.sort((a, b) => {
+                      const order = { high: 0, medium: 1, low: 2 };
+                      return order[a.priority] - order[b.priority];
+                    }).map(task => (
+                      <div 
+                        key={task.id} 
+                        className="cafe-card"
+                        style={{
+                          borderRadius: '1rem',
+                          padding: '16px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '12px',
+                          opacity: task.done ? 0.7 : 1
+                        }}
+                      >
+                        <button
+                          onClick={() => toggleTask(task.id)}
+                          className={`check-circle ${task.done ? 'checked' : ''}`}
+                          style={{
+                            width: '40px',
+                            height: '40px',
+                            borderRadius: '12px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexShrink: 0,
+                            border: 'none',
+                            cursor: 'pointer',
+                            background: !task.done ? '#F5E6D3' : undefined,
+                            border: !task.done ? '2px solid #D4C4A8' : 'none'
+                          }}
+                        >
+                          {task.done && <span style={{ color: '#FFF8F0' }}>✓</span>}
+                        </button>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <p 
+                            className="body-text"
+                            style={{
+                              fontWeight: 500,
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap',
+                              textDecoration: task.done ? 'line-through' : 'none',
+                              color: task.done ? '#A8A8A8' : '#5D4037'
+                            }}
+                          >
+                            {task.text}
+                          </p>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px', flexWrap: 'wrap' }}>
+                            <span className="body-text" style={{ fontSize: '0.75rem', color: '#8B7355' }}>
+                              🕐 {formatTime(task.time)}
+                            </span>
+                            <span 
+                              className="body-text"
+                              style={{
+                                fontSize: '0.75rem',
+                                padding: '2px 8px',
+                                borderRadius: '9999px',
+                                fontWeight: 500,
+                                background: priorityStyles[task.priority].bg,
+                                color: priorityStyles[task.priority].text
+                              }}
+                            >
+                              {task.priority}
+                            </span>
+                            {task.reminder && task.time && task.time !== 'Anytime' && (
+                              <span className="body-text" style={{ fontSize: '0.7rem', color: '#C4946A' }}>
+                                🔔
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        {task.time && task.time !== 'Anytime' && (
+                          <button
+                            onClick={() => toggleReminder(task.id)}
+                            className={`reminder-toggle ${task.reminder ? 'active' : 'inactive'}`}
+                            title={task.reminder ? 'Reminder on' : 'Reminder off'}
+                          >
+                            {task.reminder ? '🔔' : '🔕'}
+                          </button>
+                        )}
+                        <button
+                          onClick={() => deleteTask(task.id)}
+                          style={{
+                            width: '32px',
+                            height: '32px',
+                            borderRadius: '8px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '1.25rem',
+                            flexShrink: 0,
+                            color: '#C4A77D',
+                            background: 'transparent',
+                            border: 'none',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              )}
+            </div>
+
+            {/* Footer */}
+            <footer style={{ marginTop: '32px', textAlign: 'center', paddingBottom: '16px' }}>
+              <div className="cafe-card" style={{ borderRadius: '1rem', padding: '20px' }}>
+                <span style={{ fontSize: '1.5rem' }}>🍂</span>
+                <p className="handwritten" style={{ fontSize: '1.25rem', marginTop: '8px', color: '#6B5344' }}>
+                  {completedHabits + completedTasks === habits.length + tasks.length 
+                    ? "You've done beautifully today ✨"
+                    : completedHabits + completedTasks > (habits.length + tasks.length) / 2
+                    ? "Keep brewing greatness ☕"
+                    : "One sip at a time, dear 🍃"
+                  }
+                </p>
+              </div>
+              <p className="body-text" style={{ fontSize: '0.75rem', marginTop: '16px', color: '#C4A77D' }}>
+                ─── made with warmth ───
+              </p>
+            </footer>
+          </div>
+
+          {/* Onboarding Modal */}
+          {showOnboarding && (
+            <div className="onboarding-overlay">
+              <button className="onboarding-skip" onClick={dismissOnboarding}>
+                Skip tutorial
+              </button>
+              
+              <div className="onboarding-modal">
+                {/* Step 0: Welcome */}
+                {onboardingStep === 0 && (
+                  <>
+                    <div className="onboarding-header">
+                      <div className="onboarding-icon">☕</div>
+                      <h2 className="handwritten" style={{ fontSize: '2rem', color: '#5D4037', margin: 0 }}>
+                        Welcome to Daily Brew!
+                      </h2>
+                    </div>
+                    <div className="onboarding-content">
+                      <div className="onboarding-step-indicator">
+                        {[0,1,2,3].map(i => (
+                          <div key={i} className={`step-dot ${i === onboardingStep ? 'active' : ''}`} />
+                        ))}
+                      </div>
+                      <p className="body-text" style={{ color: '#6B5344', fontSize: '15px', lineHeight: 1.6, textAlign: 'center', marginBottom: '16px' }}>
+                        Your cozy companion for tracking habits and tasks. Let me show you how to make the most of it!
+                      </p>
+                      <div className="onboarding-illustration">
+                        <span style={{ fontSize: '32px' }}>📅 ⭐ ✓</span>
+                        <p className="body-text" style={{ fontSize: '13px', color: '#8B7355', marginTop: '8px' }}>
+                          Track habits, manage tasks, stay organized
+                        </p>
+                      </div>
+                    </div>
+                    <div className="onboarding-footer">
+                      <button className="onboarding-btn primary" onClick={nextOnboardingStep}>
+                        Get Started →
+                      </button>
+                    </div>
+                  </>
+                )}
+
+                {/* Step 1: Adding Reminders */}
+                {onboardingStep === 1 && (
+                  <>
+                    <div className="onboarding-header">
+                      <div className="onboarding-icon">🔔</div>
+                      <h2 className="handwritten" style={{ fontSize: '1.75rem', color: '#5D4037', margin: 0 }}>
+                        Task Reminders
+                      </h2>
+                    </div>
+                    <div className="onboarding-content">
+                      <div className="onboarding-step-indicator">
+                        {[0,1,2,3].map(i => (
+                          <div key={i} className={`step-dot ${i === onboardingStep ? 'active' : ''}`} />
+                        ))}
+                      </div>
+                      <p className="body-text" style={{ color: '#6B5344', fontSize: '14px', lineHeight: 1.6, marginBottom: '16px' }}>
+                        When adding a new task, you can set a reminder:
+                      </p>
+                      <div className="onboarding-illustration">
+                        <div style={{ textAlign: 'left', padding: '8px' }}>
+                          <div className="feature-item">
+                            <span className="feature-icon">🕐</span>
+                            <span className="feature-text">Set a <strong>time</strong> for your task</span>
+                          </div>
+                          <div className="feature-item">
+                            <span className="feature-icon">☑️</span>
+                            <span className="feature-text">Check <strong>"Remind me at this time"</strong></span>
+                          </div>
+                          <div className="feature-item">
+                            <span className="feature-icon">✨</span>
+                            <span className="feature-text">You'll get a notification at the scheduled time!</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="onboarding-footer">
+                      <button className="onboarding-btn secondary" onClick={prevOnboardingStep}>
+                        ← Back
+                      </button>
+                      <button className="onboarding-btn primary" onClick={nextOnboardingStep}>
+                        Next →
+                      </button>
+                    </div>
+                  </>
+                )}
+
+                {/* Step 2: Toggle Reminders */}
+                {onboardingStep === 2 && (
+                  <>
+                    <div className="onboarding-header">
+                      <div className="onboarding-icon">🔕</div>
+                      <h2 className="handwritten" style={{ fontSize: '1.75rem', color: '#5D4037', margin: 0 }}>
+                        Toggle Reminders
+                      </h2>
+                    </div>
+                    <div className="onboarding-content">
+                      <div className="onboarding-step-indicator">
+                        {[0,1,2,3].map(i => (
+                          <div key={i} className={`step-dot ${i === onboardingStep ? 'active' : ''}`} />
+                        ))}
+                      </div>
+                      <p className="body-text" style={{ color: '#6B5344', fontSize: '14px', lineHeight: 1.6, marginBottom: '16px' }}>
+                        You can turn reminders on or off for any task with a set time:
+                      </p>
+                      <div className="onboarding-illustration">
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '24px', padding: '12px' }}>
+                          <div style={{ textAlign: 'center' }}>
+                            <div style={{ 
+                              width: '44px', 
+                              height: '44px', 
+                              borderRadius: '12px',
+                              background: 'linear-gradient(145deg, #D4A574 0%, #C4946A 100%)',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              fontSize: '20px',
+                              margin: '0 auto 8px'
+                            }}>🔔</div>
+                            <span className="body-text" style={{ fontSize: '12px', color: '#6B5344' }}>Reminder ON</span>
+                          </div>
+                          <span style={{ fontSize: '24px', color: '#C4A77D' }}>⟷</span>
+                          <div style={{ textAlign: 'center' }}>
+                            <div style={{ 
+                              width: '44px', 
+                              height: '44px', 
+                              borderRadius: '12px',
+                              background: '#F0E6D8',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              fontSize: '20px',
+                              margin: '0 auto 8px'
+                            }}>🔕</div>
+                            <span className="body-text" style={{ fontSize: '12px', color: '#6B5344' }}>Reminder OFF</span>
+                          </div>
+                        </div>
+                        <p className="body-text" style={{ fontSize: '12px', color: '#8B7355', marginTop: '8px' }}>
+                          Tap the bell icon on any task to toggle
+                        </p>
+                      </div>
+                    </div>
+                    <div className="onboarding-footer">
+                      <button className="onboarding-btn secondary" onClick={prevOnboardingStep}>
+                        ← Back
+                      </button>
+                      <button className="onboarding-btn primary" onClick={nextOnboardingStep}>
+                        Next →
+                      </button>
+                    </div>
+                  </>
+                )}
+
+                {/* Step 3: Notification Actions */}
+                {onboardingStep === 3 && (
+                  <>
+                    <div className="onboarding-header">
+                      <div className="onboarding-icon">📱</div>
+                      <h2 className="handwritten" style={{ fontSize: '1.75rem', color: '#5D4037', margin: 0 }}>
+                        When You Get a Reminder
+                      </h2>
+                    </div>
+                    <div className="onboarding-content">
+                      <div className="onboarding-step-indicator">
+                        {[0,1,2,3].map(i => (
+                          <div key={i} className={`step-dot ${i === onboardingStep ? 'active' : ''}`} />
+                        ))}
+                      </div>
+                      <p className="body-text" style={{ color: '#6B5344', fontSize: '14px', lineHeight: 1.6, marginBottom: '16px' }}>
+                        Notifications appear on your lock screen with quick actions:
+                      </p>
+                      <div className="onboarding-illustration">
+                        <div style={{ textAlign: 'left', padding: '8px' }}>
+                          <div className="feature-item">
+                            <span className="feature-icon">✓</span>
+                            <span className="feature-text"><strong>Done</strong> — Mark the task complete instantly</span>
+                          </div>
+                          <div className="feature-item">
+                            <span className="feature-icon">⏰</span>
+                            <span className="feature-text"><strong>+10 min</strong> — Snooze and get reminded again</span>
+                          </div>
+                          <div className="feature-item">
+                            <span className="feature-icon">👆</span>
+                            <span className="feature-text"><strong>Tap</strong> — Open the app to see details</span>
+                          </div>
+                        </div>
+                      </div>
+                      <p className="body-text" style={{ fontSize: '12px', color: '#8B7355', textAlign: 'center', marginTop: '12px' }}>
+                        💡 Make sure to allow notifications when prompted!
+                      </p>
+                    </div>
+                    <div className="onboarding-footer">
+                      <button className="onboarding-btn secondary" onClick={prevOnboardingStep}>
+                        ← Back
+                      </button>
+                      <button className="onboarding-btn primary" onClick={dismissOnboarding}>
+                        Let's Go! ☕
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // Render app
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<HabitTracker />);
+    
+    // Hide loading screen
+    setTimeout(() => {
+      document.getElementById('loadingScreen').classList.add('hidden');
+    }, 500);
+  </script>
+
+  <script>
+    // Service Worker Registration & Update Logic
+    let deferredPrompt;
+    let newWorker;
+    
+    // Register service worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', async () => {
+        try {
+          const registration = await navigator.serviceWorker.register('sw.js');
+          console.log('SW registered:', registration.scope);
+          
+          // Check for updates when app becomes visible (battery-conscious)
+          document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+              registration.update();
+            }
+          });
+          
+          // Listen for new service worker
+          registration.addEventListener('updatefound', () => {
+            newWorker = registration.installing;
+            newWorker.addEventListener('statechange', () => {
+              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                // New version available
+                document.getElementById('updateToast').classList.add('show');
+              }
+            });
+          });
+        } catch (error) {
+          console.error('SW registration failed:', error);
+        }
+      });
+      
+      // Handle controller change (after update)
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        window.location.reload();
+      });
+    }
+    
+    // Update button click
+    document.getElementById('updateBtn').addEventListener('click', () => {
+      if (newWorker) {
+        newWorker.postMessage({ type: 'SKIP_WAITING' });
+      }
+      document.getElementById('updateToast').classList.remove('show');
+    });
+    
+    // Install prompt handling
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      
+      // Show install banner after a short delay
+      setTimeout(() => {
+        document.getElementById('installBanner').classList.add('show');
+      }, 3000);
+    });
+    
+    // Install button click
+    document.getElementById('installBtn').addEventListener('click', async () => {
+      if (!deferredPrompt) return;
+      
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      console.log('Install outcome:', outcome);
+      
+      deferredPrompt = null;
+      document.getElementById('installBanner').classList.remove('show');
+    });
+    
+    // Close banner button
+    document.getElementById('closeBanner').addEventListener('click', () => {
+      document.getElementById('installBanner').classList.remove('show');
+      // Don't show again this session
+      sessionStorage.setItem('installBannerDismissed', 'true');
+    });
+    
+    // Check if banner was dismissed
+    if (sessionStorage.getItem('installBannerDismissed')) {
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+      });
+    }
+    
+    // Detect if running as installed app
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+      document.getElementById('installBanner').style.display = 'none';
+    }
+    
+    // Notification permission handling
+    const notificationBanner = document.getElementById('notificationBanner');
+    const enableNotificationsBtn = document.getElementById('enableNotificationsBtn');
+    const closeNotificationBanner = document.getElementById('closeNotificationBanner');
+    
+    // Show notification banner if permission not granted and not denied
+    function checkNotificationBanner() {
+      if ('Notification' in window) {
+        const permission = Notification.permission;
+        const dismissed = sessionStorage.getItem('notificationBannerDismissed');
+        
+        if (permission === 'default' && !dismissed) {
+          setTimeout(() => {
+            notificationBanner.classList.add('show');
+          }, 5000);
+        }
+      }
+    }
+    
+    enableNotificationsBtn.addEventListener('click', async () => {
+      const permission = await Notification.requestPermission();
+      notificationBanner.classList.remove('show');
+      
+      if (permission === 'granted') {
+        // Show a test notification
+        if (navigator.serviceWorker.controller) {
+          const registration = await navigator.serviceWorker.ready;
+          registration.showNotification('☕ Notifications Enabled!', {
+            body: 'You\'ll now receive reminders for your tasks.',
+            icon: 'icons/icon-192.png',
+            badge: 'icons/icon-96.png'
+          });
+        }
+      }
+    });
+    
+    closeNotificationBanner.addEventListener('click', () => {
+      notificationBanner.classList.remove('show');
+      sessionStorage.setItem('notificationBannerDismissed', 'true');
+    });
+    
+    // Check on load
+    checkNotificationBanner();
+    
+    // Listen for messages from service worker (notification actions)
+    navigator.serviceWorker.addEventListener('message', (event) => {
+      if (event.data.type === 'NOTIFICATION_ACTION') {
+        const { action, taskId } = event.data.payload;
+        
+        if (action === 'complete') {
+          // Mark task as complete - dispatch event for React
+          window.dispatchEvent(new CustomEvent('completeTask', { detail: { taskId } }));
+        } else if (action === 'snooze') {
+          // Snooze - reschedule for 10 minutes later
+          window.dispatchEvent(new CustomEvent('snoozeTask', { detail: { taskId } }));
+        }
+      }
+    });
+  </script>
+</body>
+</html>
