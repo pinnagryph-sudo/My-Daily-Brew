@@ -872,6 +872,14 @@
     // WHAT'S NEW CONTENT
     // ═══════════════════════════════════════════════════════════════
     const whatsNewContent = [
+      { version: '8.0', title: '🚀 Major UX Improvements', items: [
+        { icon: '📋', title: 'Habit Templates', desc: '10 curated habit packs to quick-start your routine!' },
+        { icon: '📦', title: 'Habit Archiving', desc: 'Archive habits instead of deleting - restore anytime' },
+        { icon: '⋮⋮', title: 'Drag & Drop Reorder', desc: 'Drag habits to rearrange your list' },
+        { icon: '👆', title: 'Calendar Swipe', desc: 'Swipe left/right to navigate months' },
+        { icon: '📅', title: 'Full Year Heatmap', desc: 'See your entire year at a glance' },
+        { icon: '📊', title: 'Collapsible Stats', desc: 'Click headers to collapse sections' },
+      ]},
       { version: '8.0', title: '🎨 Visual Theme Enhancements', items: [
         { icon: '☕', title: 'Coffee Cup Progress', desc: 'XP bar fills up like a coffee cup!' },
         { icon: '💨', title: 'Steam Celebrations', desc: 'Steam & confetti rise from your cup' },
@@ -901,17 +909,21 @@
     // TUTORIAL STEPS
     // ═══════════════════════════════════════════════════════════════
     const tutorialSteps = [
-      { id: 'welcome', title: 'Welcome to Daily Brew 8.0! ☕', subtitle: 'So much has changed!', content: "Wow, we've been busy! Your cozy café has gotten a major renovation with tons of new features. Let me give you the grand tour of everything new!", icon: '🏠', highlight: null },
+      { id: 'welcome', title: 'Welcome to Daily Brew 8.0! ☕', subtitle: 'So much has changed!', content: "Wow, we've been busy! Your cozy café has gotten a major renovation with tons of new features including habit templates, archiving, drag & drop, and more. Let me give you the grand tour!", icon: '🏠', highlight: null },
       { id: 'sign', title: 'Your Café Sign', subtitle: 'Swinging in the breeze...', content: "Notice your café name now hangs on a cute wooden sign that gently sways! It's the little details that make this place feel like home.", icon: '🪧', highlight: 'header' },
+      { id: 'templates', title: 'Habit Templates', subtitle: 'Quick-start your routine!', content: "New! Tap '📋 Templates' in your Habits section to browse 10 curated habit packs like Morning Brew Ritual, Zen Garden, and Brain Brew. Add entire packs with one tap!", icon: '📋', highlight: 'habits' },
+      { id: 'reorder', title: 'Drag & Drop', subtitle: 'Organize your way!', content: "See the ⋮⋮ handle on each habit? Drag it to reorder your habits however you like. Your most important habits can be right at the top!", icon: '⋮⋮', highlight: 'habits' },
+      { id: 'archive', title: 'Habit Archiving', subtitle: 'Nothing is lost!', content: "Instead of deleting habits, you can now archive them with 📦. This preserves your streak history! Restore archived habits anytime from the archive button.", icon: '📦', highlight: 'habits' },
       { id: 'menu', title: 'Today\'s Specials Board', subtitle: 'Challenges, café-style!', content: "Your active challenges now appear on a charming chalkboard menu. Complete the specials to earn bonus XP!", icon: '📋', highlight: 'challenges' },
       { id: 'xpbar', title: 'Coffee Cup Progress', subtitle: 'Watch it fill up!', content: "Your XP bar now fills like a coffee cup! As you earn XP, watch the liquid rise. It even shows how much XP until your next rank!", icon: '☕', highlight: 'xp' },
+      { id: 'calendar', title: 'Swipe Navigation', subtitle: 'Navigate with ease!', content: "On the Calendar tab, you can now swipe left or right to navigate between months. Much faster than tapping arrows!", icon: '👆', highlight: 'calendar' },
+      { id: 'yearly', title: 'Full Year Heatmap', subtitle: 'Your year at a glance!', content: "Tap '📅 Full Year' in the Calendar tab to see a GitHub-style yearly view of all your habit completions. Watch your consistency grow!", icon: '📅', highlight: 'calendar' },
       { id: 'seasonal', title: 'Seasonal Magic', subtitle: 'Watch the seasons change...', content: "Look closely - seasonal particles float across your screen! ❄️ Snowflakes in winter, 🍂 leaves in autumn, 🌸 petals in spring. Toggle this in Settings.", icon: '✨', highlight: null },
       { id: 'celebrations', title: 'Steam & Confetti', subtitle: 'Celebrate every win!', content: "When you achieve something, your brew icon appears with rising steam and confetti! Every accomplishment deserves a little celebration.", icon: '🎉', highlight: null },
       { id: 'habits', title: 'Enhanced Habits', subtitle: 'New superpowers!', content: "Habits now have categories (💪 Health, 💼 Work, 🌟 Personal, 🧘 Mindfulness). You can also ⏭️ skip a day without breaking your streak, and ✏️ edit any habit!", icon: '⭐', highlight: 'habits' },
       { id: 'tasks', title: 'Supercharged Tasks', subtitle: 'Work smarter!', content: "Tasks now have ✏️ Edit, 💾 Save as Template, and quick notes. Build a library of templates for tasks you do often!", icon: '✓', highlight: 'tasks' },
       { id: 'timer', title: 'Timer Presets', subtitle: 'Ready-made focus sessions!', content: "Quick access to ⚡ Quick (15m), 🍅 Pomodoro (25m), 📚 Extended (45m), and 🧠 Deep Work (90m). Just tap and go!", icon: '⏱️', highlight: 'timer' },
-      { id: 'mood', title: 'Mood Notes', subtitle: 'Tell your story...', content: "After selecting your mood, you can now add a note explaining why you feel that way. Great for reflection!", icon: '😊', highlight: 'mood' },
-      { id: 'weekly', title: 'Weekly Review', subtitle: 'See your progress!', content: "Head to the Stats tab and tap 'Weekly Review' for a beautiful summary of your week's accomplishments, streaks, and focus time!", icon: '📊', highlight: 'stats' },
+      { id: 'stats', title: 'Collapsible Stats', subtitle: 'Less clutter, more focus!', content: "The Stats tab can feel overwhelming. Now you can click any section header to collapse it. The app remembers your preferences!", icon: '📊', highlight: 'stats' },
       { id: 'visuals', title: 'Visual Settings', subtitle: 'Make it yours!', content: "In Settings, find 'Visual Effects' to toggle 📜 Paper Texture (notebook feel) and seasonal animations. Plus 16 custom accent colors!", icon: '🎨', highlight: 'settings' },
       { id: 'ready', title: 'Enjoy Your Stay! ☕', subtitle: 'Your table is ready...', content: "That's everything new! Remember: small, consistent sips of progress add up. Your cozy productivity journey continues!", icon: '✨', highlight: null },
     ];
