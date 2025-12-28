@@ -34,7 +34,7 @@
   <div class="loading-screen" id="loadingScreen">
     <div class="loading-icon">☕</div>
     <div class="loading-text">Brewing something special...</div>
-    <div class="loading-subtext">v6.17 • Task Notes</div>
+    <div class="loading-subtext">v7.0 • Medium Features Complete</div>
   </div>
 
   <script type="text/babel">
@@ -65,10 +65,10 @@
     };
 
     const seasonalDecorations = {
-      spring: { emoji: '🌸', name: 'Cherry Blossom', accent: '#FFB7C5' },
-      summer: { emoji: '🌻', name: 'Sunshine', accent: '#FFD93D' },
-      fall: { emoji: '🍂', name: 'Pumpkin Spice', accent: '#D2691E' },
-      winter: { emoji: '❄️', name: 'Peppermint', accent: '#B8E0E0' }
+      spring: { emoji: '🌸', name: 'Cherry Blossom', accent: '#FFB7C5', gradient: 'linear-gradient(135deg, #FFB7C5, #FF69B4)' },
+      summer: { emoji: '🌻', name: 'Sunshine', accent: '#FFD93D', gradient: 'linear-gradient(135deg, #FFD93D, #FF8C00)' },
+      fall: { emoji: '🍂', name: 'Pumpkin Spice', accent: '#D2691E', gradient: 'linear-gradient(135deg, #D2691E, #8B4513)' },
+      winter: { emoji: '❄️', name: 'Peppermint', accent: '#B8E0E0', gradient: 'linear-gradient(135deg, #B8E0E0, #87CEEB)' }
     };
 
     // ═══════════════════════════════════════════════════════════════
@@ -784,7 +784,7 @@
     // MAIN APP COMPONENT
     // ═══════════════════════════════════════════════════════════════
     function App() {
-      const APP_VERSION = '6.17.0';
+      const APP_VERSION = '7.0.0';
       const season = getCurrentSeason();
       const seasonDeco = seasonalDecorations[season];
 
@@ -795,7 +795,16 @@
       const [autoDarkMode, setAutoDarkMode] = useState(() => load('autoDarkMode', false));
       const [customAccent, setCustomAccent] = useState(() => load('customAccent', ''));
       const baseTheme = brewThemes[brewType][isDark ? 'dark' : 'light'];
-      const theme = customAccent ? { ...baseTheme, accent: customAccent, accentGradient: `linear-gradient(145deg, ${customAccent} 0%, ${customAccent}dd 100%)` } : baseTheme;
+      const theme = (() => {
+        let t = baseTheme;
+        if (useSeasonalTheme && seasonDeco) {
+          t = { ...t, accent: seasonDeco.accent, accentGradient: seasonDeco.gradient };
+        }
+        if (customAccent) {
+          t = { ...t, accent: customAccent, accentGradient: `linear-gradient(145deg, ${customAccent} 0%, ${customAccent}dd 100%)` };
+        }
+        return t;
+      })();
       const levels = brewRanks[brewType];
       const badges = brewBadges[brewType];
       const messages = brewMessages[brewType];
@@ -821,6 +830,9 @@
       const [showTutorial, setShowTutorial] = useState(false);
       const [tutorialStep, setTutorialStep] = useState(0);
       const [showAddHabit, setShowAddHabit] = useState(false);
+      const [moodNote, setMoodNote] = useState('');
+      const [editingHabit, setEditingHabit] = useState(null);
+      const [editingTask, setEditingTask] = useState(null);
       const [showAddTask, setShowAddTask] = useState(false);
       const [showThemePicker, setShowThemePicker] = useState(false);
       const [showSettings, setShowSettings] = useState(false);
@@ -828,6 +840,10 @@
       const [showQuickAdd, setShowQuickAdd] = useState(false);
       const [showSubtaskInput, setShowSubtaskInput] = useState(null);
       const [showChallenges, setShowChallenges] = useState(false);
+      const [showWeeklyReview, setShowWeeklyReview] = useState(false);
+      const [taskTemplates, setTaskTemplates] = useState(() => load('taskTemplates', []));
+      const [focusHistory, setFocusHistory] = useState(() => load('focusHistory', {}));
+      const [useSeasonalTheme, setUseSeasonalTheme] = useState(() => load('useSeasonalTheme', false));
       const [showYearReview, setShowYearReview] = useState(false);
       const [showCustomTimer, setShowCustomTimer] = useState(false);
       const [showExport, setShowExport] = useState(false);
@@ -837,7 +853,7 @@
       const [showDailyTip, setShowDailyTip] = useState(() => load('lastTipDate', '') !== getDateKey());
       const [showNotificationPrompt, setShowNotificationPrompt] = useState(() => !load('notificationPromptDismissed', false));
       const [weather, setWeather] = useState(() => load('weather', { temp: null, icon: null, lastFetch: null }));
-      const [newHabit, setNewHabit] = useState({ name: '', icon: '💧' });
+      const [newHabit, setNewHabit] = useState({ name: '', icon: '💧', category: null });
       const [newTask, setNewTask] = useState({ text: '', time: '', priority: 'medium', category: null, recurring: 'none', subtasks: [], note: '' });
       const [newSubtask, setNewSubtask] = useState('');
       const [calendarDate, setCalendarDate] = useState(new Date());
@@ -920,6 +936,9 @@
       // Save effects
       useEffect(() => { store('habits', habits); }, [habits]);
       useEffect(() => { store('tasks', tasks); }, [tasks]);
+      useEffect(() => { store('taskTemplates', taskTemplates); }, [taskTemplates]);
+      useEffect(() => { store('focusHistory', focusHistory); }, [focusHistory]);
+      useEffect(() => { store('useSeasonalTheme', useSeasonalTheme); }, [useSeasonalTheme]);
       useEffect(() => { store('moods', moods); }, [moods]);
       useEffect(() => { store('journal', journal); }, [journal]);
       useEffect(() => { store('habitHistory', habitHistory); }, [habitHistory]);
@@ -1247,7 +1266,7 @@
       useEffect(() => {
         const lastDate = gameStats.lastActiveDate;
         if (lastDate !== todayKey) {
-          setHabits(h => h.map(habit => ({ ...habit, completed: false })));
+          setHabits(h => h.map(habit => ({ ...habit, completed: false, skipped: false })));
           
           // Reset recurring tasks
           const dayOfWeek = getDayOfWeek();
@@ -1314,6 +1333,11 @@
           setSoundEnabled(false); // Stop sound when timer completes
           const elapsed = timerStartTime ? Math.round((Date.now() - timerStartTime) / 60000) : 25;
           setGameStats(s => ({ ...s, totalFocusMinutes: s.totalFocusMinutes + elapsed }));
+          // Record focus session
+          setFocusHistory(h => {
+            const todayMinutes = (h[todayKey] || 0) + elapsed;
+            return { ...h, [todayKey]: todayMinutes };
+          });
           updateChallengeProgress('focus', elapsed);
           addXP(elapsed);
           triggerCelebration(messages.timerDone);
@@ -1527,16 +1551,24 @@
         checkPerfectDay();
       };
 
-      const addHabit = () => { if (!newHabit.name.trim()) return; setHabits([...habits, { id: Date.now(), name: newHabit.name, icon: newHabit.icon, completed: false, streak: 0, history: {} }]); setNewHabit({ name: '', icon: '💧' }); setShowAddHabit(false); setShowQuickAdd(false); };
+      const addHabit = () => { if (!newHabit.name.trim()) return; setHabits([...habits, { id: Date.now(), name: newHabit.name, icon: newHabit.icon, category: newHabit.category, completed: false, streak: 0, history: {} }]); setNewHabit({ name: '', icon: '💧', category: null }); setShowAddHabit(false); setShowQuickAdd(false); };
       const confirmDeleteHabit = (id) => { const habit = habits.find(h => h.id === id); setConfirmDelete({ type: 'habit', id, name: habit.name, icon: habit.icon }); };
       const deleteHabit = (id) => { const habit = habits.find(h => h.id === id); setHabits(habits.filter(h => h.id !== id)); setUndoAction({ type: 'habit', action: () => setHabits(h => [...h, habit]) }); setTimeout(() => setUndoAction(null), 4000); setConfirmDelete(null); };
       const reorderHabit = (id, dir) => { const idx = habits.findIndex(h => h.id === id); if ((dir === -1 && idx === 0) || (dir === 1 && idx === habits.length - 1)) return; const n = [...habits]; [n[idx], n[idx + dir]] = [n[idx + dir], n[idx]]; setHabits(n); };
       const togglePinHabit = (id) => { setHabits(habits.map(h => h.id === id ? { ...h, pinned: !h.pinned } : h)); };
+      const skipHabit = (id) => {
+        setHabits(habits.map(h => {
+          if (h.id !== id) return h;
+          const newHistory = { ...(h.history || {}), [todayKey]: 'skipped' };
+          return { ...h, skipped: true, history: newHistory };
+        }));
+        triggerCelebration('⏭️ Habit skipped for today');
+      };
       const togglePinTask = (id) => { setTasks(tasks.map(t => t.id === id ? { ...t, pinned: !t.pinned } : t)); };
       const duplicateHabit = (id) => { 
         const habit = habits.find(h => h.id === id); 
         if (habit) {
-          const newHabit = { ...habit, id: Date.now(), name: habit.name + ' (copy)', completed: false, streak: 0, pinned: false, history: {} };
+          const newHabit = { ...habit, id: Date.now(), name: habit.name + ' (copy)', completed: false, streak: 0, pinned: false, history: {}, category: habit.category };
           setHabits([...habits, newHabit]);
           triggerCelebration('📋 Habit duplicated!');
         }
@@ -1578,10 +1610,44 @@
       const addTask = () => { if (!newTask.text.trim()) return; setTasks([...tasks, { ...newTask, id: Date.now(), done: false, lastReset: todayKey }]); setNewTask({ text: '', time: '', priority: 'medium', category: null, recurring: 'none', subtasks: [], note: '' }); setShowAddTask(false); setShowQuickAdd(false); };
       const confirmDeleteTask = (id) => { const task = tasks.find(t => t.id === id); setConfirmDelete({ type: 'task', id, name: task.text }); };
       const deleteTask = (id) => { const task = tasks.find(t => t.id === id); setTasks(tasks.filter(t => t.id !== id)); setUndoAction({ type: 'task', action: () => setTasks(ts => [...ts, task]) }); setTimeout(() => setUndoAction(null), 4000); setConfirmDelete(null); };
+      
+      // Task Templates
+      const saveAsTemplate = (task) => {
+        const template = { id: Date.now(), text: task.text, time: task.time, priority: task.priority, category: task.category, recurring: task.recurring, subtasks: task.subtasks || [], note: task.note || '' };
+        setTaskTemplates([...taskTemplates, template]);
+        triggerCelebration('📑 Template saved!');
+      };
+      const useTemplate = (template) => {
+        setTasks([...tasks, { ...template, id: Date.now(), done: false, lastReset: todayKey, subtasks: (template.subtasks || []).map(st => ({ ...st, done: false })) }]);
+        triggerCelebration('✨ Task created from template!');
+      };
+      const deleteTemplate = (id) => { setTaskTemplates(taskTemplates.filter(t => t.id !== id)); };
+      
+      // Edit functions
+      const updateHabit = (id, updates) => {
+        setHabits(habits.map(h => h.id === id ? { ...h, ...updates } : h));
+        setEditingHabit(null);
+        triggerCelebration('✏️ Habit updated!');
+      };
+      const updateTask = (id, updates) => {
+        setTasks(tasks.map(t => t.id === id ? { ...t, ...updates } : t));
+        setEditingTask(null);
+        triggerCelebration('✏️ Task updated!');
+      };
 
       const checkPerfectDay = () => { setTimeout(() => { const allH = habits.length > 0 && habits.every(h => h.completed); const activeTasks = tasks.filter(t => !t.recurring || t.recurring === 'none' || (t.recurring === 'daily') || (t.recurring === 'weekdays' && getDayOfWeek() >= 1 && getDayOfWeek() <= 5) || (t.recurring === 'weekly' && getDayOfWeek() === 1)); const allT = activeTasks.length === 0 || activeTasks.every(t => t.done); if (allH && allT && !gameStats.perfectDayToday) { setGameStats(s => ({ ...s, perfectDays: s.perfectDays + 1, perfectDayToday: true })); updateChallengeProgress('perfect'); triggerCelebration('✨ Perfect day!'); addXP(50); } }, 100); };
 
-      const setMood = (value) => { const isNew = !moods[todayKey]; setMoods({ ...moods, [todayKey]: { value, time: Date.now() } }); setGameStats(s => ({ ...s, lastMoodValue: value, moodDaysTracked: isNew ? s.moodDaysTracked + 1 : s.moodDaysTracked })); if (isNew) { addXP(5); updateChallengeProgress('moods'); } };
+      const setMood = (value, note = '') => { 
+        const isNew = !moods[todayKey]; 
+        setMoods({ ...moods, [todayKey]: { value, time: Date.now(), note: note || moods[todayKey]?.note || '' } }); 
+        setGameStats(s => ({ ...s, lastMoodValue: value, moodDaysTracked: isNew ? s.moodDaysTracked + 1 : s.moodDaysTracked })); 
+        if (isNew) { addXP(5); updateChallengeProgress('moods'); } 
+      };
+      const updateMoodNote = (note) => {
+        if (moods[todayKey]) {
+          setMoods({ ...moods, [todayKey]: { ...moods[todayKey], note } });
+        }
+      };
       const saveJournal = () => { const isNew = !journal[todayKey]; setJournal({ ...journal, [todayKey]: todayJournal }); if (isNew && (todayJournal.gratitude || todayJournal.reflection || todayJournal.tomorrow)) { setGameStats(s => ({ ...s, journalEntries: s.journalEntries + 1 })); updateChallengeProgress('journal'); addXP(10); } };
 
       // Share
@@ -1686,6 +1752,89 @@
           month: monthTotal > 0 ? Math.round((monthCompleted / monthTotal) * 100) : 0
         };
       }, [habits, habitHistory]);
+
+      // Focus Stats
+      const focusStats = useMemo(() => {
+        const now = new Date();
+        let weekMinutes = 0, monthMinutes = 0;
+        
+        for (let i = 0; i < 7; i++) {
+          const date = new Date(now);
+          date.setDate(date.getDate() - i);
+          const key = getDateKey(date);
+          weekMinutes += focusHistory[key] || 0;
+        }
+        
+        for (let i = 0; i < 30; i++) {
+          const date = new Date(now);
+          date.setDate(date.getDate() - i);
+          const key = getDateKey(date);
+          monthMinutes += focusHistory[key] || 0;
+        }
+        
+        return {
+          today: focusHistory[todayKey] || 0,
+          week: weekMinutes,
+          month: monthMinutes,
+          total: gameStats.totalFocusMinutes || 0
+        };
+      }, [focusHistory, todayKey, gameStats.totalFocusMinutes]);
+
+      // Weekly Review Data
+      const weeklyReviewData = useMemo(() => {
+        const now = new Date();
+        const weekStart = new Date(now);
+        weekStart.setDate(now.getDate() - now.getDay()); // Start of week (Sunday)
+        
+        let habitsCompleted = 0, habitsTotal = 0;
+        let tasksCompleted = 0;
+        let perfectDays = 0;
+        let focusMinutes = 0;
+        let moodSum = 0, moodCount = 0;
+        const dailyStats = [];
+        
+        for (let i = 0; i < 7; i++) {
+          const date = new Date(weekStart);
+          date.setDate(weekStart.getDate() + i);
+          const key = getDateKey(date);
+          
+          // Habits for this day
+          let dayHabits = 0, dayHabitsTotal = habits.length;
+          habits.forEach(h => {
+            habitsTotal++;
+            if ((h.history || habitHistory[h.id] || {})[key]) {
+              habitsCompleted++;
+              dayHabits++;
+            }
+          });
+          
+          // Check if perfect day (all habits done)
+          if (dayHabitsTotal > 0 && dayHabits === dayHabitsTotal) perfectDays++;
+          
+          // Mood
+          if (moods[key]) {
+            moodSum += moods[key].value;
+            moodCount++;
+          }
+          
+          dailyStats.push({ date: key, habits: dayHabits, total: dayHabitsTotal });
+        }
+        
+        // Count tasks completed this week (approximate from gameStats)
+        tasksCompleted = tasks.filter(t => t.done).length;
+        focusMinutes = gameStats.totalFocusMinutes || 0;
+        
+        return {
+          habitsCompleted,
+          habitsTotal,
+          habitRate: habitsTotal > 0 ? Math.round((habitsCompleted / habitsTotal) * 100) : 0,
+          tasksCompleted,
+          perfectDays,
+          avgMood: moodCount > 0 ? (moodSum / moodCount).toFixed(1) : null,
+          focusMinutes,
+          dailyStats
+        };
+      }, [habits, habitHistory, tasks, moods, gameStats]);
 
       // Year review
       // Mood Insights - correlate mood with habits
@@ -1952,6 +2101,18 @@
                       </button>
                     ))}
                   </div>
+                  {moods[todayKey] && (
+                    <div style={{ marginTop: '10px' }}>
+                      <input 
+                        type="text" 
+                        placeholder="Why do you feel this way? (optional)" 
+                        value={moods[todayKey]?.note || ''} 
+                        onChange={e => updateMoodNote(e.target.value)}
+                        style={{ ...s.input, fontSize: '0.75rem', padding: '8px 12px' }}
+                        maxLength={100}
+                      />
+                    </div>
+                  )}
                 </div>
 
                 {/* Active Challenges Preview */}
@@ -1989,17 +2150,25 @@
                       {h.completed ? '✓' : h.icon}
                     </button>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <p className="bt" style={{ fontSize: '0.9rem', fontWeight: 500, color: h.completed ? theme.textMuted : theme.text, textDecoration: h.completed ? 'line-through' : 'none', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {h.pinned && <span style={{ color: theme.accent, marginRight: '4px' }}>⭐</span>}{h.name}
+                      <p className="bt" style={{ fontSize: '0.9rem', fontWeight: 500, color: h.completed || h.skipped ? theme.textMuted : theme.text, textDecoration: h.completed ? 'line-through' : 'none', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {h.pinned && <span style={{ color: theme.accent, marginRight: '4px' }}>⭐</span>}
+                        {h.skipped && <span style={{ marginRight: '4px' }}>⏭️</span>}
+                        {h.name}
                       </p>
-                      <span className="bt" style={{ fontSize: '0.6rem', padding: '2px 6px', borderRadius: '999px', background: theme.streakGradient, color: theme.isDark ? '#1a1a1a' : '#fff' }}>🔥 {h.streak}d</span>
+                      <div style={{ display: 'flex', gap: '4px', alignItems: 'center', flexWrap: 'wrap' }}>
+                        <span className="bt" style={{ fontSize: '0.6rem', padding: '2px 6px', borderRadius: '999px', background: theme.streakGradient, color: theme.isDark ? '#1a1a1a' : '#fff' }}>🔥 {h.streak}d</span>
+                        {h.category && (() => { const cat = categories.find(c => c.id === h.category); return cat ? <span style={{ fontSize: '0.55rem', padding: '1px 5px', borderRadius: '4px', background: `${cat.color}22`, color: cat.color }}>{cat.icon}</span> : null; })()}
+                        {h.skipped && <span className="bt" style={{ fontSize: '0.55rem', color: theme.textMuted }}>Skipped</span>}
+                      </div>
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
                       <button onClick={() => reorderHabit(h.id, -1)} style={{ background: 'none', border: 'none', color: theme.textMuted, fontSize: '0.7rem', cursor: 'pointer' }} aria-label="Move up">▲</button>
                       <button onClick={() => reorderHabit(h.id, 1)} style={{ background: 'none', border: 'none', color: theme.textMuted, fontSize: '0.7rem', cursor: 'pointer' }} aria-label="Move down">▼</button>
                     </div>
                     <button onClick={() => togglePinHabit(h.id)} style={{ background: 'none', border: 'none', color: h.pinned ? theme.accent : theme.textMuted, fontSize: '0.9rem', cursor: 'pointer', padding: '6px' }} aria-label={h.pinned ? 'Unpin habit' : 'Pin habit'}>{h.pinned ? '⭐' : '☆'}</button>
+                    {!h.completed && !h.skipped && <button onClick={() => skipHabit(h.id)} style={{ background: 'none', border: 'none', color: theme.textMuted, fontSize: '0.9rem', cursor: 'pointer', padding: '6px' }} aria-label="Skip habit">⏭️</button>}
                     <button onClick={() => duplicateHabit(h.id)} style={{ background: 'none', border: 'none', color: theme.textMuted, fontSize: '0.9rem', cursor: 'pointer', padding: '6px' }} aria-label="Duplicate habit">📋</button>
+                    <button onClick={() => setEditingHabit(h)} style={{ background: 'none', border: 'none', color: theme.textMuted, fontSize: '0.9rem', cursor: 'pointer', padding: '6px' }} aria-label="Edit habit">✏️</button>
                     <button onClick={() => confirmDeleteHabit(h.id)} style={{ background: 'none', border: 'none', color: theme.textMuted, fontSize: '0.9rem', cursor: 'pointer', padding: '6px' }} aria-label="Delete habit">🗑</button>
                   </SwipeableCard>
                 ))}
@@ -2040,6 +2209,8 @@
                         </div>
                         <button onClick={() => togglePinTask(task.id)} style={{ background: 'none', border: 'none', color: task.pinned ? theme.accent : theme.textMuted, fontSize: '0.9rem', cursor: 'pointer', padding: '6px' }} aria-label={task.pinned ? 'Unpin task' : 'Pin task'}>{task.pinned ? '⭐' : '☆'}</button>
                         <button onClick={() => duplicateTask(task.id)} style={{ background: 'none', border: 'none', color: theme.textMuted, fontSize: '0.9rem', cursor: 'pointer', padding: '6px' }} aria-label="Duplicate task">📋</button>
+                        <button onClick={() => setEditingTask(task)} style={{ background: 'none', border: 'none', color: theme.textMuted, fontSize: '0.9rem', cursor: 'pointer', padding: '6px' }} aria-label="Edit task">✏️</button>
+                        <button onClick={() => saveAsTemplate(task)} style={{ background: 'none', border: 'none', color: theme.textMuted, fontSize: '0.9rem', cursor: 'pointer', padding: '6px' }} aria-label="Save as template">📑</button>
                         <button onClick={() => confirmDeleteTask(task.id)} style={{ background: 'none', border: 'none', color: theme.textMuted, fontSize: '0.9rem', cursor: 'pointer', padding: '6px' }}>🗑</button>
                       </div>
                       {subtasksTotal > 0 && (
@@ -2154,6 +2325,29 @@
                   <button onClick={() => setShowCustomTimer(true)} className="bt" style={{ background: 'none', border: 'none', color: theme.accent, fontSize: '0.8rem', cursor: 'pointer' }}>⚙️ Custom time</button>
                 </div>
 
+                {/* Focus Stats */}
+                <div style={{ ...s.card, marginBottom: '12px' }}>
+                  <p className="bt" style={{ fontSize: '0.8rem', fontWeight: 600, color: theme.text, marginBottom: '10px' }}>⏱️ Focus Stats</p>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px', textAlign: 'center' }}>
+                    <div style={{ background: theme.progressBg, borderRadius: '8px', padding: '8px 4px' }}>
+                      <p style={{ fontSize: '1.1rem', fontWeight: 600, color: theme.accent }}>{focusStats.today}</p>
+                      <p className="bt" style={{ fontSize: '0.55rem', color: theme.textMuted }}>Today (min)</p>
+                    </div>
+                    <div style={{ background: theme.progressBg, borderRadius: '8px', padding: '8px 4px' }}>
+                      <p style={{ fontSize: '1.1rem', fontWeight: 600, color: theme.text }}>{focusStats.week}</p>
+                      <p className="bt" style={{ fontSize: '0.55rem', color: theme.textMuted }}>This Week</p>
+                    </div>
+                    <div style={{ background: theme.progressBg, borderRadius: '8px', padding: '8px 4px' }}>
+                      <p style={{ fontSize: '1.1rem', fontWeight: 600, color: theme.text }}>{focusStats.month}</p>
+                      <p className="bt" style={{ fontSize: '0.55rem', color: theme.textMuted }}>This Month</p>
+                    </div>
+                    <div style={{ background: theme.progressBg, borderRadius: '8px', padding: '8px 4px' }}>
+                      <p style={{ fontSize: '1.1rem', fontWeight: 600, color: theme.text }}>{Math.round(focusStats.total / 60)}h</p>
+                      <p className="bt" style={{ fontSize: '0.55rem', color: theme.textMuted }}>All Time</p>
+                    </div>
+                  </div>
+                </div>
+
                 {soundEnabled && ambientSound !== 'off' && (
                   <div style={{ ...s.card, textAlign: 'center', background: theme.accentLight }} className="pulse">
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', flexWrap: 'wrap' }}>
@@ -2256,11 +2450,19 @@
             {/* STATS TAB */}
             {activeTab === 'stats' && (
               <div className="fade">
-                {/* Year in Review */}
-                <button onClick={() => setShowYearReview(true)} style={{ ...s.card, width: '100%', textAlign: 'center', cursor: 'pointer', border: `2px solid ${theme.accent}` }}>
-                  <span style={{ fontSize: '1.2rem' }}>📅</span>
-                  <p className="hw" style={{ fontSize: '1.2rem', color: theme.text, marginTop: '4px' }}>{currentYear} Year in Review</p>
-                </button>
+                {/* Quick Stats Row */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '10px' }}>
+                  {/* Year in Review */}
+                  <button onClick={() => setShowYearReview(true)} style={{ ...s.card, width: '100%', textAlign: 'center', cursor: 'pointer', border: `2px solid ${theme.accent}` }}>
+                    <span style={{ fontSize: '1.2rem' }}>📅</span>
+                    <p className="hw" style={{ fontSize: '0.9rem', color: theme.text, marginTop: '4px' }}>{currentYear} Review</p>
+                  </button>
+                  {/* Weekly Review */}
+                  <button onClick={() => setShowWeeklyReview(true)} style={{ ...s.card, width: '100%', textAlign: 'center', cursor: 'pointer', border: `2px solid ${theme.accent}` }}>
+                    <span style={{ fontSize: '1.2rem' }}>📊</span>
+                    <p className="hw" style={{ fontSize: '0.9rem', color: theme.text, marginTop: '4px' }}>This Week</p>
+                  </button>
+                </div>
 
                 {/* Challenges */}
                 <div style={{ ...s.card, cursor: 'pointer' }} onClick={() => setShowChallenges(true)}>
@@ -2479,10 +2681,63 @@
                 <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap', marginBottom: '14px', maxHeight: '120px', overflow: 'auto' }}>
                   {defaultEmojis.map(e => (<button key={e} onClick={() => setNewHabit({ ...newHabit, icon: e })} style={{ width: '36px', height: '36px', borderRadius: '10px', border: newHabit.icon === e ? `2px solid ${theme.accent}` : 'none', background: newHabit.icon === e ? theme.accentLight : theme.progressBg, fontSize: '1.1rem', cursor: 'pointer' }}>{e}</button>))}
                 </div>
-                <input value={newHabit.name} onChange={e => setNewHabit({ ...newHabit, name: e.target.value })} placeholder="Habit name..." style={{ ...s.input, marginBottom: '14px' }} onKeyPress={e => e.key === 'Enter' && addHabit()} autoFocus />
+                <input value={newHabit.name} onChange={e => setNewHabit({ ...newHabit, name: e.target.value })} placeholder="Habit name..." style={{ ...s.input, marginBottom: '10px' }} onKeyPress={e => e.key === 'Enter' && addHabit()} autoFocus />
+                <p className="bt" style={{ fontSize: '0.8rem', color: theme.textSecondary, marginBottom: '6px' }}>Category (optional):</p>
+                <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap', marginBottom: '14px' }}>
+                  {categories.map(c => (<button key={c.id} onClick={() => setNewHabit({ ...newHabit, category: newHabit.category === c.id ? null : c.id })} style={{ padding: '5px 10px', borderRadius: '8px', border: newHabit.category === c.id ? `2px solid ${c.color}` : `1px solid ${theme.cardBorder}`, background: newHabit.category === c.id ? `${c.color}22` : 'transparent', fontSize: '0.7rem', cursor: 'pointer', color: newHabit.category === c.id ? c.color : theme.textSecondary }}>{c.icon} {c.name}</button>))}
+                </div>
                 <div style={{ display: 'flex', gap: '10px' }}>
                   <button onClick={() => setShowAddHabit(false)} style={{ ...s.btnSecondary, flex: 1 }}>Cancel</button>
                   <button onClick={addHabit} style={{ ...s.btn, flex: 1 }}>Add Habit</button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Edit Habit */}
+          {editingHabit && (
+            <div style={s.modal} onClick={() => setEditingHabit(null)}>
+              <div style={s.modalContent} className="slide" onClick={e => e.stopPropagation()}>
+                <h2 className="hw" style={{ fontSize: '1.4rem', color: theme.text, marginBottom: '16px' }}>✏️ Edit Habit</h2>
+                <p className="bt" style={{ fontSize: '0.8rem', color: theme.textSecondary, marginBottom: '8px' }}>Icon:</p>
+                <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap', marginBottom: '14px', maxHeight: '100px', overflow: 'auto' }}>
+                  {defaultEmojis.map(e => (<button key={e} onClick={() => setEditingHabit({ ...editingHabit, icon: e })} style={{ width: '36px', height: '36px', borderRadius: '10px', border: editingHabit.icon === e ? `2px solid ${theme.accent}` : 'none', background: editingHabit.icon === e ? theme.accentLight : theme.progressBg, fontSize: '1.1rem', cursor: 'pointer' }}>{e}</button>))}
+                </div>
+                <input value={editingHabit.name} onChange={e => setEditingHabit({ ...editingHabit, name: e.target.value })} placeholder="Habit name..." style={{ ...s.input, marginBottom: '10px' }} autoFocus />
+                <p className="bt" style={{ fontSize: '0.8rem', color: theme.textSecondary, marginBottom: '6px' }}>Category:</p>
+                <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap', marginBottom: '14px' }}>
+                  {categories.map(c => (<button key={c.id} onClick={() => setEditingHabit({ ...editingHabit, category: editingHabit.category === c.id ? null : c.id })} style={{ padding: '5px 10px', borderRadius: '8px', border: editingHabit.category === c.id ? `2px solid ${c.color}` : `1px solid ${theme.cardBorder}`, background: editingHabit.category === c.id ? `${c.color}22` : 'transparent', fontSize: '0.7rem', cursor: 'pointer', color: editingHabit.category === c.id ? c.color : theme.textSecondary }}>{c.icon} {c.name}</button>))}
+                </div>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <button onClick={() => setEditingHabit(null)} style={{ ...s.btnSecondary, flex: 1 }}>Cancel</button>
+                  <button onClick={() => updateHabit(editingHabit.id, { name: editingHabit.name, icon: editingHabit.icon, category: editingHabit.category })} style={{ ...s.btn, flex: 1 }}>Save</button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Edit Task */}
+          {editingTask && (
+            <div style={s.modal} onClick={() => setEditingTask(null)}>
+              <div style={s.modalContent} className="slide" onClick={e => e.stopPropagation()}>
+                <h2 className="hw" style={{ fontSize: '1.4rem', color: theme.text, marginBottom: '16px' }}>✏️ Edit Task</h2>
+                <input value={editingTask.text} onChange={e => setEditingTask({ ...editingTask, text: e.target.value })} placeholder="Task name..." style={{ ...s.input, marginBottom: '8px' }} autoFocus />
+                <input value={editingTask.note || ''} onChange={e => setEditingTask({ ...editingTask, note: e.target.value })} placeholder="📝 Note (optional)" style={{ ...s.input, marginBottom: '12px', fontSize: '0.8rem' }} />
+                <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
+                  <input type="time" value={editingTask.time || ''} onChange={e => setEditingTask({ ...editingTask, time: e.target.value })} style={{ ...s.input, flex: 1 }} />
+                  <select value={editingTask.priority} onChange={e => setEditingTask({ ...editingTask, priority: e.target.value })} style={{ ...s.input, flex: 1 }}>
+                    <option value="high">🔴 High</option>
+                    <option value="medium">🟡 Medium</option>
+                    <option value="low">🟢 Low</option>
+                  </select>
+                </div>
+                <p className="bt" style={{ fontSize: '0.8rem', color: theme.textSecondary, marginBottom: '6px' }}>Category:</p>
+                <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap', marginBottom: '14px' }}>
+                  {categories.map(c => (<button key={c.id} onClick={() => setEditingTask({ ...editingTask, category: editingTask.category === c.id ? null : c.id })} style={{ padding: '5px 10px', borderRadius: '8px', border: editingTask.category === c.id ? `2px solid ${c.color}` : `1px solid ${theme.cardBorder}`, background: editingTask.category === c.id ? `${c.color}22` : 'transparent', fontSize: '0.7rem', cursor: 'pointer' }}>{c.icon}</button>))}
+                </div>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <button onClick={() => setEditingTask(null)} style={{ ...s.btnSecondary, flex: 1 }}>Cancel</button>
+                  <button onClick={() => updateTask(editingTask.id, { text: editingTask.text, note: editingTask.note, time: editingTask.time, priority: editingTask.priority, category: editingTask.category })} style={{ ...s.btn, flex: 1 }}>Save</button>
                 </div>
               </div>
             </div>
@@ -2513,6 +2768,19 @@
                     <button key={r.id} onClick={() => setNewTask({ ...newTask, recurring: r.id })} style={{ padding: '6px 12px', borderRadius: '8px', border: newTask.recurring === r.id ? `2px solid ${theme.accent}` : `1px solid ${theme.cardBorder}`, background: newTask.recurring === r.id ? theme.accentLight : 'transparent', fontSize: '0.75rem', color: theme.text, cursor: 'pointer', fontFamily: "'Lora',serif" }}>{r.label}</button>
                   ))}
                 </div>
+                {taskTemplates.length > 0 && (
+                  <div style={{ marginBottom: '14px' }}>
+                    <p className="bt" style={{ fontSize: '0.8rem', color: theme.textSecondary, marginBottom: '6px' }}>📑 Templates:</p>
+                    <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                      {taskTemplates.map(t => (
+                        <div key={t.id} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <button onClick={() => { useTemplate(t); setShowAddTask(false); }} style={{ padding: '6px 10px', borderRadius: '8px', border: `1px solid ${theme.cardBorder}`, background: theme.progressBg, fontSize: '0.7rem', color: theme.text, cursor: 'pointer', fontFamily: "'Lora',serif" }}>{t.text.slice(0, 15)}{t.text.length > 15 ? '...' : ''}</button>
+                          <button onClick={() => deleteTemplate(t.id)} style={{ background: 'none', border: 'none', color: theme.textMuted, fontSize: '0.7rem', cursor: 'pointer', padding: '2px' }}>✕</button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
                 <div style={{ display: 'flex', gap: '10px' }}>
                   <button onClick={() => setShowAddTask(false)} style={{ ...s.btnSecondary, flex: 1 }}>Cancel</button>
                   <button onClick={addTask} style={{ ...s.btn, flex: 1 }}>Add Task</button>
@@ -2621,7 +2889,21 @@
                 </div>
 
                 <div style={{ marginBottom: '14px' }}>
-                  <p className="bt" style={{ fontSize: '0.8rem', color: theme.textSecondary, marginBottom: '6px' }}>Season: {seasonDeco.emoji} {seasonDeco.name}</p>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                    <p className="bt" style={{ fontSize: '0.8rem', color: theme.textSecondary }}>Season: {seasonDeco.emoji} {seasonDeco.name}</p>
+                  </div>
+                  <button 
+                    onClick={() => setUseSeasonalTheme(!useSeasonalTheme)} 
+                    style={{ 
+                      ...s.btnSecondary, 
+                      width: '100%', 
+                      fontSize: '0.75rem',
+                      background: useSeasonalTheme ? theme.accentLight : 'transparent',
+                      border: useSeasonalTheme ? `2px solid ${theme.accent}` : `1px solid ${theme.cardBorder}`
+                    }}
+                  >
+                    {useSeasonalTheme ? `🎨 Seasonal Theme Active (${seasonDeco.name})` : '🎨 Enable Seasonal Theme Colors'}
+                  </button>
                 </div>
 
                 <div style={{ marginBottom: '14px', padding: '10px', background: theme.progressBg, borderRadius: '10px' }}>
@@ -2656,6 +2938,35 @@
                     }
                     return <p className="bt" style={{ fontSize: '0.7rem', color: theme.accent, marginTop: '6px' }}>👑 All milestones achieved!</p>;
                   })()}
+                </div>
+
+                {/* Widget Data */}
+                <div style={{ marginBottom: '14px', padding: '12px', background: theme.progressBg, borderRadius: '10px' }}>
+                  <p className="bt" style={{ fontSize: '0.85rem', fontWeight: 600, color: theme.text, marginBottom: '8px' }}>📱 Quick Stats (Widget)</p>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', marginBottom: '10px' }}>
+                    <div style={{ background: theme.cardBg, borderRadius: '8px', padding: '10px', textAlign: 'center', border: `1px solid ${theme.cardBorder}` }}>
+                      <p style={{ fontSize: '1.3rem', fontWeight: 600, color: theme.accent }}>{progress}%</p>
+                      <p className="bt" style={{ fontSize: '0.55rem', color: theme.textMuted }}>Today</p>
+                    </div>
+                    <div style={{ background: theme.cardBg, borderRadius: '8px', padding: '10px', textAlign: 'center', border: `1px solid ${theme.cardBorder}` }}>
+                      <p style={{ fontSize: '1.3rem', fontWeight: 600, color: theme.text }}>🔥 {gameStats.appStreak}</p>
+                      <p className="bt" style={{ fontSize: '0.55rem', color: theme.textMuted }}>Streak</p>
+                    </div>
+                    <div style={{ background: theme.cardBg, borderRadius: '8px', padding: '10px', textAlign: 'center', border: `1px solid ${theme.cardBorder}` }}>
+                      <p style={{ fontSize: '1.3rem', fontWeight: 600, color: theme.text }}>{gameStats.xp}</p>
+                      <p className="bt" style={{ fontSize: '0.55rem', color: theme.textMuted }}>XP</p>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => {
+                      const data = `📊 My Daily Brew Stats\n🔥 ${gameStats.appStreak} day streak\n✅ ${progress}% today (${completedHabits}/${habits.length} habits)\n🏆 ${gameStats.xp} XP • ${currentLevel.title}`;
+                      navigator.clipboard.writeText(data);
+                      triggerCelebration('📋 Stats copied!');
+                    }}
+                    style={{ ...s.btnSecondary, width: '100%', fontSize: '0.75rem' }}
+                  >
+                    📋 Copy Stats to Clipboard
+                  </button>
                 </div>
 
                 {/* Notifications */}
@@ -2815,6 +3126,61 @@
                 )}
 
                 <button onClick={() => setShowChallenges(false)} style={{ ...s.btn, width: '100%', marginTop: '14px' }}>Close</button>
+              </div>
+            </div>
+          )}
+
+          {/* Weekly Review */}
+          {showWeeklyReview && (
+            <div style={s.modal} className="fade" onClick={() => setShowWeeklyReview(false)}>
+              <div style={s.modalContent} className="slide" onClick={e => e.stopPropagation()}>
+                <h2 className="hw" style={{ fontSize: '1.4rem', color: theme.text, marginBottom: '16px' }}>📊 Weekly Review</h2>
+                
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: '10px', marginBottom: '16px' }}>
+                  <div style={{ background: theme.progressBg, borderRadius: '12px', padding: '14px', textAlign: 'center' }}>
+                    <p style={{ fontSize: '1.5rem', fontWeight: 600, color: theme.accent }}>{weeklyReviewData.habitRate}%</p>
+                    <p className="bt" style={{ fontSize: '0.65rem', color: theme.textSecondary }}>Habit Rate</p>
+                  </div>
+                  <div style={{ background: theme.progressBg, borderRadius: '12px', padding: '14px', textAlign: 'center' }}>
+                    <p style={{ fontSize: '1.5rem', fontWeight: 600, color: theme.text }}>{weeklyReviewData.perfectDays}</p>
+                    <p className="bt" style={{ fontSize: '0.65rem', color: theme.textSecondary }}>Perfect Days</p>
+                  </div>
+                  <div style={{ background: theme.progressBg, borderRadius: '12px', padding: '14px', textAlign: 'center' }}>
+                    <p style={{ fontSize: '1.5rem', fontWeight: 600, color: theme.text }}>{weeklyReviewData.tasksCompleted}</p>
+                    <p className="bt" style={{ fontSize: '0.65rem', color: theme.textSecondary }}>Tasks Done</p>
+                  </div>
+                  <div style={{ background: theme.progressBg, borderRadius: '12px', padding: '14px', textAlign: 'center' }}>
+                    <p style={{ fontSize: '1.5rem', fontWeight: 600, color: theme.text }}>{weeklyReviewData.avgMood || '—'}</p>
+                    <p className="bt" style={{ fontSize: '0.65rem', color: theme.textSecondary }}>Avg Mood</p>
+                  </div>
+                </div>
+
+                <p className="bt" style={{ fontSize: '0.85rem', fontWeight: 600, color: theme.text, marginBottom: '8px' }}>Daily Breakdown</p>
+                <div style={{ display: 'flex', gap: '4px', marginBottom: '16px' }}>
+                  {['S','M','T','W','T','F','S'].map((day, i) => {
+                    const stat = weeklyReviewData.dailyStats[i];
+                    const pct = stat && stat.total > 0 ? (stat.habits / stat.total) * 100 : 0;
+                    return (
+                      <div key={i} style={{ flex: 1, textAlign: 'center' }}>
+                        <div style={{ height: '60px', background: theme.progressBg, borderRadius: '6px', display: 'flex', alignItems: 'flex-end', overflow: 'hidden', marginBottom: '4px' }}>
+                          <div style={{ width: '100%', height: `${pct}%`, background: pct === 100 ? theme.success : theme.accent, transition: 'height 0.3s' }} />
+                        </div>
+                        <span className="bt" style={{ fontSize: '0.6rem', color: theme.textMuted }}>{day}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                <div style={{ background: theme.accentLight, borderRadius: '10px', padding: '12px', marginBottom: '14px' }}>
+                  <p className="bt" style={{ fontSize: '0.8rem', color: theme.text, textAlign: 'center' }}>
+                    {weeklyReviewData.habitRate >= 80 ? '🌟 Outstanding week! Keep it up!' : 
+                     weeklyReviewData.habitRate >= 60 ? '💪 Great progress this week!' :
+                     weeklyReviewData.habitRate >= 40 ? '👍 Good effort! Room to grow.' :
+                     '🌱 Every step counts. Try again next week!'}
+                  </p>
+                </div>
+
+                <button onClick={() => setShowWeeklyReview(false)} style={{ ...s.btn, width: '100%' }}>Close</button>
               </div>
             </div>
           )}
