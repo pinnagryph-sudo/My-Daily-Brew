@@ -905,7 +905,7 @@
       const [ambianceTrack, setAmbianceTrack] = useState(() => load('ambianceTrack', 'auto')); // 'auto' or specific track id
       const [ambianceVolume, setAmbianceVolume] = useState(() => load('ambianceVolume', 35)); // 0-100
       const [musicVolume, setMusicVolume] = useState(() => load('musicVolume', 25)); // 0-100
-      const [soundMood, setSoundMood] = useState(() => load('soundMood', 'cozy')); // kept for ambiance mood override
+      const [soundMood, setSoundMood] = useState(() => load('soundMood', 'auto')); // 'auto' follows theme, or specific mood
       const [backgroundPlay, setBackgroundPlay] = useState(() => load('backgroundPlay', false));
       const [soundEnabled, setSoundEnabled] = useState(false); // Whether sound is currently playing
       const [showSoundMenu, setShowSoundMenu] = useState(false);
@@ -940,13 +940,19 @@
       
       const getActiveAmbianceTrack = useCallback(() => {
         if (ambianceTrack !== 'auto') return ambianceTrack;
-        // Auto selection: mood override first, then theme-based defaults
+        // Auto selection based on soundMood
+        if (soundMood === 'auto') {
+          // Theme-based defaults: coffee→fireplace, tea→rain, matcha→wind
+          if (brewType === 'coffee') return 'fireplace';
+          if (brewType === 'tea') return 'rain';
+          if (brewType === 'matcha') return 'wind';
+          return 'fireplace';
+        }
+        // Manual mood selection
         if (soundMood === 'cozy') return 'fireplace';
+        if (soundMood === 'rainy') return 'rain';
+        if (soundMood === 'wind') return 'wind';
         if (soundMood === 'soothing') return 'ocean';
-        // Theme-based defaults: coffee→fireplace, tea→rain, matcha→wind
-        if (brewType === 'coffee') return 'fireplace';
-        if (brewType === 'tea') return 'rain';
-        if (brewType === 'matcha') return 'wind';
         return 'fireplace';
       }, [ambianceTrack, brewType, soundMood]);
       
@@ -3066,6 +3072,23 @@
                   <span>🗺️</span> Show Me Around (v8.0 Features)
                 </button>
                 
+                {/* Credits Section */}
+                <div style={{ marginBottom: '14px', padding: '12px', background: theme.progressBg, borderRadius: '10px' }}>
+                  <p className="bt" style={{ fontSize: '0.85rem', fontWeight: 600, color: theme.text, marginBottom: '10px' }}>🎵 Audio Credits</p>
+                  <div className="bt" style={{ fontSize: '0.7rem', color: theme.textSecondary, lineHeight: 1.8 }}>
+                    <p style={{ marginBottom: '6px' }}><strong>Background Music:</strong></p>
+                    <p>☕ "Cafe Contemplations" — VinylNoise</p>
+                    <p>🎹 "Elegant Background" — Grand_Project</p>
+                    <p>🍵 "Tea Time on a Rainy Day" — HarumachiMusic</p>
+                    <p>🎧 "Minimal Lo-Fi Ambient" — DesiFreeMusic</p>
+                    <p>🎋 "Zen Garden Beats" — Eggshy</p>
+                    <p style={{ marginBottom: '8px' }}>🇯🇵 "Japanese Lofi Beat" — Music-for-Videos</p>
+                    <p style={{ marginBottom: '6px' }}><strong>Ambient Sounds:</strong></p>
+                    <p>🔥 Fireplace • 🌧️ Rain • 🍃 Wind • 🌊 Ocean — Pixabay</p>
+                    <p style={{ marginTop: '8px', fontSize: '0.65rem', color: theme.textMuted }}>All audio licensed under Pixabay Content License</p>
+                  </div>
+                </div>
+                
                 <button onClick={() => setShowSettings(false)} style={{ ...s.btn, width: '100%' }}>Done</button>
               </div>
             </div>
@@ -3450,17 +3473,19 @@
                 {(ambientSound === 'ambiance' || ambientSound === 'both') && (
                   <div style={{ marginBottom: '14px' }}>
                     <p className="bt" style={{ fontSize: '0.75rem', color: theme.textSecondary, marginBottom: '8px' }}>Ambiance Mood:</p>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '6px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '6px' }}>
                       {[
-                        { id: 'cozy', icon: '🔥', name: 'Cozy', desc: 'Warm fireplace' },
-                        { id: 'chill', icon: '🌧️', name: 'Rainy', desc: 'Soft rain' },
-                        { id: 'soothing', icon: '🌊', name: 'Ocean', desc: 'Gentle waves' },
+                        { id: 'auto', icon: '✨', name: 'Auto', desc: 'Match theme' },
+                        { id: 'cozy', icon: '🔥', name: 'Cozy', desc: 'Fireplace' },
+                        { id: 'rainy', icon: '🌧️', name: 'Rainy', desc: 'Soft rain' },
+                        { id: 'wind', icon: '🍃', name: 'Wind', desc: 'Trees' },
+                        { id: 'soothing', icon: '🌊', name: 'Ocean', desc: 'Waves' },
                       ].map(mood => (
                         <button 
                           key={mood.id}
                           onClick={() => setSoundMood(mood.id)}
                           style={{
-                            padding: '10px 6px',
+                            padding: '8px 4px',
                             borderRadius: '10px',
                             border: soundMood === mood.id ? `2px solid ${theme.accent}` : `1px solid ${theme.cardBorder}`,
                             background: soundMood === mood.id ? theme.accentLight : 'transparent',
@@ -3468,8 +3493,8 @@
                             textAlign: 'center'
                           }}
                         >
-                          <span style={{ fontSize: '1.2rem', display: 'block' }}>{mood.icon}</span>
-                          <span className="bt" style={{ fontSize: '0.7rem', color: theme.text, fontWeight: soundMood === mood.id ? 600 : 400 }}>
+                          <span style={{ fontSize: '1.1rem', display: 'block' }}>{mood.icon}</span>
+                          <span className="bt" style={{ fontSize: '0.6rem', color: theme.text, fontWeight: soundMood === mood.id ? 600 : 400 }}>
                             {mood.name}
                           </span>
                         </button>
