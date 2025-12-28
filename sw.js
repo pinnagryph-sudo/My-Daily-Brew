@@ -1,6 +1,6 @@
 // Service Worker for My Daily Brew PWA
 // Version-based caching for easy updates
-const CACHE_VERSION = 'v7.3.0';
+const CACHE_VERSION = 'v7.5.0';
 const CACHE_NAME = `daily-brew-${CACHE_VERSION}`;
 
 // Assets to cache for offline use
