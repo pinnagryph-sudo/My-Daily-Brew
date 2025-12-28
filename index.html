@@ -20,7 +20,7 @@
   <style>
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
     html, body, #root { height: 100%; width: 100%; overflow-x: hidden; }
-    body { font-family: 'Cormorant Garamond', Georgia, serif; min-height: 100vh; transition: background 0.4s ease; overscroll-behavior: none; }
+    body { font-family: 'Cormorant Garamond', Georgia, serif; min-height: 100vh; min-height: -webkit-fill-available; transition: background 0.4s ease; overscroll-behavior: none; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
     .loading-screen { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; background: linear-gradient(180deg, #F5E6D3 0%, #FDFBF7 50%, #F5E6D3 100%); transition: opacity 0.5s; }
     .loading-screen.hidden { opacity: 0; pointer-events: none; }
     .loading-icon { font-size: 56px; animation: steam 2s ease-in-out infinite; }
@@ -1612,12 +1612,12 @@
 
       // Styles
       const s = {
-        card: { background: theme.cardBg, border: `1px solid ${theme.cardBorder}`, borderRadius: '16px', padding: '14px', marginBottom: '10px' },
+        card: { background: theme.cardBg, border: `1px solid ${theme.cardBorder}`, borderRadius: '14px', padding: '12px', marginBottom: '8px' },
         btn: { background: theme.accentGradient, color: theme.isDark ? '#1a1a1a' : '#fff', border: 'none', borderRadius: '12px', padding: '12px 20px', fontFamily: "'Lora',serif", fontWeight: 600, cursor: 'pointer' },
         btnSecondary: { background: theme.progressBg, color: theme.text, border: `1px solid ${theme.cardBorder}`, borderRadius: '12px', padding: '10px 16px', fontFamily: "'Lora',serif", fontWeight: 500, cursor: 'pointer' },
         input: { background: theme.inputBg, border: `1px solid ${theme.inputBorder}`, borderRadius: '12px', padding: '12px', fontFamily: "'Lora',serif", fontSize: '1rem', color: theme.text, width: '100%', outline: 'none' },
         navItem: (a) => ({ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px', padding: '8px 12px', borderRadius: '12px', background: a ? theme.accentGradient : 'transparent', color: a ? (theme.isDark ? '#1a1a1a' : '#fff') : theme.textSecondary, border: 'none', cursor: 'pointer', fontFamily: "'Lora',serif", fontSize: '9px', fontWeight: a ? 600 : 400 }),
-        fab: { position: 'fixed', bottom: '90px', right: '20px', width: '56px', height: '56px', borderRadius: '50%', background: theme.accentGradient, border: 'none', fontSize: '24px', cursor: 'pointer', boxShadow: '0 4px 20px rgba(0,0,0,0.3)', zIndex: 99, display: 'flex', alignItems: 'center', justifyContent: 'center', color: theme.isDark ? '#1a1a1a' : '#fff' },
+        fab: { position: 'fixed', bottom: '75px', right: '16px', width: '52px', height: '52px', borderRadius: '50%', background: theme.accentGradient, border: 'none', fontSize: '22px', cursor: 'pointer', boxShadow: '0 4px 20px rgba(0,0,0,0.3)', zIndex: 99, display: 'flex', alignItems: 'center', justifyContent: 'center', color: theme.isDark ? '#1a1a1a' : '#fff' },
         modal: { position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' },
         modalContent: { background: theme.modalBg, borderRadius: '20px', maxWidth: '360px', width: '100%', padding: '20px', maxHeight: '85vh', overflow: 'auto' }
       };
@@ -1641,7 +1641,7 @@
             .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
           `}</style>
 
-          <div style={{ maxWidth: '28rem', margin: '0 auto', padding: '16px 14px 100px' }}>
+          <div style={{ maxWidth: 'min(100%, 480px)', margin: '0 auto', padding: '12px 12px 85px' }}>
             {/* Header with seasonal decoration */}
             <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '14px' }}>
               <div>
@@ -2148,10 +2148,10 @@
             onClick={() => setShowSoundMenu(true)} 
             style={{ 
               position: 'fixed', 
-              bottom: '90px', 
-              left: '20px', 
-              width: '48px', 
-              height: '48px', 
+              bottom: '75px', 
+              left: '16px', 
+              width: '44px', 
+              height: '44px', 
               borderRadius: '50%', 
               background: soundEnabled ? theme.accentGradient : theme.cardBg, 
               border: `2px solid ${soundEnabled ? 'transparent' : theme.cardBorder}`, 
