@@ -180,6 +180,130 @@
     };
 
     // ═══════════════════════════════════════════════════════════════
+    // HABIT TEMPLATES - Curated habit packs for quick setup
+    // ═══════════════════════════════════════════════════════════════
+    const habitTemplates = {
+      'morning-brew': {
+        name: 'Morning Brew Ritual',
+        icon: '🌅',
+        description: 'Start your day right with this energizing morning routine',
+        habits: [
+          { name: 'Wake up early', icon: '⏰' },
+          { name: 'Drink water', icon: '💧' },
+          { name: 'Morning stretch', icon: '🧘' },
+          { name: 'Healthy breakfast', icon: '🥣' },
+          { name: 'Review daily goals', icon: '📋' }
+        ]
+      },
+      'wellness': {
+        name: 'Wellness Blend',
+        icon: '💚',
+        description: 'A balanced mix of physical and mental health habits',
+        habits: [
+          { name: 'Exercise 30 min', icon: '🏃' },
+          { name: 'Drink 8 glasses water', icon: '💧' },
+          { name: 'Take vitamins', icon: '💊' },
+          { name: 'Meditation', icon: '🧘' },
+          { name: 'Sleep 8 hours', icon: '😴' }
+        ]
+      },
+      'productivity': {
+        name: 'Espresso Shot Focus',
+        icon: '⚡',
+        description: 'High-energy habits for maximum productivity',
+        habits: [
+          { name: 'Plan tomorrow tonight', icon: '📝' },
+          { name: 'Deep work session', icon: '🎯' },
+          { name: 'Inbox zero', icon: '📧' },
+          { name: 'Learn something new', icon: '📚' },
+          { name: 'Review accomplishments', icon: '✅' }
+        ]
+      },
+      'mindfulness': {
+        name: 'Zen Garden',
+        icon: '🍃',
+        description: 'Cultivate inner peace and mindfulness',
+        habits: [
+          { name: 'Morning meditation', icon: '🧘' },
+          { name: 'Gratitude journaling', icon: '🙏' },
+          { name: 'Digital detox hour', icon: '📵' },
+          { name: 'Nature walk', icon: '🌳' },
+          { name: 'Evening reflection', icon: '🌙' }
+        ]
+      },
+      'self-care': {
+        name: 'Latte Love',
+        icon: '💝',
+        description: 'Nurturing habits for self-care and happiness',
+        habits: [
+          { name: 'Skincare routine', icon: '✨' },
+          { name: 'Read for pleasure', icon: '📖' },
+          { name: 'Connect with friend', icon: '💬' },
+          { name: 'Creative time', icon: '🎨' },
+          { name: 'Treat yourself', icon: '🍰' }
+        ]
+      },
+      'fitness': {
+        name: 'Power Blend',
+        icon: '💪',
+        description: 'Build strength and endurance',
+        habits: [
+          { name: 'Workout', icon: '🏋️' },
+          { name: 'Protein intake', icon: '🥩' },
+          { name: 'Stretch/yoga', icon: '🧘' },
+          { name: '10k steps', icon: '👟' },
+          { name: 'Track progress', icon: '📊' }
+        ]
+      },
+      'learning': {
+        name: 'Brain Brew',
+        icon: '🧠',
+        description: 'Feed your mind and grow every day',
+        habits: [
+          { name: 'Read 30 minutes', icon: '📚' },
+          { name: 'Practice skill', icon: '🎯' },
+          { name: 'Watch educational content', icon: '🎓' },
+          { name: 'Language practice', icon: '🗣️' },
+          { name: 'Teach someone', icon: '👨‍🏫' }
+        ]
+      },
+      'creative': {
+        name: 'Artisan Roast',
+        icon: '🎨',
+        description: 'Nurture your creative spirit',
+        habits: [
+          { name: 'Create something', icon: '✏️' },
+          { name: 'Capture inspiration', icon: '📸' },
+          { name: 'Practice your craft', icon: '🎭' },
+          { name: 'Share your work', icon: '🌟' },
+          { name: 'Explore new art', icon: '🖼️' }
+        ]
+      },
+      'minimalist': {
+        name: 'Simple Sip',
+        icon: '🫧',
+        description: 'Just the essentials for a balanced life',
+        habits: [
+          { name: 'Move your body', icon: '🚶' },
+          { name: 'Hydrate', icon: '💧' },
+          { name: 'Moment of calm', icon: '🌸' }
+        ]
+      },
+      'night-owl': {
+        name: 'Evening Wind-Down',
+        icon: '🌙',
+        description: 'End your day peacefully for better sleep',
+        habits: [
+          { name: 'No screens 1hr before bed', icon: '📵' },
+          { name: 'Prepare tomorrow', icon: '📋' },
+          { name: 'Light stretching', icon: '🧘' },
+          { name: 'Gratitude moment', icon: '🙏' },
+          { name: 'Consistent bedtime', icon: '🛏️' }
+        ]
+      }
+    };
+
+    // ═══════════════════════════════════════════════════════════════
     // DAILY JOURNAL PROMPTS - 366 unique prompts for the year
     // ═══════════════════════════════════════════════════════════════
     const journalPrompts = [
@@ -847,6 +971,7 @@
 
       const [activeTab, setActiveTab] = useState('today');
       const [habits, setHabits] = useState(() => load('habits', [{ id: 1, name: 'Drink water', icon: '💧', completed: false, streak: 0, history: {} }]));
+      const [archivedHabits, setArchivedHabits] = useState(() => load('archivedHabits', []));
       const [tasks, setTasks] = useState(() => load('tasks', []));
       const [moods, setMoods] = useState(() => load('moods', {}));
       const [journal, setJournal] = useState(() => load('journal', {}));
@@ -866,6 +991,12 @@
       const [showTutorial, setShowTutorial] = useState(false);
       const [tutorialStep, setTutorialStep] = useState(0);
       const [showAddHabit, setShowAddHabit] = useState(false);
+      const [showHabitTemplates, setShowHabitTemplates] = useState(false);
+      const [showArchivedHabits, setShowArchivedHabits] = useState(false);
+      const [showYearlyHeatmap, setShowYearlyHeatmap] = useState(false);
+      const [draggedHabit, setDraggedHabit] = useState(null);
+      const [dragOverHabit, setDragOverHabit] = useState(null);
+      const [collapsedStats, setCollapsedStats] = useState(() => load('collapsedStats', {}));
       const [showAddTask, setShowAddTask] = useState(false);
       const [showThemePicker, setShowThemePicker] = useState(false);
       const [showSettings, setShowSettings] = useState(false);
@@ -897,6 +1028,25 @@
       const [calendarDate, setCalendarDate] = useState(new Date());
       const [selectedCalendarDay, setSelectedCalendarDay] = useState(null); // For day detail modal
       const [calendarViewMode, setCalendarViewMode] = useState('month'); // 'month' or 'week'
+      const [calendarTouchStart, setCalendarTouchStart] = useState(null);
+      const [calendarTouchEnd, setCalendarTouchEnd] = useState(null);
+      const minSwipeDistance = 50;
+      
+      const handleCalendarSwipe = () => {
+        if (!calendarTouchStart || !calendarTouchEnd) return;
+        const distance = calendarTouchStart - calendarTouchEnd;
+        if (Math.abs(distance) > minSwipeDistance) {
+          if (distance > 0) {
+            // Swipe left - next month
+            setCalendarDate(new Date(calYear, calMonth + 1, 1));
+          } else {
+            // Swipe right - previous month
+            setCalendarDate(new Date(calYear, calMonth - 1, 1));
+          }
+        }
+        setCalendarTouchStart(null);
+        setCalendarTouchEnd(null);
+      };
       const [selectedHeatmapDay, setSelectedHeatmapDay] = useState(null); // For heatmap tooltip
       const [heatmapFilter, setHeatmapFilter] = useState('all'); // 'all' or habit id
       const [timerSeconds, setTimerSeconds] = useState(25 * 60);
@@ -984,6 +1134,8 @@
 
       // Save effects
       useEffect(() => { store('habits', habits); }, [habits]);
+      useEffect(() => { store('archivedHabits', archivedHabits); }, [archivedHabits]);
+      useEffect(() => { store('collapsedStats', collapsedStats); }, [collapsedStats]);
       useEffect(() => { store('tasks', tasks); }, [tasks]);
       useEffect(() => { store('moods', moods); }, [moods]);
       useEffect(() => { store('journal', journal); }, [journal]);
@@ -1599,6 +1751,97 @@
       const confirmDeleteHabit = (id) => { const habit = habits.find(h => h.id === id); setConfirmDelete({ type: 'habit', id, name: habit.name, icon: habit.icon }); };
       const deleteHabit = (id) => { const habit = habits.find(h => h.id === id); setHabits(habits.filter(h => h.id !== id)); setUndoAction({ type: 'habit', action: () => setHabits(h => [...h, habit]) }); setTimeout(() => setUndoAction(null), 4000); setConfirmDelete(null); };
       const reorderHabit = (id, dir) => { const idx = habits.findIndex(h => h.id === id); if ((dir === -1 && idx === 0) || (dir === 1 && idx === habits.length - 1)) return; const n = [...habits]; [n[idx], n[idx + dir]] = [n[idx + dir], n[idx]]; setHabits(n); };
+      
+      // Drag and drop habit reordering
+      const handleHabitDragStart = (e, habit) => {
+        setDraggedHabit(habit);
+        e.dataTransfer.effectAllowed = 'move';
+        e.target.style.opacity = '0.5';
+      };
+      const handleHabitDragEnd = (e) => {
+        e.target.style.opacity = '1';
+        setDraggedHabit(null);
+        setDragOverHabit(null);
+      };
+      const handleHabitDragOver = (e, habit) => {
+        e.preventDefault();
+        if (draggedHabit && habit.id !== draggedHabit.id) {
+          setDragOverHabit(habit.id);
+        }
+      };
+      const handleHabitDrop = (e, targetHabit) => {
+        e.preventDefault();
+        if (!draggedHabit || draggedHabit.id === targetHabit.id) return;
+        const dragIdx = habits.findIndex(h => h.id === draggedHabit.id);
+        const dropIdx = habits.findIndex(h => h.id === targetHabit.id);
+        const newHabits = [...habits];
+        newHabits.splice(dragIdx, 1);
+        newHabits.splice(dropIdx, 0, draggedHabit);
+        setHabits(newHabits);
+        setDraggedHabit(null);
+        setDragOverHabit(null);
+      };
+      
+      // Touch-based reordering for mobile
+      const [touchStartY, setTouchStartY] = useState(null);
+      const [touchHabit, setTouchHabit] = useState(null);
+      const handleHabitTouchStart = (e, habit) => {
+        setTouchStartY(e.touches[0].clientY);
+        setTouchHabit(habit);
+      };
+      const handleHabitTouchMove = (e, habit) => {
+        if (!touchHabit || touchHabit.id !== habit.id) return;
+        const currentY = e.touches[0].clientY;
+        const diff = currentY - touchStartY;
+        if (Math.abs(diff) > 50) {
+          const dir = diff > 0 ? 1 : -1;
+          reorderHabit(touchHabit.id, dir);
+          setTouchStartY(currentY);
+        }
+      };
+      const handleHabitTouchEnd = () => {
+        setTouchStartY(null);
+        setTouchHabit(null);
+      };
+      
+      // Archive habit instead of deleting
+      const archiveHabit = (id) => {
+        const habit = habits.find(h => h.id === id);
+        if (habit) {
+          setArchivedHabits([...archivedHabits, { ...habit, archivedAt: new Date().toISOString() }]);
+          setHabits(habits.filter(h => h.id !== id));
+          setConfirmDelete(null);
+        }
+      };
+      const restoreHabit = (id) => {
+        const habit = archivedHabits.find(h => h.id === id);
+        if (habit) {
+          const { archivedAt, ...restored } = habit;
+          setHabits([...habits, restored]);
+          setArchivedHabits(archivedHabits.filter(h => h.id !== id));
+        }
+      };
+      const permanentlyDeleteHabit = (id) => {
+        setArchivedHabits(archivedHabits.filter(h => h.id !== id));
+      };
+      
+      // Add habits from template
+      const addHabitsFromTemplate = (templateId) => {
+        const template = habitTemplates[templateId];
+        if (!template) return;
+        const newHabits = template.habits.map(h => ({
+          id: Date.now() + Math.random(),
+          name: h.name,
+          icon: h.icon,
+          completed: false,
+          streak: 0,
+          history: {},
+          pinned: false,
+          skippedToday: false
+        }));
+        setHabits([...habits, ...newHabits]);
+        setShowHabitTemplates(false);
+      };
 
       // Task actions
       const toggleTask = (id) => {
@@ -2145,15 +2388,42 @@
                 {/* Habits */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '14px 0 8px' }}>
                   <h2 className="bt" style={{ fontSize: '0.95rem', fontWeight: 600, color: theme.text }}>⭐ Habits</h2>
-                  <button onClick={() => setShowAddHabit(true)} style={{ ...s.btn, padding: '5px 12px', fontSize: '1rem' }} aria-label="Add habit">+</button>
+                  <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                    <button onClick={() => setShowHabitTemplates(true)} style={{ background: theme.accentLight, border: 'none', borderRadius: '8px', padding: '5px 10px', fontSize: '0.65rem', color: theme.accent, cursor: 'pointer', fontFamily: "'Lora', serif" }} aria-label="Browse templates">📋 Templates</button>
+                    {archivedHabits.length > 0 && (
+                      <button onClick={() => setShowArchivedHabits(true)} style={{ background: 'none', border: `1px solid ${theme.cardBorder}`, borderRadius: '8px', padding: '5px 8px', fontSize: '0.65rem', color: theme.textSecondary, cursor: 'pointer' }} aria-label="View archived">📦 {archivedHabits.length}</button>
+                    )}
+                    <button onClick={() => setShowAddHabit(true)} style={{ ...s.btn, padding: '5px 12px', fontSize: '1rem' }} aria-label="Add habit">+</button>
+                  </div>
                 </div>
 
                 {habits.length === 0 && <p className="bt" style={{ textAlign: 'center', color: theme.textMuted, padding: '16px' }}>{messages.emptyHabits}</p>}
 
-                {[...habits].sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0)).map(h => {
+                {[...habits].sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0)).map((h, idx) => {
                   const habitCat = habitCategories.find(c => c.id === h.category);
                   return (
-                  <SwipeableCard key={h.id} onSwipeRight={() => !h.skippedToday && toggleHabit(h.id)} style={{ ...s.card, display: 'flex', alignItems: 'center', gap: '10px', borderColor: h.completed ? theme.success : h.skippedToday ? theme.textMuted : h.pinned ? theme.accent : theme.cardBorder, opacity: h.skippedToday ? 0.6 : 1 }}>
+                  <SwipeableCard 
+                    key={h.id} 
+                    onSwipeRight={() => !h.skippedToday && toggleHabit(h.id)} 
+                    draggable={true}
+                    onDragStart={(e) => handleHabitDragStart(e, h)}
+                    onDragEnd={handleHabitDragEnd}
+                    onDragOver={(e) => handleHabitDragOver(e, h)}
+                    onDrop={(e) => handleHabitDrop(e, h)}
+                    style={{ 
+                      ...s.card, 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      gap: '8px', 
+                      borderColor: dragOverHabit === h.id ? theme.accent : h.completed ? theme.success : h.skippedToday ? theme.textMuted : h.pinned ? theme.accent : theme.cardBorder, 
+                      opacity: h.skippedToday ? 0.6 : 1,
+                      transform: dragOverHabit === h.id ? 'scale(1.02)' : 'scale(1)',
+                      transition: 'transform 0.2s, border-color 0.2s'
+                    }}
+                  >
+                    {/* Drag handle */}
+                    <div style={{ color: theme.textMuted, fontSize: '0.9rem', cursor: 'grab', padding: '2px', userSelect: 'none', touchAction: 'none' }} title="Drag to reorder">⋮⋮</div>
+                    
                     <button onClick={() => !h.skippedToday && toggleHabit(h.id)} className={h.completed ? 'pop' : ''} aria-pressed={h.completed} disabled={h.skippedToday} style={{ width: '40px', height: '40px', borderRadius: '12px', border: h.completed ? 'none' : `2px solid ${theme.inputBorder}`, background: h.skippedToday ? theme.progressBg : h.completed ? theme.accentGradient : theme.progressBg, fontSize: '1rem', cursor: h.skippedToday ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: h.completed ? (theme.isDark ? '#1a1a1a' : '#fff') : theme.text, flexShrink: 0 }}>
                       {h.skippedToday ? '⏭️' : h.completed ? '✓' : h.icon}
                     </button>
@@ -2175,8 +2445,7 @@
                       {h.pinned ? '⭐' : '☆'}
                     </button>
                     <button onClick={() => setEditingHabit(h)} style={{ background: 'none', border: 'none', color: theme.textMuted, fontSize: '0.7rem', cursor: 'pointer', padding: '4px' }} aria-label="Edit">✏️</button>
-                    <button onClick={() => duplicateHabit(h)} style={{ background: 'none', border: 'none', color: theme.textMuted, fontSize: '0.8rem', cursor: 'pointer', padding: '4px' }} aria-label="Duplicate">📋</button>
-                    <button onClick={() => confirmDeleteHabit(h.id)} style={{ background: 'none', border: 'none', color: theme.textMuted, fontSize: '0.9rem', cursor: 'pointer', padding: '6px' }} aria-label="Delete habit">🗑</button>
+                    <button onClick={() => archiveHabit(h.id)} style={{ background: 'none', border: 'none', color: theme.textMuted, fontSize: '0.75rem', cursor: 'pointer', padding: '4px' }} aria-label="Archive habit" title="Archive">📦</button>
                   </SwipeableCard>
                   );
                 })}
@@ -2497,16 +2766,25 @@
                 )}
 
                 {/* Calendar Card - Café Menu Board Style */}
-                <div style={{ 
-                  ...s.card, 
-                  background: theme.isDark ? 'linear-gradient(135deg, #2a2420 0%, #1a1815 100%)' : 'linear-gradient(135deg, #3d2f1f 0%, #2a1f15 100%)',
-                  border: `3px solid ${theme.isDark ? '#4a3f35' : '#5d4a3a'}`,
-                  borderRadius: '16px',
-                  position: 'relative',
-                  overflow: 'hidden'
-                }}>
+                <div 
+                  onTouchStart={e => setCalendarTouchStart(e.targetTouches[0].clientX)}
+                  onTouchMove={e => setCalendarTouchEnd(e.targetTouches[0].clientX)}
+                  onTouchEnd={handleCalendarSwipe}
+                  style={{ 
+                    ...s.card, 
+                    background: theme.isDark ? 'linear-gradient(135deg, #2a2420 0%, #1a1815 100%)' : 'linear-gradient(135deg, #3d2f1f 0%, #2a1f15 100%)',
+                    border: `3px solid ${theme.isDark ? '#4a3f35' : '#5d4a3a'}`,
+                    borderRadius: '16px',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    touchAction: 'pan-y'
+                  }}
+                >
                   {/* Chalkboard texture overlay */}
                   <div style={{ position: 'absolute', inset: 0, background: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 100 100\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noise\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.8\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noise)\' opacity=\'0.03\'/%3E%3C/svg%3E")', pointerEvents: 'none' }} />
+                  
+                  {/* Swipe hint */}
+                  <div style={{ position: 'absolute', top: '8px', right: '8px', fontSize: '0.55rem', color: 'rgba(255,255,255,0.4)', fontFamily: "'Lora', serif" }}>← swipe →</div>
                   
                   {/* Header with navigation */}
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', position: 'relative' }}>
@@ -2683,31 +2961,39 @@
 
                 {/* Theme-aware Heatmap */}
                 <div style={{ ...s.card, marginTop: '16px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
                     <h3 style={{ fontFamily: "'Caveat', cursive", fontSize: '1.3rem', color: theme.text, margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
                       {tc.bean} {tc.name} Counter
                       <span className="bt" style={{ fontSize: '0.7rem', color: theme.textSecondary, fontFamily: "'Lora', serif" }}>(12 weeks)</span>
                     </h3>
-                    {/* Habit filter dropdown */}
-                    <select 
-                      value={heatmapFilter} 
-                      onChange={e => setHeatmapFilter(e.target.value)}
-                      className="bt"
-                      style={{ 
-                        background: theme.inputBg, 
-                        border: `1px solid ${theme.cardBorder}`, 
-                        borderRadius: '6px', 
-                        padding: '4px 8px', 
-                        fontSize: '0.7rem', 
-                        color: theme.text,
-                        cursor: 'pointer'
-                      }}
-                    >
-                      <option value="all">All Habits</option>
-                      {habits.map(h => (
-                        <option key={h.id} value={h.id}>{h.icon} {h.name}</option>
-                      ))}
-                    </select>
+                    <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                      <button 
+                        onClick={() => setShowYearlyHeatmap(true)}
+                        style={{ background: theme.accentLight, border: 'none', borderRadius: '6px', padding: '4px 8px', fontSize: '0.65rem', color: theme.accent, cursor: 'pointer', fontFamily: "'Lora', serif" }}
+                      >
+                        📅 Full Year
+                      </button>
+                      {/* Habit filter dropdown */}
+                      <select 
+                        value={heatmapFilter} 
+                        onChange={e => setHeatmapFilter(e.target.value)}
+                        className="bt"
+                        style={{ 
+                          background: theme.inputBg, 
+                          border: `1px solid ${theme.cardBorder}`, 
+                          borderRadius: '6px', 
+                          padding: '4px 8px', 
+                          fontSize: '0.7rem', 
+                          color: theme.text,
+                          cursor: 'pointer'
+                        }}
+                      >
+                        <option value="all">All Habits</option>
+                        {habits.map(h => (
+                          <option key={h.id} value={h.id}>{h.icon} {h.name}</option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
 
                   {/* Current streak indicator */}
@@ -3092,8 +3378,14 @@
               <div className="fade">
                 {/* Habit Completion Rate */}
                 <div style={s.card}>
-                  <h3 className="bt" style={{ fontSize: '0.85rem', fontWeight: 600, color: theme.text, marginBottom: '10px' }}>📊 Habit Completion Rate</h3>
-                  {(() => {
+                  <div 
+                    onClick={() => setCollapsedStats({...collapsedStats, completion: !collapsedStats.completion})}
+                    style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', marginBottom: collapsedStats.completion ? 0 : '10px' }}
+                  >
+                    <h3 className="bt" style={{ fontSize: '0.85rem', fontWeight: 600, color: theme.text }}>📊 Habit Completion Rate</h3>
+                    <span style={{ color: theme.textMuted, fontSize: '0.8rem', transition: 'transform 0.2s', transform: collapsedStats.completion ? 'rotate(-90deg)' : 'rotate(0deg)' }}>▼</span>
+                  </div>
+                  {!collapsedStats.completion && (() => {
                     // Calculate this week's completion
                     const today = new Date();
                     const weekStart = new Date(today);
@@ -3417,6 +3709,310 @@
                 <div style={{ display: 'flex', gap: '10px' }}>
                   <button onClick={() => setShowAddHabit(false)} style={{ ...s.btnSecondary, flex: 1 }}>Cancel</button>
                   <button onClick={addHabit} style={{ ...s.btn, flex: 1 }}>Add Habit</button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Habit Templates Modal */}
+          {showHabitTemplates && (
+            <div style={s.modal} onClick={() => setShowHabitTemplates(false)}>
+              <div style={{ ...s.modalContent, maxWidth: '440px', maxHeight: '85vh', overflow: 'hidden', display: 'flex', flexDirection: 'column' }} className="slide" onClick={e => e.stopPropagation()}>
+                <div style={{ borderBottom: `1px solid ${theme.cardBorder}`, paddingBottom: '12px', marginBottom: '12px' }}>
+                  <h2 className="hw" style={{ fontSize: '1.4rem', color: theme.text, marginBottom: '4px' }}>📋 Habit Templates</h2>
+                  <p className="bt" style={{ fontSize: '0.75rem', color: theme.textSecondary }}>Quick-start your routine with curated habit packs</p>
+                </div>
+                
+                <div style={{ overflowY: 'auto', flex: 1, paddingRight: '8px' }}>
+                  {Object.entries(habitTemplates).map(([id, template]) => (
+                    <div key={id} style={{ 
+                      background: theme.cardBg, 
+                      border: `1px solid ${theme.cardBorder}`, 
+                      borderRadius: '12px', 
+                      padding: '14px', 
+                      marginBottom: '10px',
+                      transition: 'transform 0.2s, box-shadow 0.2s'
+                    }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+                        <div>
+                          <h3 className="bt" style={{ fontSize: '0.95rem', fontWeight: 600, color: theme.text, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <span style={{ fontSize: '1.2rem' }}>{template.icon}</span>
+                            {template.name}
+                          </h3>
+                          <p className="bt" style={{ fontSize: '0.7rem', color: theme.textSecondary, marginTop: '2px' }}>{template.description}</p>
+                        </div>
+                        <button 
+                          onClick={() => addHabitsFromTemplate(id)} 
+                          style={{ 
+                            ...s.btn, 
+                            padding: '6px 14px', 
+                            fontSize: '0.75rem',
+                            whiteSpace: 'nowrap'
+                          }}
+                        >
+                          + Add All
+                        </button>
+                      </div>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                        {template.habits.map((h, i) => (
+                          <span key={i} style={{ 
+                            display: 'inline-flex', 
+                            alignItems: 'center', 
+                            gap: '4px', 
+                            padding: '4px 8px', 
+                            borderRadius: '6px', 
+                            background: theme.accentLight, 
+                            fontSize: '0.7rem',
+                            color: theme.text
+                          }}>
+                            {h.icon} {h.name}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                
+                <div style={{ borderTop: `1px solid ${theme.cardBorder}`, paddingTop: '12px', marginTop: '8px' }}>
+                  <button onClick={() => setShowHabitTemplates(false)} style={{ ...s.btnSecondary, width: '100%' }}>Close</button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Archived Habits Modal */}
+          {showArchivedHabits && (
+            <div style={s.modal} onClick={() => setShowArchivedHabits(false)}>
+              <div style={{ ...s.modalContent, maxWidth: '400px' }} className="slide" onClick={e => e.stopPropagation()}>
+                <h2 className="hw" style={{ fontSize: '1.4rem', color: theme.text, marginBottom: '4px' }}>📦 Archived Habits</h2>
+                <p className="bt" style={{ fontSize: '0.75rem', color: theme.textSecondary, marginBottom: '16px' }}>Habits you've set aside. Restore or delete permanently.</p>
+                
+                {archivedHabits.length === 0 ? (
+                  <p className="bt" style={{ textAlign: 'center', color: theme.textMuted, padding: '24px' }}>No archived habits</p>
+                ) : (
+                  <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
+                    {archivedHabits.map(h => (
+                      <div key={h.id} style={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: '10px', 
+                        padding: '10px', 
+                        background: theme.cardBg, 
+                        border: `1px solid ${theme.cardBorder}`, 
+                        borderRadius: '10px',
+                        marginBottom: '8px'
+                      }}>
+                        <span style={{ fontSize: '1.3rem' }}>{h.icon}</span>
+                        <div style={{ flex: 1 }}>
+                          <p className="bt" style={{ fontSize: '0.85rem', color: theme.text }}>{h.name}</p>
+                          <p className="bt" style={{ fontSize: '0.65rem', color: theme.textMuted }}>
+                            🔥 {h.streak}d streak • Archived {new Date(h.archivedAt).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <button onClick={() => restoreHabit(h.id)} style={{ background: theme.accentLight, border: 'none', borderRadius: '6px', padding: '6px 10px', fontSize: '0.7rem', color: theme.accent, cursor: 'pointer' }} title="Restore">↩️ Restore</button>
+                        <button onClick={() => permanentlyDeleteHabit(h.id)} style={{ background: 'none', border: 'none', color: theme.textMuted, fontSize: '0.9rem', cursor: 'pointer', padding: '4px' }} title="Delete permanently">🗑️</button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                
+                <button onClick={() => setShowArchivedHabits(false)} style={{ ...s.btnSecondary, width: '100%', marginTop: '12px' }}>Close</button>
+              </div>
+            </div>
+          )}
+
+          {/* Yearly Heatmap Modal */}
+          {showYearlyHeatmap && (
+            <div style={s.modal} onClick={() => setShowYearlyHeatmap(false)}>
+              <div style={{ ...s.modalContent, maxWidth: '95vw', width: '800px', maxHeight: '90vh', overflow: 'hidden', display: 'flex', flexDirection: 'column' }} className="slide" onClick={e => e.stopPropagation()}>
+                <div style={{ borderBottom: `1px solid ${theme.cardBorder}`, paddingBottom: '12px', marginBottom: '12px' }}>
+                  <h2 className="hw" style={{ fontSize: '1.4rem', color: theme.text, marginBottom: '4px' }}>
+                    📅 {currentYear} Year in Review
+                  </h2>
+                  <p className="bt" style={{ fontSize: '0.75rem', color: theme.textSecondary }}>Your habit journey throughout the year</p>
+                </div>
+                
+                <div style={{ overflowX: 'auto', overflowY: 'auto', flex: 1, paddingBottom: '8px' }}>
+                  {/* Month labels */}
+                  <div style={{ display: 'flex', marginLeft: '28px', marginBottom: '4px' }}>
+                    {['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].map((m, i) => (
+                      <div key={i} className="bt" style={{ width: `${100/12}%`, minWidth: '50px', fontSize: '0.6rem', color: theme.textMuted }}>{m}</div>
+                    ))}
+                  </div>
+                  
+                  <div style={{ display: 'flex' }}>
+                    {/* Day labels */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', marginRight: '4px', paddingTop: '2px' }}>
+                      {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d, i) => (
+                        <div key={i} className="bt" style={{ height: '10px', fontSize: '0.5rem', color: theme.textMuted, display: 'flex', alignItems: 'center' }}>{d}</div>
+                      ))}
+                    </div>
+                    
+                    {/* Year grid */}
+                    <div style={{ display: 'flex', gap: '2px', flexWrap: 'nowrap' }}>
+                      {(() => {
+                        // Generate 53 weeks for the year
+                        const yearStart = new Date(currentYear, 0, 1);
+                        const firstDayOfWeek = yearStart.getDay();
+                        const weeks = [];
+                        
+                        for (let w = 0; w < 53; w++) {
+                          const week = [];
+                          for (let d = 0; d < 7; d++) {
+                            const dayOffset = w * 7 + d - firstDayOfWeek;
+                            const date = new Date(currentYear, 0, 1 + dayOffset);
+                            
+                            if (date.getFullYear() !== currentYear) {
+                              week.push(null);
+                            } else {
+                              const key = getDateKey(date);
+                              const completedCount = habits.filter(h => (h.history || habitHistory[h.id] || {})[key]).length;
+                              week.push({ date: key, count: completedCount, total: habits.length, dateObj: date });
+                            }
+                          }
+                          weeks.push(week);
+                        }
+                        
+                        const themeColors = {
+                          coffee: theme.isDark 
+                            ? ['#5a4a3a', '#7a6a5a', '#9a7a5a', '#a67c52'] 
+                            : ['#d4c4a8', '#c4a882', '#a67c52', '#6b4423'],
+                          tea: theme.isDark 
+                            ? ['#3a4a3a', '#4a6a4a', '#5a8a5a', '#6aaa6a'] 
+                            : ['#c8d8c8', '#a8c8a8', '#88b888', '#68a868'],
+                          matcha: theme.isDark 
+                            ? ['#3a4a3a', '#4a5a4a', '#5a7a5a', '#6a9a6a'] 
+                            : ['#d4e8d4', '#b4d8b4', '#94c894', '#74b874']
+                        };
+                        const colors = themeColors[brewType] || themeColors.coffee;
+                        const shapeStyle = {
+                          coffee: '50% 50% 50% 50% / 60% 60% 40% 40%',
+                          tea: '30% 70% 70% 30% / 30% 30% 70% 70%',
+                          matcha: '50%'
+                        };
+                        
+                        return weeks.map((week, wi) => (
+                          <div key={wi} style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                            {week.map((day, di) => {
+                              if (!day) return <div key={di} style={{ width: '10px', height: '10px' }} />;
+                              const intensity = day.total > 0 ? day.count / day.total : 0;
+                              const color = intensity === 0 ? theme.progressBg 
+                                : intensity < 0.33 ? colors[0]
+                                : intensity < 0.66 ? colors[1]
+                                : intensity < 1 ? colors[2]
+                                : colors[3];
+                              
+                              return (
+                                <div 
+                                  key={di}
+                                  title={`${day.dateObj.toLocaleDateString()}: ${day.count}/${day.total}`}
+                                  style={{ 
+                                    width: '10px', 
+                                    height: '10px', 
+                                    borderRadius: shapeStyle[brewType] || shapeStyle.coffee,
+                                    background: color,
+                                    cursor: 'pointer'
+                                  }}
+                                />
+                              );
+                            })}
+                          </div>
+                        ));
+                      })()}
+                    </div>
+                  </div>
+                  
+                  {/* Legend */}
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginTop: '16px' }}>
+                    <span className="bt" style={{ fontSize: '0.65rem', color: theme.textMuted }}>Less</span>
+                    {[0, 0.25, 0.5, 0.75, 1].map((intensity, i) => {
+                      const colors = {
+                        coffee: theme.isDark 
+                          ? ['#5a4a3a', '#7a6a5a', '#9a7a5a', '#a67c52'] 
+                          : ['#d4c4a8', '#c4a882', '#a67c52', '#6b4423'],
+                        tea: theme.isDark 
+                          ? ['#3a4a3a', '#4a6a4a', '#5a8a5a', '#6aaa6a'] 
+                          : ['#c8d8c8', '#a8c8a8', '#88b888', '#68a868'],
+                        matcha: theme.isDark 
+                          ? ['#3a4a3a', '#4a5a4a', '#5a7a5a', '#6a9a6a'] 
+                          : ['#d4e8d4', '#b4d8b4', '#94c894', '#74b874']
+                      };
+                      const themeColors = colors[brewType] || colors.coffee;
+                      const color = intensity === 0 ? theme.progressBg 
+                        : intensity < 0.33 ? themeColors[0]
+                        : intensity < 0.66 ? themeColors[1]
+                        : intensity < 1 ? themeColors[2]
+                        : themeColors[3];
+                      const shapeStyle = {
+                        coffee: '50% 50% 50% 50% / 60% 60% 40% 40%',
+                        tea: '30% 70% 70% 30% / 30% 30% 70% 70%',
+                        matcha: '50%'
+                      };
+                      return (
+                        <div 
+                          key={i}
+                          style={{ 
+                            width: '12px', 
+                            height: '12px', 
+                            borderRadius: shapeStyle[brewType] || shapeStyle.coffee,
+                            background: color
+                          }}
+                        />
+                      );
+                    })}
+                    <span className="bt" style={{ fontSize: '0.65rem', color: theme.textMuted }}>More</span>
+                  </div>
+                  
+                  {/* Year stats */}
+                  <div style={{ 
+                    marginTop: '20px', 
+                    padding: '16px', 
+                    background: theme.cardBg, 
+                    border: `1px solid ${theme.cardBorder}`, 
+                    borderRadius: '12px' 
+                  }}>
+                    <h4 className="bt" style={{ fontSize: '0.9rem', color: theme.text, marginBottom: '12px' }}>📊 Year Stats</h4>
+                    {(() => {
+                      let totalDaysTracked = 0;
+                      let totalCompleted = 0;
+                      let perfectDays = 0;
+                      
+                      for (let d = new Date(currentYear, 0, 1); d <= today && d.getFullYear() === currentYear; d.setDate(d.getDate() + 1)) {
+                        const key = getDateKey(d);
+                        const completed = habits.filter(h => (h.history || habitHistory[h.id] || {})[key]).length;
+                        if (completed > 0) totalDaysTracked++;
+                        totalCompleted += completed;
+                        if (habits.length > 0 && completed === habits.length) perfectDays++;
+                      }
+                      
+                      const daysSoFar = Math.floor((today - new Date(currentYear, 0, 1)) / (1000 * 60 * 60 * 24)) + 1;
+                      
+                      return (
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '12px' }}>
+                          <div style={{ textAlign: 'center', padding: '10px', background: theme.accentLight, borderRadius: '8px' }}>
+                            <div style={{ fontSize: '1.5rem', fontWeight: 600, color: theme.accent }}>{totalDaysTracked}</div>
+                            <div className="bt" style={{ fontSize: '0.7rem', color: theme.textSecondary }}>Days Active</div>
+                          </div>
+                          <div style={{ textAlign: 'center', padding: '10px', background: theme.accentLight, borderRadius: '8px' }}>
+                            <div style={{ fontSize: '1.5rem', fontWeight: 600, color: theme.accent }}>{perfectDays}</div>
+                            <div className="bt" style={{ fontSize: '0.7rem', color: theme.textSecondary }}>Perfect Days ⭐</div>
+                          </div>
+                          <div style={{ textAlign: 'center', padding: '10px', background: theme.accentLight, borderRadius: '8px' }}>
+                            <div style={{ fontSize: '1.5rem', fontWeight: 600, color: theme.accent }}>{totalCompleted}</div>
+                            <div className="bt" style={{ fontSize: '0.7rem', color: theme.textSecondary }}>Habits Done</div>
+                          </div>
+                          <div style={{ textAlign: 'center', padding: '10px', background: theme.accentLight, borderRadius: '8px' }}>
+                            <div style={{ fontSize: '1.5rem', fontWeight: 600, color: theme.accent }}>{Math.round(totalDaysTracked / daysSoFar * 100)}%</div>
+                            <div className="bt" style={{ fontSize: '0.7rem', color: theme.textSecondary }}>Consistency</div>
+                          </div>
+                        </div>
+                      );
+                    })()}
+                  </div>
+                </div>
+                
+                <div style={{ borderTop: `1px solid ${theme.cardBorder}`, paddingTop: '12px', marginTop: '8px' }}>
+                  <button onClick={() => setShowYearlyHeatmap(false)} style={{ ...s.btnSecondary, width: '100%' }}>Close</button>
                 </div>
               </div>
             </div>
