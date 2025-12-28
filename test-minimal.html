@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daily Brew - Test</title>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600&family=Lora:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Lora', serif; min-height: 100vh; background: #F5E6D3; }
+    .loading { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #F5E6D3; z-index: 9999; transition: opacity 0.5s; }
+    .loading.hidden { opacity: 0; pointer-events: none; }
+    .loading-text { font-family: 'Caveat', cursive; font-size: 26px; color: #5D4037; margin-top: 16px; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <div class="loading" id="loading">
+    <div style="font-size: 56px;">☕</div>
+    <div class="loading-text">Brewing...</div>
+  </div>
+
+  <script>
+    window.onerror = function(msg, url, line, col, error) {
+      document.getElementById('loading').innerHTML = '<div style="color: red; padding: 20px; text-align: center;"><h2>Error</h2><p>' + msg + '</p><p>Line: ' + line + '</p></div>';
+      return false;
+    };
+  </script>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    function App() {
+      const [brewType, setBrewType] = useState('coffee');
+      const [count, setCount] = useState(0);
+
+      const themes = {
+        coffee: { bg: '#F5E6D3', accent: '#8B4513', text: '#3E2723', icon: '☕' },
+        tea: { bg: '#F0F5E9', accent: '#6B8E5A', text: '#2D4A2D', icon: '🍵' },
+        matcha: { bg: '#E8F5E9', accent: '#558B2F', text: '#1B5E20', icon: '🍃' }
+      };
+
+      const theme = themes[brewType];
+
+      return (
+        <div style={{ minHeight: '100vh', background: theme.bg, padding: '20px', transition: 'all 0.3s' }}>
+          <h1 style={{ fontFamily: 'Caveat', fontSize: '2rem', color: theme.text, textAlign: 'center', marginBottom: '20px' }}>
+            {theme.icon} Daily Brew Works!
+          </h1>
+          
+          <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', marginBottom: '20px' }}>
+            {Object.entries(themes).map(([key, t]) => (
+              <button
+                key={key}
+                onClick={() => setBrewType(key)}
+                style={{
+                  padding: '10px 20px',
+                  borderRadius: '10px',
+                  border: brewType === key ? `2px solid ${t.accent}` : '1px solid #ccc',
+                  background: t.bg,
+                  cursor: 'pointer',
+                  fontSize: '1.2rem'
+                }}
+              >
+                {t.icon}
+              </button>
+            ))}
+          </div>
+
+          <div style={{ textAlign: 'center', padding: '20px', background: 'white', borderRadius: '15px', maxWidth: '300px', margin: '0 auto' }}>
+            <p style={{ fontSize: '1.2rem', color: theme.text, marginBottom: '10px' }}>Counter: {count}</p>
+            <button
+              onClick={() => setCount(c => c + 1)}
+              style={{
+                padding: '10px 30px',
+                background: theme.accent,
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontSize: '1rem'
+              }}
+            >
+              Add +1
+            </button>
+          </div>
+
+          <p style={{ textAlign: 'center', marginTop: '30px', color: theme.text, opacity: 0.7 }}>
+            ✅ React + Babel working correctly!
+          </p>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    setTimeout(() => document.getElementById('loading').classList.add('hidden'), 500);
+  </script>
+</body>
+</html>

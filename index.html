@@ -19,8 +19,10 @@
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <style>
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
-    html, body, #root { height: 100%; width: 100%; overflow-x: hidden; }
-    body { font-family: 'Cormorant Garamond', Georgia, serif; min-height: 100vh; min-height: 100dvh; transition: background 0.4s ease; overscroll-behavior: none; -webkit-tap-highlight-color: transparent; }
+    html, body, #root { height: 100%; width: 100%; overflow-x: hidden; margin: 0; padding: 0; }
+    html { height: -webkit-fill-available; }
+    body { font-family: 'Cormorant Garamond', Georgia, serif; min-height: 100vh; min-height: 100dvh; min-height: -webkit-fill-available; transition: background 0.4s ease; overscroll-behavior: none; -webkit-tap-highlight-color: transparent; }
+    #root { display: flex; flex-direction: column; min-height: 100vh; min-height: 100dvh; }
     .loading-screen { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; background: linear-gradient(180deg, #F5E6D3 0%, #FDFBF7 50%, #F5E6D3 100%); transition: opacity 0.5s; }
     .loading-screen.hidden { opacity: 0; pointer-events: none; }
     .loading-icon { font-size: 56px; animation: steam 2s ease-in-out infinite; }
@@ -34,7 +36,7 @@
   <div class="loading-screen" id="loadingScreen">
     <div class="loading-icon">☕</div>
     <div class="loading-text">Brewing something special...</div>
-    <div class="loading-subtext">v6.7.2 Mobile Fix</div>
+    <div class="loading-subtext">v6.7.3 Layout Fix</div>
   </div>
 
   <script type="text/babel">
@@ -719,7 +721,7 @@
     // MAIN APP COMPONENT
     // ═══════════════════════════════════════════════════════════════
     function App() {
-      const APP_VERSION = '6.7.2';
+      const APP_VERSION = '6.7.3';
       const season = getCurrentSeason();
       const seasonDeco = seasonalDecorations[season];
 
@@ -1590,7 +1592,7 @@
       };
 
       return (
-        <div style={{ minHeight: '100vh', background: theme.bg, transition: 'background 0.4s', filter: highContrast ? 'contrast(1.2)' : 'none' }}>
+        <div style={{ minHeight: '100vh', minHeight: '100dvh', background: theme.bg, transition: 'background 0.4s', filter: highContrast ? 'contrast(1.2)' : 'none', display: 'flex', flexDirection: 'column' }}>
           <style>{`
             .hw { font-family: 'Caveat', cursive; }
             .bt { font-family: 'Lora', serif; }
@@ -1606,7 +1608,7 @@
             .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
           `}</style>
 
-          <div style={{ maxWidth: '100%', margin: '0 auto', padding: '12px 12px 70px' }}>
+          <div style={{ flex: 1, maxWidth: '100%', margin: '0 auto', padding: '12px 12px 70px', width: '100%', boxSizing: 'border-box' }}>
             {/* Header with seasonal decoration */}
             <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '14px' }}>
               <div>
@@ -1705,7 +1707,7 @@
 
             {/* TODAY TAB */}
             {activeTab === 'today' && (
-              <div className="fade">
+              <div className="fade" style={{ display: 'flex', flexDirection: 'column', minHeight: 'calc(100vh - 180px)' }}>
                 {/* Progress */}
                 <div style={s.card}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
@@ -1834,7 +1836,7 @@
                 })}
 
                 {/* Motivational */}
-                <div style={{ ...s.card, textAlign: 'center', marginTop: '12px' }}>
+                <div style={{ ...s.card, textAlign: 'center', marginTop: 'auto' }}>
                   <span style={{ fontSize: '1.1rem' }}>{brewThemes[brewType].icon}</span>
                   <p className="hw" style={{ fontSize: '1rem', color: theme.textSecondary, marginTop: '4px' }}>
                     {progress === 100 ? messages.perfect : progress > 60 ? messages.good : messages.start}
