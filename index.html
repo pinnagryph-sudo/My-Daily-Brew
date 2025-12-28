@@ -895,6 +895,10 @@
       const [newTask, setNewTask] = useState({ text: '', time: '', priority: 'medium', category: null, recurring: 'none', subtasks: [] });
       const [newSubtask, setNewSubtask] = useState('');
       const [calendarDate, setCalendarDate] = useState(new Date());
+      const [selectedCalendarDay, setSelectedCalendarDay] = useState(null); // For day detail modal
+      const [calendarViewMode, setCalendarViewMode] = useState('month'); // 'month' or 'week'
+      const [selectedHeatmapDay, setSelectedHeatmapDay] = useState(null); // For heatmap tooltip
+      const [heatmapFilter, setHeatmapFilter] = useState('all'); // 'all' or habit id
       const [timerSeconds, setTimerSeconds] = useState(25 * 60);
       const [timerRunning, setTimerRunning] = useState(false);
       const [timerTask, setTimerTask] = useState(null);
@@ -2450,45 +2454,636 @@
             {/* CALENDAR TAB */}
             {activeTab === 'calendar' && (
               <div className="fade">
-                <div style={s.card}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                    <button onClick={() => setCalendarDate(new Date(calYear, calMonth - 1, 1))} style={{ background: 'none', border: 'none', color: theme.textSecondary, fontSize: '1.1rem', cursor: 'pointer', padding: '6px' }}>‹</button>
-                    <h2 className="bt" style={{ fontSize: '0.95rem', fontWeight: 600, color: theme.text }}>{calendarDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</h2>
-                    <button onClick={() => setCalendarDate(new Date(calYear, calMonth + 1, 1))} style={{ background: 'none', border: 'none', color: theme.textSecondary, fontSize: '1.1rem', cursor: 'pointer', padding: '6px' }}>›</button>
+                {/* Theme-specific icons and text */}
+                {(() => {
+                  const themeCalendar = {
+                    coffee: { icon: '☕', bean: '☕', empty: '○', quarter: '◔', half: '◑', full: '☕', name: 'Bean', verb: 'brewing', place: 'café' },
+                    tea: { icon: '🍵', bean: '🍃', empty: '○', quarter: '◔', half: '◑', full: '🍵', name: 'Leaf', verb: 'steeping', place: 'tea house' },
+                    matcha: { icon: '🍃', bean: '🌿', empty: '○', quarter: '◔', half: '◑', full: '🍃', name: 'Zen', verb: 'cultivating', place: 'garden' }
+                  };
+                  const tc = themeCalendar[brewType] || themeCalendar.coffee;
+                  
+                  return (
+                    <>
+                {/* Current Streak Banner */}
+                {gameStats.appStreak > 0 && (
+                  <div style={{ 
+                    background: `linear-gradient(135deg, ${theme.accent}20, ${theme.accent}40)`,
+                    borderRadius: '12px',
+                    padding: '12px 16px',
+                    marginBottom: '16px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    border: `2px solid ${theme.accent}50`
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <span style={{ fontSize: '2rem' }}>🔥</span>
+                      <div>
+                        <div style={{ fontFamily: "'Caveat', cursive", fontSize: '1.4rem', color: theme.accent, fontWeight: 600 }}>
+                          {gameStats.appStreak} Day Streak!
+                        </div>
+                        <div className="bt" style={{ fontSize: '0.7rem', color: theme.textSecondary }}>
+                          Best: {gameStats.maxStreak} days • Keep {tc.verb}!
+                        </div>
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', gap: '2px' }}>
+                      {[...Array(Math.min(7, gameStats.appStreak))].map((_, i) => (
+                        <span key={i} style={{ fontSize: '1rem', animation: `float ${1 + i * 0.1}s ease-in-out infinite alternate` }}>{tc.icon}</span>
+                      ))}
+                    </div>
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', gap: '3px', marginBottom: '4px' }}>
-                    {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d, i) => <div key={i} className="bt" style={{ textAlign: 'center', fontSize: '0.6rem', color: theme.textMuted, padding: '3px' }}>{d}</div>)}
+                )}
+
+                {/* Calendar Card - Café Menu Board Style */}
+                <div style={{ 
+                  ...s.card, 
+                  background: theme.isDark ? 'linear-gradient(135deg, #2a2420 0%, #1a1815 100%)' : 'linear-gradient(135deg, #3d2f1f 0%, #2a1f15 100%)',
+                  border: `3px solid ${theme.isDark ? '#4a3f35' : '#5d4a3a'}`,
+                  borderRadius: '16px',
+                  position: 'relative',
+                  overflow: 'hidden'
+                }}>
+                  {/* Chalkboard texture overlay */}
+                  <div style={{ position: 'absolute', inset: 0, background: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 100 100\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noise\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.8\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noise)\' opacity=\'0.03\'/%3E%3C/svg%3E")', pointerEvents: 'none' }} />
+                  
+                  {/* Header with navigation */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', position: 'relative' }}>
+                    <button onClick={() => setCalendarDate(new Date(calYear, calMonth - 1, 1))} style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', fontSize: '1rem', cursor: 'pointer', padding: '8px 12px', borderRadius: '8px' }}>‹</button>
+                    <div style={{ textAlign: 'center' }}>
+                      <h2 style={{ fontFamily: "'Caveat', cursive", fontSize: '1.5rem', color: '#fff', margin: 0 }}>
+                        {tc.icon} {calendarDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                      </h2>
+                      <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', marginTop: '4px' }}>
+                        <button 
+                          onClick={() => setCalendarViewMode('month')} 
+                          className="bt"
+                          style={{ background: calendarViewMode === 'month' ? theme.accent : 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', fontSize: '0.65rem', padding: '3px 8px', borderRadius: '10px', cursor: 'pointer' }}
+                        >Month</button>
+                        <button 
+                          onClick={() => setCalendarViewMode('week')} 
+                          className="bt"
+                          style={{ background: calendarViewMode === 'week' ? theme.accent : 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', fontSize: '0.65rem', padding: '3px 8px', borderRadius: '10px', cursor: 'pointer' }}
+                        >Week</button>
+                        <button 
+                          onClick={() => setCalendarDate(new Date())} 
+                          className="bt"
+                          style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', fontSize: '0.65rem', padding: '3px 8px', borderRadius: '10px', cursor: 'pointer' }}
+                        >Today</button>
+                      </div>
+                    </div>
+                    <button onClick={() => setCalendarDate(new Date(calYear, calMonth + 1, 1))} style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', fontSize: '1rem', cursor: 'pointer', padding: '8px 12px', borderRadius: '8px' }}>›</button>
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', gap: '3px' }}>
-                    {calDays.map((day, i) => {
+
+                  {/* Day headers */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', gap: '4px', marginBottom: '6px' }}>
+                    {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((d, i) => (
+                      <div key={i} style={{ textAlign: 'center', fontFamily: "'Caveat', cursive", fontSize: '0.85rem', color: 'rgba(255,255,255,0.7)', padding: '4px' }}>{d}</div>
+                    ))}
+                  </div>
+
+                  {/* Calendar grid - Theme-aware Style */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', gap: '4px' }}>
+                    {(calendarViewMode === 'week' 
+                      ? (() => {
+                          // Get current week's days
+                          const weekStart = new Date(today);
+                          weekStart.setDate(today.getDate() - today.getDay());
+                          return [...Array(7)].map((_, i) => {
+                            const d = new Date(weekStart);
+                            d.setDate(weekStart.getDate() + i);
+                            return d;
+                          });
+                        })()
+                      : calDays
+                    ).map((day, i) => {
                       if (!day) return <div key={i} />;
                       const dk = getDateKey(day);
                       const dm = moods[dk];
+                      const hasJournal = journal[dk] && (journal[dk].gratitude || journal[dk].reflection || journal[dk].tomorrow || journal[dk].promptResponse);
+                      const dayHabits = habits.filter(h => (h.history || habitHistory[h.id] || {})[dk]);
+                      const habitCompletion = habits.length > 0 ? dayHabits.length / habits.length : 0;
                       const isToday = isSameDay(day, today);
+                      const isPast = day < today && !isToday;
+                      const isFuture = day > today;
+                      const isOnStreak = dayHabits.length > 0 && habitCompletion >= 0.5;
+                      const isPerfect = habitCompletion === 1 && habits.length > 0;
+                      
                       return (
-                        <div key={i} style={{ aspectRatio: '1', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', borderRadius: '8px', background: isToday ? theme.accentGradient : dm ? theme.accentLight : 'transparent', border: isToday ? 'none' : `1px solid ${theme.cardBorder}` }}>
-                          <span className="bt" style={{ fontSize: '0.7rem', color: isToday ? (theme.isDark ? '#1a1a1a' : '#fff') : theme.text, fontWeight: isToday ? 600 : 400 }}>{day.getDate()}</span>
-                          {dm && <span style={{ fontSize: '0.45rem' }}>{moodEmojis.find(m => m.value === dm.value)?.emoji}</span>}
+                        <div 
+                          key={i} 
+                          onClick={() => !isFuture && setSelectedCalendarDay({ date: day, key: dk })}
+                          style={{ 
+                            aspectRatio: calendarViewMode === 'week' ? '1/1.2' : '1',
+                            display: 'flex', 
+                            flexDirection: 'column', 
+                            alignItems: 'center', 
+                            justifyContent: 'center', 
+                            borderRadius: '10px', 
+                            background: isToday 
+                              ? 'linear-gradient(135deg, #d4a574 0%, #c4956a 100%)' 
+                              : isPerfect 
+                                ? 'linear-gradient(135deg, #8b7355 0%, #6b5a45 100%)'
+                                : 'rgba(255,255,255,0.05)',
+                            border: isToday ? '2px solid #fff' : isPerfect ? '2px solid #d4a574' : '1px solid rgba(255,255,255,0.1)',
+                            cursor: isFuture ? 'default' : 'pointer',
+                            opacity: isFuture ? 0.4 : 1,
+                            position: 'relative',
+                            transition: 'transform 0.2s, box-shadow 0.2s',
+                            padding: '2px'
+                          }}
+                          onMouseOver={e => { if (!isFuture) e.currentTarget.style.transform = 'scale(1.05)'; }}
+                          onMouseOut={e => e.currentTarget.style.transform = 'scale(1)'}
+                        >
+                          {/* Date number */}
+                          <span style={{ 
+                            fontFamily: "'Caveat', cursive", 
+                            fontSize: calendarViewMode === 'week' ? '1.1rem' : '0.9rem', 
+                            color: isToday ? '#2a1f15' : '#fff', 
+                            fontWeight: isToday ? 700 : 500,
+                            lineHeight: 1
+                          }}>{day.getDate()}</span>
+                          
+                          {/* Theme-aware fill indicator */}
+                          {!isFuture && habits.length > 0 && (
+                            <div style={{ 
+                              fontSize: calendarViewMode === 'week' ? '1.2rem' : '0.7rem',
+                              marginTop: '1px',
+                              filter: habitCompletion === 0 ? 'grayscale(1) opacity(0.3)' : 'none'
+                            }}>
+                              {habitCompletion === 0 ? tc.empty : habitCompletion < 0.5 ? tc.quarter : habitCompletion < 1 ? tc.half : tc.full}
+                            </div>
+                          )}
+                          
+                          {/* Activity indicators */}
+                          {!isFuture && (dm || hasJournal) && (
+                            <div style={{ display: 'flex', gap: '1px', marginTop: '1px' }}>
+                              {dm && <span style={{ fontSize: '0.4rem' }}>{moodEmojis.find(m => m.value === dm.value)?.emoji}</span>}
+                              {hasJournal && <span style={{ fontSize: '0.4rem' }}>📝</span>}
+                            </div>
+                          )}
+                          
+                          {/* Perfect day star */}
+                          {isPerfect && (
+                            <span style={{ position: 'absolute', top: '-2px', right: '-2px', fontSize: '0.6rem' }}>⭐</span>
+                          )}
+                          
+                          {/* Streak flame */}
+                          {isOnStreak && !isPerfect && (
+                            <span style={{ position: 'absolute', top: '-2px', right: '-2px', fontSize: '0.5rem' }}>🔥</span>
+                          )}
                         </div>
                       );
                     })}
                   </div>
-                </div>
 
-                {/* Heatmap */}
-                <div style={s.card}>
-                  <h3 className="bt" style={{ fontSize: '0.85rem', fontWeight: 600, color: theme.text, marginBottom: '10px' }}>🔥 Habit Heatmap (12 weeks)</h3>
-                  <div style={{ display: 'flex', gap: '2px', justifyContent: 'center' }}>
-                    {heatmapData.map((week, wi) => (
-                      <div key={wi} style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                        {week.map((day, di) => {
-                          const intensity = day.total > 0 ? day.count / day.total : 0;
-                          return (<div key={di} title={`${day.date}: ${day.count}/${day.total}`} style={{ width: '10px', height: '10px', borderRadius: '2px', background: intensity === 0 ? theme.progressBg : `rgba(${theme.isDark ? '139,171,123' : '107,139,91'}, ${0.3 + intensity * 0.7})`, cursor: 'pointer', transition: 'transform 0.2s' }} />);
-                        })}
-                      </div>
-                    ))}
+                  {/* Month Summary - Receipt Style */}
+                  <div style={{ 
+                    marginTop: '16px', 
+                    padding: '12px', 
+                    background: 'rgba(255,255,255,0.08)', 
+                    borderRadius: '8px',
+                    fontFamily: "'Courier New', monospace"
+                  }}>
+                    <div style={{ textAlign: 'center', color: 'rgba(255,255,255,0.9)', fontSize: '0.7rem', marginBottom: '8px', borderBottom: '1px dashed rgba(255,255,255,0.3)', paddingBottom: '6px' }}>
+                      ═══ MONTHLY SUMMARY ═══
+                    </div>
+                    {(() => {
+                      const monthDays = calDays.filter(d => d && d <= today);
+                      const activeDays = monthDays.filter(d => {
+                        const k = getDateKey(d);
+                        return habits.some(h => (h.history || habitHistory[h.id] || {})[k]);
+                      }).length;
+                      const perfectDays = monthDays.filter(d => {
+                        const k = getDateKey(d);
+                        return habits.length > 0 && habits.every(h => (h.history || habitHistory[h.id] || {})[k]);
+                      }).length;
+                      const moodDays = monthDays.filter(d => moods[getDateKey(d)]).length;
+                      const journalDays = monthDays.filter(d => {
+                        const j = journal[getDateKey(d)];
+                        return j && (j.gratitude || j.reflection || j.tomorrow || j.promptResponse);
+                      }).length;
+                      const avgMood = monthDays.length > 0 
+                        ? monthDays.reduce((sum, d) => sum + (moods[getDateKey(d)]?.value || 0), 0) / Math.max(1, moodDays)
+                        : 0;
+                      
+                      return (
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px', fontSize: '0.65rem', color: 'rgba(255,255,255,0.8)' }}>
+                          <div>{tc.icon} Active Days:</div><div style={{ textAlign: 'right' }}>{activeDays}/{monthDays.length}</div>
+                          <div>⭐ Perfect Days:</div><div style={{ textAlign: 'right' }}>{perfectDays}</div>
+                          <div>😊 Mood Logged:</div><div style={{ textAlign: 'right' }}>{moodDays} days</div>
+                          <div>📝 Journal Entries:</div><div style={{ textAlign: 'right' }}>{journalDays}</div>
+                          {moodDays > 0 && <><div>📊 Avg Mood:</div><div style={{ textAlign: 'right' }}>{moodEmojis.find(m => m.value === Math.round(avgMood))?.emoji || '—'}</div></>}
+                        </div>
+                      );
+                    })()}
                   </div>
                 </div>
+
+                {/* Theme-aware Heatmap */}
+                <div style={{ ...s.card, marginTop: '16px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                    <h3 style={{ fontFamily: "'Caveat', cursive", fontSize: '1.3rem', color: theme.text, margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      {tc.bean} {tc.name} Counter
+                      <span className="bt" style={{ fontSize: '0.7rem', color: theme.textSecondary, fontFamily: "'Lora', serif" }}>(12 weeks)</span>
+                    </h3>
+                    {/* Habit filter dropdown */}
+                    <select 
+                      value={heatmapFilter} 
+                      onChange={e => setHeatmapFilter(e.target.value)}
+                      className="bt"
+                      style={{ 
+                        background: theme.inputBg, 
+                        border: `1px solid ${theme.cardBorder}`, 
+                        borderRadius: '6px', 
+                        padding: '4px 8px', 
+                        fontSize: '0.7rem', 
+                        color: theme.text,
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <option value="all">All Habits</option>
+                      {habits.map(h => (
+                        <option key={h.id} value={h.id}>{h.icon} {h.name}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Current streak indicator */}
+                  {gameStats.appStreak > 0 && (
+                    <div style={{ 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      gap: '6px', 
+                      marginBottom: '12px',
+                      padding: '8px 12px',
+                      background: theme.accentLight,
+                      borderRadius: '8px',
+                      fontSize: '0.75rem'
+                    }}>
+                      <span>🔥</span>
+                      <span className="bt" style={{ color: theme.accent, fontWeight: 600 }}>{gameStats.appStreak} day streak</span>
+                      <span style={{ color: theme.textMuted }}>•</span>
+                      <span className="bt" style={{ color: theme.textSecondary }}>Longest: {gameStats.maxStreak} days</span>
+                    </div>
+                  )}
+
+                  {/* Month labels */}
+                  <div style={{ display: 'flex', marginLeft: '28px', marginBottom: '4px', position: 'relative', height: '14px' }}>
+                    {(() => {
+                      const months = [];
+                      let lastMonth = -1;
+                      heatmapData.forEach((week, wi) => {
+                        const d = new Date(week[0].date);
+                        if (d.getMonth() !== lastMonth) {
+                          lastMonth = d.getMonth();
+                          months.push({ month: d.toLocaleDateString('en-US', { month: 'short' }), pos: wi });
+                        }
+                      });
+                      return months.map((m, i) => (
+                        <div key={i} className="bt" style={{ 
+                          position: 'absolute', 
+                          left: `${m.pos * 14}px`, 
+                          fontSize: '0.6rem', 
+                          color: theme.textMuted 
+                        }}>{m.month}</div>
+                      ));
+                    })()}
+                  </div>
+
+                  <div style={{ display: 'flex', marginTop: '4px' }}>
+                    {/* Day labels */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', marginRight: '4px', paddingTop: '2px' }}>
+                      {['', 'M', '', 'W', '', 'F', ''].map((d, i) => (
+                        <div key={i} className="bt" style={{ height: '12px', fontSize: '0.55rem', color: theme.textMuted, display: 'flex', alignItems: 'center' }}>{d}</div>
+                      ))}
+                    </div>
+                    
+                    {/* Heatmap grid - Theme-aware shapes */}
+                    <div style={{ display: 'flex', gap: '2px', flexWrap: 'nowrap', overflowX: 'auto' }}>
+                      {heatmapData.map((week, wi) => (
+                        <div key={wi} style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                          {week.map((day, di) => {
+                            // Filter by selected habit or show all
+                            let count, total;
+                            if (heatmapFilter === 'all') {
+                              count = day.count;
+                              total = day.total;
+                            } else {
+                              const habit = habits.find(h => h.id === heatmapFilter);
+                              if (habit) {
+                                total = 1;
+                                count = (habit.history || habitHistory[habit.id] || {})[day.date] ? 1 : 0;
+                              } else {
+                                count = 0;
+                                total = 1;
+                              }
+                            }
+                            
+                            const intensity = total > 0 ? count / total : 0;
+                            const isSelected = selectedHeatmapDay === day.date;
+                            
+                            // Theme-aware colors
+                            const getHeatmapColor = (int) => {
+                              if (int === 0) return theme.progressBg;
+                              const colors = {
+                                coffee: theme.isDark 
+                                  ? ['#5a4a3a', '#7a6a5a', '#9a7a5a', '#a67c52'] 
+                                  : ['#d4c4a8', '#c4a882', '#a67c52', '#6b4423'],
+                                tea: theme.isDark 
+                                  ? ['#3a4a3a', '#4a6a4a', '#5a8a5a', '#6aaa6a'] 
+                                  : ['#c8d8c8', '#a8c8a8', '#88b888', '#68a868'],
+                                matcha: theme.isDark 
+                                  ? ['#3a4a3a', '#4a5a4a', '#5a7a5a', '#6a9a6a'] 
+                                  : ['#d4e8d4', '#b4d8b4', '#94c894', '#74b874']
+                              };
+                              const themeColors = colors[brewType] || colors.coffee;
+                              if (int < 0.33) return themeColors[0];
+                              if (int < 0.66) return themeColors[1];
+                              if (int < 1) return themeColors[2];
+                              return themeColors[3];
+                            };
+                            
+                            // Theme-aware shape
+                            const shapeStyle = {
+                              coffee: '50% 50% 50% 50% / 60% 60% 40% 40%', // Bean
+                              tea: '30% 70% 70% 30% / 30% 30% 70% 70%', // Leaf-ish
+                              matcha: '50%' // Circle/zen
+                            };
+                            
+                            return (
+                              <div 
+                                key={di} 
+                                onClick={() => setSelectedHeatmapDay(isSelected ? null : day.date)}
+                                style={{ 
+                                  width: '12px', 
+                                  height: '12px', 
+                                  borderRadius: shapeStyle[brewType] || shapeStyle.coffee,
+                                  background: getHeatmapColor(intensity),
+                                  cursor: 'pointer',
+                                  transition: 'transform 0.2s, box-shadow 0.2s',
+                                  transform: isSelected ? 'scale(1.4)' : 'scale(1)',
+                                  boxShadow: isSelected ? `0 0 8px ${theme.accent}` : 'none',
+                                  position: 'relative',
+                                  animation: intensity === 1 ? 'pulse 2s ease-in-out infinite' : 'none'
+                                }}
+                                onMouseOver={e => e.currentTarget.style.transform = 'scale(1.3)'}
+                                onMouseOut={e => e.currentTarget.style.transform = isSelected ? 'scale(1.4)' : 'scale(1)'}
+                              >
+                                {/* Detail line for coffee beans */}
+                                {brewType === 'coffee' && intensity > 0 && (
+                                  <div style={{ 
+                                    position: 'absolute', 
+                                    left: '50%', 
+                                    top: '20%', 
+                                    bottom: '30%', 
+                                    width: '1px', 
+                                    background: 'rgba(0,0,0,0.2)',
+                                    transform: 'translateX(-50%)'
+                                  }} />
+                                )}
+                                {/* Leaf vein for tea */}
+                                {brewType === 'tea' && intensity > 0 && (
+                                  <div style={{ 
+                                    position: 'absolute', 
+                                    left: '30%', 
+                                    top: '50%', 
+                                    width: '50%', 
+                                    height: '1px', 
+                                    background: 'rgba(0,0,0,0.15)',
+                                    transform: 'rotate(-30deg)'
+                                  }} />
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Heatmap tooltip */}
+                  {selectedHeatmapDay && (
+                    <div style={{ 
+                      marginTop: '12px', 
+                      padding: '10px', 
+                      background: theme.accentLight, 
+                      borderRadius: '8px',
+                      fontSize: '0.8rem'
+                    }}>
+                      <div className="bt" style={{ fontWeight: 600, color: theme.text, marginBottom: '4px' }}>
+                        📅 {new Date(selectedHeatmapDay).toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
+                      </div>
+                      {(() => {
+                        const dayData = heatmapData.flat().find(d => d.date === selectedHeatmapDay);
+                        if (!dayData) return null;
+                        
+                        if (heatmapFilter === 'all') {
+                          return (
+                            <div className="bt" style={{ color: theme.textSecondary }}>
+                              {tc.icon} {dayData.count}/{dayData.total} habits completed ({dayData.total > 0 ? Math.round(dayData.count / dayData.total * 100) : 0}%)
+                            </div>
+                          );
+                        } else {
+                          const habit = habits.find(h => h.id === heatmapFilter);
+                          const completed = habit && (habit.history || habitHistory[habit.id] || {})[selectedHeatmapDay];
+                          return (
+                            <div className="bt" style={{ color: theme.textSecondary }}>
+                              {habit?.icon} {habit?.name}: {completed ? '✅ Completed' : '❌ Not completed'}
+                            </div>
+                          );
+                        }
+                      })()}
+                    </div>
+                  )}
+
+                  {/* Legend */}
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginTop: '12px' }}>
+                    <span className="bt" style={{ fontSize: '0.65rem', color: theme.textMuted }}>Less</span>
+                    {[0, 0.25, 0.5, 0.75, 1].map((intensity, i) => {
+                      const getHeatmapColor = (int) => {
+                        if (int === 0) return theme.progressBg;
+                        const colors = {
+                          coffee: theme.isDark 
+                            ? ['#5a4a3a', '#7a6a5a', '#9a7a5a', '#a67c52'] 
+                            : ['#d4c4a8', '#c4a882', '#a67c52', '#6b4423'],
+                          tea: theme.isDark 
+                            ? ['#3a4a3a', '#4a6a4a', '#5a8a5a', '#6aaa6a'] 
+                            : ['#c8d8c8', '#a8c8a8', '#88b888', '#68a868'],
+                          matcha: theme.isDark 
+                            ? ['#3a4a3a', '#4a5a4a', '#5a7a5a', '#6a9a6a'] 
+                            : ['#d4e8d4', '#b4d8b4', '#94c894', '#74b874']
+                        };
+                        const themeColors = colors[brewType] || colors.coffee;
+                        if (int < 0.33) return themeColors[0];
+                        if (int < 0.66) return themeColors[1];
+                        if (int < 1) return themeColors[2];
+                        return themeColors[3];
+                      };
+                      const shapeStyle = {
+                        coffee: '50% 50% 50% 50% / 60% 60% 40% 40%',
+                        tea: '30% 70% 70% 30% / 30% 30% 70% 70%',
+                        matcha: '50%'
+                      };
+                      return (
+                        <div 
+                          key={i}
+                          style={{ 
+                            width: '12px', 
+                            height: '12px', 
+                            borderRadius: shapeStyle[brewType] || shapeStyle.coffee,
+                            background: getHeatmapColor(intensity)
+                          }}
+                        />
+                      );
+                    })}
+                    <span className="bt" style={{ fontSize: '0.65rem', color: theme.textMuted }}>More</span>
+                  </div>
+                </div>
+
+                {/* Day Detail Modal */}
+                {selectedCalendarDay && (
+                  <div 
+                    onClick={() => setSelectedCalendarDay(null)}
+                    style={{ 
+                      position: 'fixed', 
+                      inset: 0, 
+                      background: 'rgba(0,0,0,0.6)', 
+                      backdropFilter: 'blur(4px)',
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'center', 
+                      zIndex: 1000,
+                      padding: '20px'
+                    }}
+                  >
+                    <div 
+                      onClick={e => e.stopPropagation()}
+                      style={{ 
+                        background: theme.isDark ? '#2a2520' : '#faf6f0',
+                        borderRadius: '16px',
+                        padding: '20px',
+                        maxWidth: '340px',
+                        width: '100%',
+                        maxHeight: '80vh',
+                        overflowY: 'auto',
+                        border: `3px solid ${theme.accent}40`,
+                        boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
+                      }}
+                    >
+                      {/* Receipt-style header */}
+                      <div style={{ textAlign: 'center', borderBottom: `2px dashed ${theme.cardBorder}`, paddingBottom: '12px', marginBottom: '12px' }}>
+                        <div style={{ fontSize: '1.5rem', marginBottom: '4px' }}>{tc.icon}</div>
+                        <div style={{ fontFamily: "'Caveat', cursive", fontSize: '1.4rem', color: theme.accent }}>
+                          Daily {brewType === 'coffee' ? 'Brew' : brewType === 'tea' ? 'Steep' : 'Zen'} Receipt
+                        </div>
+                        <div className="bt" style={{ fontSize: '0.8rem', color: theme.textSecondary }}>
+                          {selectedCalendarDay.date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
+                        </div>
+                      </div>
+
+                      {/* Habits section */}
+                      <div style={{ marginBottom: '16px' }}>
+                        <div style={{ fontFamily: "'Caveat', cursive", fontSize: '1.1rem', color: theme.text, marginBottom: '8px' }}>
+                          ═══ Habits {brewType === 'coffee' ? 'Brewed' : brewType === 'tea' ? 'Steeped' : 'Cultivated'} ═══
+                        </div>
+                        {habits.length > 0 ? (
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                            {habits.map(h => {
+                              const completed = (h.history || habitHistory[h.id] || {})[selectedCalendarDay.key];
+                              return (
+                                <div key={h.id} className="bt" style={{ 
+                                  display: 'flex', 
+                                  justifyContent: 'space-between', 
+                                  fontSize: '0.8rem',
+                                  color: completed ? theme.text : theme.textMuted,
+                                  textDecoration: completed ? 'none' : 'line-through',
+                                  opacity: completed ? 1 : 0.6
+                                }}>
+                                  <span>{h.icon} {h.name}</span>
+                                  <span>{completed ? '✓' : '✗'}</span>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        ) : (
+                          <div className="bt" style={{ fontSize: '0.8rem', color: theme.textMuted, fontStyle: 'italic' }}>No habits tracked</div>
+                        )}
+                      </div>
+
+                      {/* Mood section */}
+                      {moods[selectedCalendarDay.key] && (
+                        <div style={{ marginBottom: '16px' }}>
+                          <div style={{ fontFamily: "'Caveat', cursive", fontSize: '1.1rem', color: theme.text, marginBottom: '8px' }}>
+                            ═══ Mood Check ═══
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <span style={{ fontSize: '1.5rem' }}>{moodEmojis.find(m => m.value === moods[selectedCalendarDay.key].value)?.emoji}</span>
+                            <span className="bt" style={{ fontSize: '0.85rem', color: theme.text }}>
+                              {moodEmojis.find(m => m.value === moods[selectedCalendarDay.key].value)?.label}
+                            </span>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Journal section */}
+                      {journal[selectedCalendarDay.key] && (journal[selectedCalendarDay.key].gratitude || journal[selectedCalendarDay.key].reflection || journal[selectedCalendarDay.key].tomorrow || journal[selectedCalendarDay.key].promptResponse) && (
+                        <div style={{ marginBottom: '16px' }}>
+                          <div style={{ fontFamily: "'Caveat', cursive", fontSize: '1.1rem', color: theme.text, marginBottom: '8px' }}>
+                            ═══ Journal Entry ═══
+                          </div>
+                          <div style={{ fontFamily: "'Caveat', cursive", fontSize: '0.95rem', color: theme.textSecondary, lineHeight: 1.5 }}>
+                            {journal[selectedCalendarDay.key].promptResponse && (
+                              <div style={{ marginBottom: '6px' }}>
+                                <span style={{ color: theme.accent }}>✨ </span>
+                                {journal[selectedCalendarDay.key].promptResponse.substring(0, 100)}{journal[selectedCalendarDay.key].promptResponse.length > 100 ? '...' : ''}
+                              </div>
+                            )}
+                            {journal[selectedCalendarDay.key].gratitude && (
+                              <div style={{ marginBottom: '6px' }}>
+                                <span style={{ color: theme.accent }}>🙏 </span>
+                                {journal[selectedCalendarDay.key].gratitude.substring(0, 80)}{journal[selectedCalendarDay.key].gratitude.length > 80 ? '...' : ''}
+                              </div>
+                            )}
+                            {journal[selectedCalendarDay.key].reflection && (
+                              <div>
+                                <span style={{ color: theme.accent }}>💭 </span>
+                                {journal[selectedCalendarDay.key].reflection.substring(0, 80)}{journal[selectedCalendarDay.key].reflection.length > 80 ? '...' : ''}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Footer */}
+                      <div style={{ borderTop: `2px dashed ${theme.cardBorder}`, paddingTop: '12px', textAlign: 'center' }}>
+                        <div className="bt" style={{ fontSize: '0.7rem', color: theme.textMuted }}>
+                          ★ Thank you for {tc.verb} with us! ★
+                        </div>
+                        <button 
+                          onClick={() => setSelectedCalendarDay(null)}
+                          style={{ 
+                            marginTop: '12px',
+                            background: theme.accentGradient,
+                            border: 'none',
+                            borderRadius: '20px',
+                            padding: '8px 24px',
+                            color: theme.isDark ? '#1a1a1a' : '#fff',
+                            fontWeight: 600,
+                            cursor: 'pointer',
+                            fontSize: '0.85rem'
+                          }}
+                        >
+                          Close
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                    </>
+                  );
+                })()}
               </div>
             )}
 
