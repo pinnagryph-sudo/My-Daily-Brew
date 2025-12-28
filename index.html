@@ -20,7 +20,7 @@
   <style>
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
     html, body, #root { height: 100%; width: 100%; overflow-x: hidden; }
-    body { font-family: 'Cormorant Garamond', Georgia, serif; min-height: 100vh; min-height: -webkit-fill-available; transition: background 0.4s ease; overscroll-behavior: none; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+    body { font-family: 'Cormorant Garamond', Georgia, serif; min-height: 100vh; min-height: 100dvh; transition: background 0.4s ease; overscroll-behavior: none; -webkit-tap-highlight-color: transparent; }
     .loading-screen { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; background: linear-gradient(180deg, #F5E6D3 0%, #FDFBF7 50%, #F5E6D3 100%); transition: opacity 0.5s; }
     .loading-screen.hidden { opacity: 0; pointer-events: none; }
     .loading-icon { font-size: 56px; animation: steam 2s ease-in-out infinite; }
@@ -34,7 +34,7 @@
   <div class="loading-screen" id="loadingScreen">
     <div class="loading-icon">☕</div>
     <div class="loading-text">Brewing something special...</div>
-    <div class="loading-subtext">v7.1 • Delightful Extras</div>
+    <div class="loading-subtext">v6.7.2 Mobile Fix</div>
   </div>
 
   <script type="text/babel">
@@ -658,24 +658,6 @@
     const defaultEmojis = ['💧','🏃','📖','😴','🥗','📝','🎨','🧘','💬','✨','🎵','🚶','🍃','📓','🤸','💊','🧹','🌅','🍎','💤','🎯','📱','🧠','❤️','🌿','☀️','🌙','⭐','🔥','💪'];
     const moodEmojis = [{ emoji: '😢', label: 'Rough', value: 1 }, { emoji: '😕', label: 'Meh', value: 2 }, { emoji: '😊', label: 'Good', value: 3 }, { emoji: '😄', label: 'Great', value: 4 }, { emoji: '🤩', label: 'Amazing', value: 5 }];
 
-    // Café Decorations - unlockable with XP
-    const cafeDecorations = [
-      { id: 'plant1', name: 'Small Succulent', icon: '🪴', xpCost: 50, category: 'plants' },
-      { id: 'plant2', name: 'Potted Fern', icon: '🌿', xpCost: 100, category: 'plants' },
-      { id: 'plant3', name: 'Flower Vase', icon: '💐', xpCost: 150, category: 'plants' },
-      { id: 'plant4', name: 'Bonsai Tree', icon: '🌳', xpCost: 300, category: 'plants' },
-      { id: 'art1', name: 'Wall Clock', icon: '🕐', xpCost: 75, category: 'art' },
-      { id: 'art2', name: 'Picture Frame', icon: '🖼️', xpCost: 125, category: 'art' },
-      { id: 'art3', name: 'String Lights', icon: '✨', xpCost: 200, category: 'art' },
-      { id: 'art4', name: 'Neon Sign', icon: '💡', xpCost: 400, category: 'art' },
-      { id: 'cozy1', name: 'Candle', icon: '🕯️', xpCost: 60, category: 'cozy' },
-      { id: 'cozy2', name: 'Books Stack', icon: '📚', xpCost: 100, category: 'cozy' },
-      { id: 'cozy3', name: 'Vinyl Player', icon: '🎵', xpCost: 250, category: 'cozy' },
-      { id: 'cozy4', name: 'Fireplace', icon: '🔥', xpCost: 500, category: 'cozy' },
-      { id: 'pet1', name: 'Café Cat', icon: '🐱', xpCost: 350, category: 'pets' },
-      { id: 'pet2', name: 'Aquarium', icon: '🐠', xpCost: 450, category: 'pets' },
-    ];
-
     // ═══════════════════════════════════════════════════════════════
     // WHAT'S NEW CONTENT
     // ═══════════════════════════════════════════════════════════════
@@ -737,7 +719,7 @@
     // MAIN APP COMPONENT
     // ═══════════════════════════════════════════════════════════════
     function App() {
-      const APP_VERSION = '7.1.0';
+      const APP_VERSION = '6.7.2';
       const season = getCurrentSeason();
       const seasonDeco = seasonalDecorations[season];
 
@@ -779,9 +761,6 @@
       const [showSubtaskInput, setShowSubtaskInput] = useState(null);
       const [showChallenges, setShowChallenges] = useState(false);
       const [showYearReview, setShowYearReview] = useState(false);
-      const [unlockedDecorations, setUnlockedDecorations] = useState(() => load('unlockedDecorations', []));
-      const [showDecorations, setShowDecorations] = useState(false);
-      const [showFreezeAnimation, setShowFreezeAnimation] = useState(false);
       const [showCustomTimer, setShowCustomTimer] = useState(false);
       const [showExport, setShowExport] = useState(false);
       const [confirmDelete, setConfirmDelete] = useState(null); // { type: 'habit'|'task', id, name }
@@ -878,7 +857,6 @@
       useEffect(() => { store('habitHistory', habitHistory); }, [habitHistory]);
       useEffect(() => { store('gameStats', gameStats); }, [gameStats]);
       useEffect(() => { store('challenges', challenges); }, [challenges]);
-      useEffect(() => { store('unlockedDecorations', unlockedDecorations); }, [unlockedDecorations]);
       useEffect(() => { store('dailyXPAwarded', dailyXPAwarded); }, [dailyXPAwarded]);
       useEffect(() => { store('brewType', brewType); }, [brewType]);
       useEffect(() => { store('isDark', isDark); }, [isDark]);
@@ -1205,8 +1183,6 @@
           const isConsecutive = lastDate === getDateKey(yesterday);
           if (!isConsecutive && lastDate && gameStats.freezesAvailable > 0) {
             setGameStats(s => ({ ...s, freezesUsed: s.freezesUsed + 1, freezesAvailable: s.freezesAvailable - 1 }));
-            setShowFreezeAnimation(true);
-            setTimeout(() => setShowFreezeAnimation(false), 3000);
             triggerCelebration(messages.freeze);
           }
           const weekNum = getWeekNumber();
@@ -1394,15 +1370,6 @@
       const nextLevel = useMemo(() => { const idx = levels.findIndex(l => l.level === currentLevel.level); return levels[idx + 1] || null; }, [currentLevel, levels]);
       const xpProgress = useMemo(() => { if (!nextLevel) return 100; const min = currentLevel.xp; const need = nextLevel.xp - min; const have = gameStats.xp - min; return Math.round((have / need) * 100); }, [gameStats.xp, currentLevel, nextLevel]);
       const addXP = (amount) => setGameStats(s => ({ ...s, xp: s.xp + amount }));
-      const unlockDecoration = (decoId) => {
-        const deco = cafeDecorations.find(d => d.id === decoId);
-        if (!deco || unlockedDecorations.includes(decoId)) return;
-        if (gameStats.xp >= deco.xpCost) {
-          setGameStats(s => ({ ...s, xp: s.xp - deco.xpCost }));
-          setUnlockedDecorations([...unlockedDecorations, decoId]);
-          triggerCelebration(`${deco.icon} ${deco.name} unlocked!`);
-        }
-      };
       const triggerCelebration = (msg) => { setCelebration(msg); if ('vibrate' in navigator) navigator.vibrate(100); setTimeout(() => setCelebration(null), 2500); };
 
       // Challenge progress
@@ -1617,7 +1584,7 @@
         btnSecondary: { background: theme.progressBg, color: theme.text, border: `1px solid ${theme.cardBorder}`, borderRadius: '12px', padding: '10px 16px', fontFamily: "'Lora',serif", fontWeight: 500, cursor: 'pointer' },
         input: { background: theme.inputBg, border: `1px solid ${theme.inputBorder}`, borderRadius: '12px', padding: '12px', fontFamily: "'Lora',serif", fontSize: '1rem', color: theme.text, width: '100%', outline: 'none' },
         navItem: (a) => ({ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px', padding: '8px 12px', borderRadius: '12px', background: a ? theme.accentGradient : 'transparent', color: a ? (theme.isDark ? '#1a1a1a' : '#fff') : theme.textSecondary, border: 'none', cursor: 'pointer', fontFamily: "'Lora',serif", fontSize: '9px', fontWeight: a ? 600 : 400 }),
-        fab: { position: 'fixed', bottom: '75px', right: '16px', width: '52px', height: '52px', borderRadius: '50%', background: theme.accentGradient, border: 'none', fontSize: '22px', cursor: 'pointer', boxShadow: '0 4px 20px rgba(0,0,0,0.3)', zIndex: 99, display: 'flex', alignItems: 'center', justifyContent: 'center', color: theme.isDark ? '#1a1a1a' : '#fff' },
+        fab: { position: 'fixed', bottom: '68px', right: '16px', width: '52px', height: '52px', borderRadius: '50%', background: theme.accentGradient, border: 'none', fontSize: '22px', cursor: 'pointer', boxShadow: '0 4px 20px rgba(0,0,0,0.3)', zIndex: 99, display: 'flex', alignItems: 'center', justifyContent: 'center', color: theme.isDark ? '#1a1a1a' : '#fff' },
         modal: { position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' },
         modalContent: { background: theme.modalBg, borderRadius: '20px', maxWidth: '360px', width: '100%', padding: '20px', maxHeight: '85vh', overflow: 'auto' }
       };
@@ -1632,8 +1599,6 @@
             @keyframes pop { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
             @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
             @keyframes confetti { 0% { transform: translateY(0) rotate(0deg); opacity: 1; } 100% { transform: translateY(-100px) rotate(720deg); opacity: 0; } }
-            @keyframes freezeShimmer { 0% { transform: scale(1) rotate(0deg); filter: brightness(1); } 25% { transform: scale(1.1) rotate(-5deg); filter: brightness(1.2); } 50% { transform: scale(1.05) rotate(5deg); filter: brightness(1.1); } 75% { transform: scale(1.15) rotate(-3deg); filter: brightness(1.3); } 100% { transform: scale(1) rotate(0deg); filter: brightness(1); } }
-            @keyframes iceFloat { 0%, 100% { transform: translateY(0) rotate(0deg); } 25% { transform: translateY(-10px) rotate(-5deg); } 50% { transform: translateY(-5px) rotate(5deg); } 75% { transform: translateY(-15px) rotate(-3deg); } }
             .fade { animation: fadeIn 0.3s; }
             .slide { animation: slideUp 0.4s; }
             .pop { animation: pop 0.3s; }
@@ -1641,7 +1606,7 @@
             .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
           `}</style>
 
-          <div style={{ maxWidth: 'min(100%, 480px)', margin: '0 auto', padding: '12px 12px 85px' }}>
+          <div style={{ maxWidth: '100%', margin: '0 auto', padding: '12px 12px 70px' }}>
             {/* Header with seasonal decoration */}
             <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '14px' }}>
               <div>
@@ -1656,16 +1621,6 @@
                     </span>
                   )}
                 </p>
-                {unlockedDecorations.length > 0 && (
-                  <div style={{ display: 'flex', gap: '4px', marginTop: '4px', flexWrap: 'wrap' }}>
-                    {unlockedDecorations.slice(0, 6).map(id => {
-                      const deco = cafeDecorations.find(d => d.id === id);
-                      return deco ? <span key={id} title={deco.name} style={{ fontSize: '0.9rem' }}>{deco.icon}</span> : null;
-                    })}
-                    {unlockedDecorations.length > 6 && <span style={{ fontSize: '0.7rem', color: theme.textMuted }}>+{unlockedDecorations.length - 6}</span>}
-                    <button onClick={() => setShowDecorations(true)} style={{ background: 'none', border: 'none', fontSize: '0.65rem', color: theme.accent, cursor: 'pointer', padding: 0 }}>🛒</button>
-                  </div>
-                )}
               </div>
               <div style={{ display: 'flex', gap: '6px' }}>
                 <button onClick={() => setShowSoundMenu(true)} aria-label="Sound settings" style={{ background: soundEnabled ? theme.accentGradient : theme.accentLight, border: `1px solid ${theme.cardBorder}`, borderRadius: '10px', padding: '6px 10px', cursor: 'pointer', position: 'relative' }}>
@@ -2148,10 +2103,10 @@
             onClick={() => setShowSoundMenu(true)} 
             style={{ 
               position: 'fixed', 
-              bottom: '75px', 
-              left: '16px', 
-              width: '44px', 
-              height: '44px', 
+              bottom: '90px', 
+              left: '20px', 
+              width: '48px', 
+              height: '48px', 
               borderRadius: '50%', 
               background: soundEnabled ? theme.accentGradient : theme.cardBg, 
               border: `2px solid ${soundEnabled ? 'transparent' : theme.cardBorder}`, 
@@ -2455,55 +2410,6 @@
                 
                 <p className="bt" style={{ fontSize: '0.7rem', color: theme.textMuted, marginBottom: '14px' }}>💡 Swipe right to complete</p>
                 <button onClick={() => setShowSettings(false)} style={{ ...s.btn, width: '100%' }}>Done</button>
-              </div>
-            </div>
-          )}
-
-          {/* Café Decorations Shop */}
-          {showDecorations && (
-            <div style={s.modal} className="fade" onClick={() => setShowDecorations(false)}>
-              <div style={s.modalContent} className="slide" onClick={e => e.stopPropagation()}>
-                <h2 className="hw" style={{ fontSize: '1.4rem', color: theme.text, textAlign: 'center', marginBottom: '4px' }}>🛒 Café Decorations</h2>
-                <p className="bt" style={{ textAlign: 'center', fontSize: '0.8rem', color: theme.textSecondary, marginBottom: '6px' }}>Spend XP to decorate your café!</p>
-                <p className="bt" style={{ textAlign: 'center', fontSize: '0.9rem', color: theme.accent, marginBottom: '16px', fontWeight: 600 }}>💰 {gameStats.xp} XP available</p>
-                
-                {['plants', 'art', 'cozy', 'pets'].map(category => (
-                  <div key={category} style={{ marginBottom: '14px' }}>
-                    <p className="bt" style={{ fontSize: '0.8rem', fontWeight: 600, color: theme.text, marginBottom: '8px', textTransform: 'capitalize' }}>
-                      {category === 'plants' ? '🌿' : category === 'art' ? '🖼️' : category === 'cozy' ? '🕯️' : '🐱'} {category}
-                    </p>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px' }}>
-                      {cafeDecorations.filter(d => d.category === category).map(deco => {
-                        const owned = unlockedDecorations.includes(deco.id);
-                        const canAfford = gameStats.xp >= deco.xpCost;
-                        return (
-                          <button 
-                            key={deco.id}
-                            onClick={() => !owned && canAfford && unlockDecoration(deco.id)}
-                            disabled={owned || !canAfford}
-                            style={{ 
-                              padding: '10px', 
-                              borderRadius: '10px', 
-                              border: owned ? `2px solid ${theme.success}` : `1px solid ${theme.cardBorder}`,
-                              background: owned ? `${theme.success}15` : theme.progressBg,
-                              cursor: owned ? 'default' : canAfford ? 'pointer' : 'not-allowed',
-                              opacity: !owned && !canAfford ? 0.5 : 1,
-                              textAlign: 'center'
-                            }}
-                          >
-                            <span style={{ fontSize: '1.5rem', display: 'block', marginBottom: '4px' }}>{deco.icon}</span>
-                            <span className="bt" style={{ fontSize: '0.7rem', color: theme.text, display: 'block' }}>{deco.name}</span>
-                            <span className="bt" style={{ fontSize: '0.65rem', color: owned ? theme.success : theme.accent }}>
-                              {owned ? '✓ Owned' : `${deco.xpCost} XP`}
-                            </span>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                ))}
-                
-                <button onClick={() => setShowDecorations(false)} style={{ ...s.btn, width: '100%', marginTop: '10px' }}>Close</button>
               </div>
             </div>
           )}
@@ -2949,25 +2855,6 @@
           {celebration && (
             <div style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', background: theme.accentGradient, color: theme.isDark ? '#1a1a1a' : '#fff', padding: '16px 28px', borderRadius: '16px', zIndex: 3000, textAlign: 'center', boxShadow: '0 10px 40px rgba(0,0,0,0.3)' }} className="slide">
               <p className="hw" style={{ fontSize: '1.4rem', margin: 0 }}>{celebration}</p>
-              <div style={{ position: 'absolute', top: '-20px', left: '50%', transform: 'translateX(-50%)', width: '200px', height: '100px', pointerEvents: 'none', overflow: 'visible' }}>
-                {['🎉', '✨', '⭐', '🎊', '💫', '🌟', '❤️', '💛'].map((emoji, i) => (
-                  <span key={i} style={{ position: 'absolute', left: `${10 + (i * 12)}%`, animation: `confetti 1.5s ease-out ${i * 0.1}s forwards`, fontSize: '1.2rem' }}>{emoji}</span>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Freeze Animation Overlay */}
-          {showFreezeAnimation && (
-            <div style={{ position: 'fixed', inset: 0, background: 'radial-gradient(circle at center, rgba(135,206,235,0.3) 0%, transparent 70%)', zIndex: 2500, pointerEvents: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }} className="fade">
-              <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: '5rem', animation: 'freezeShimmer 1s ease-in-out infinite' }}>🧊</div>
-                <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', marginTop: '10px' }}>
-                  {['❄️', '❄️', '❄️', '❄️', '❄️'].map((s, i) => (
-                    <span key={i} style={{ fontSize: '1.5rem', animation: `iceFloat 2s ease-in-out ${i * 0.2}s infinite`, opacity: 0.8 }}>{s}</span>
-                  ))}
-                </div>
-              </div>
             </div>
           )}
         </div>
