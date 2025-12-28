@@ -19,10 +19,8 @@
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <style>
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
-    html, body, #root { height: 100%; width: 100%; overflow-x: hidden; margin: 0; padding: 0; }
-    html { height: -webkit-fill-available; }
-    body { font-family: 'Cormorant Garamond', Georgia, serif; min-height: 100vh; min-height: 100dvh; min-height: -webkit-fill-available; transition: background 0.4s ease; overscroll-behavior: none; -webkit-tap-highlight-color: transparent; }
-    #root { display: flex; flex-direction: column; min-height: 100vh; min-height: 100dvh; }
+    html, body, #root { height: 100%; width: 100%; overflow-x: hidden; }
+    body { font-family: 'Cormorant Garamond', Georgia, serif; min-height: 100vh; min-height: -webkit-fill-available; transition: background 0.4s ease; overscroll-behavior: none; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
     .loading-screen { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; background: linear-gradient(180deg, #F5E6D3 0%, #FDFBF7 50%, #F5E6D3 100%); transition: opacity 0.5s; }
     .loading-screen.hidden { opacity: 0; pointer-events: none; }
     .loading-icon { font-size: 56px; animation: steam 2s ease-in-out infinite; }
@@ -36,7 +34,7 @@
   <div class="loading-screen" id="loadingScreen">
     <div class="loading-icon">☕</div>
     <div class="loading-text">Brewing something special...</div>
-    <div class="loading-subtext">v6.7.3 Layout Fix</div>
+    <div class="loading-subtext">v7.2 • Easy Wins + Delightful Extras</div>
   </div>
 
   <script type="text/babel">
@@ -660,6 +658,78 @@
     const defaultEmojis = ['💧','🏃','📖','😴','🥗','📝','🎨','🧘','💬','✨','🎵','🚶','🍃','📓','🤸','💊','🧹','🌅','🍎','💤','🎯','📱','🧠','❤️','🌿','☀️','🌙','⭐','🔥','💪'];
     const moodEmojis = [{ emoji: '😢', label: 'Rough', value: 1 }, { emoji: '😕', label: 'Meh', value: 2 }, { emoji: '😊', label: 'Good', value: 3 }, { emoji: '😄', label: 'Great', value: 4 }, { emoji: '🤩', label: 'Amazing', value: 5 }];
 
+    // Café Decorations - unlockable with XP
+    const cafeDecorations = [
+      { id: 'plant1', name: 'Small Succulent', icon: '🪴', xpCost: 50, category: 'plants' },
+      { id: 'plant2', name: 'Potted Fern', icon: '🌿', xpCost: 100, category: 'plants' },
+      { id: 'plant3', name: 'Flower Vase', icon: '💐', xpCost: 150, category: 'plants' },
+      { id: 'plant4', name: 'Bonsai Tree', icon: '🌳', xpCost: 300, category: 'plants' },
+      { id: 'art1', name: 'Wall Clock', icon: '🕐', xpCost: 75, category: 'art' },
+      { id: 'art2', name: 'Picture Frame', icon: '🖼️', xpCost: 125, category: 'art' },
+      { id: 'art3', name: 'String Lights', icon: '✨', xpCost: 200, category: 'art' },
+      { id: 'art4', name: 'Neon Sign', icon: '💡', xpCost: 400, category: 'art' },
+      { id: 'cozy1', name: 'Candle', icon: '🕯️', xpCost: 60, category: 'cozy' },
+      { id: 'cozy2', name: 'Books Stack', icon: '📚', xpCost: 100, category: 'cozy' },
+      { id: 'cozy3', name: 'Vinyl Player', icon: '🎵', xpCost: 250, category: 'cozy' },
+      { id: 'cozy4', name: 'Fireplace', icon: '🔥', xpCost: 500, category: 'cozy' },
+      { id: 'pet1', name: 'Café Cat', icon: '🐱', xpCost: 350, category: 'pets' },
+      { id: 'pet2', name: 'Aquarium', icon: '🐠', xpCost: 450, category: 'pets' },
+    ];
+
+    // ═══════════════════════════════════════════════════════════════
+    // COZY QUOTES
+    // ═══════════════════════════════════════════════════════════════
+    const cozyQuotes = {
+      coffee: [
+        "☕ Life happens, coffee helps. You've got this!",
+        "☕ Today's forecast: 100% chance of getting things done.",
+        "☕ You're doing amazing, one sip at a time.",
+        "☕ Behind every successful person is a substantial amount of coffee.",
+        "☕ First we drink the coffee, then we do the things.",
+        "☕ Good things are brewing in your life today.",
+        "☕ May your coffee be strong and your Monday be short.",
+        "☕ Espresso yourself! Today is YOUR day.",
+        "☕ A yawn is a silent scream for coffee. We got you.",
+        "☕ You're brewtiful inside and out!",
+        "☕ Keep calm and drink coffee.",
+        "☕ Today's goal: Coffee and kindness.",
+      ],
+      tea: [
+        "🍵 Where there's tea, there's hope.",
+        "🍵 You are tea-riffic! Remember that today.",
+        "🍵 Steep dreams and peaceful moments await.",
+        "🍵 Life is like a cup of tea - it's all in how you make it.",
+        "🍵 Take time to stop and smell the tea leaves.",
+        "🍵 A cup of tea makes everything better.",
+        "🍵 Today's blend: 50% hustle, 50% calm.",
+        "🍵 Serenity is just a sip away.",
+        "🍵 You've got this, one cup at a time.",
+        "🍵 Let your worries steep away today.",
+        "🍵 Peace begins with a warm cup.",
+        "🍵 You're steeped in potential!",
+      ],
+      matcha: [
+        "🍃 Find your balance, one breath at a time.",
+        "🍃 Today is full of matcha potential!",
+        "🍃 Harmony is your superpower.",
+        "🍃 Be like matcha: bold yet balanced.",
+        "🍃 Your energy today? Sustained excellence.",
+        "🍃 Green means go! Chase your dreams.",
+        "🍃 Stay grounded, stay growing.",
+        "🍃 Inner peace is your birthright. Claim it.",
+        "🍃 You're whisking up something wonderful today.",
+        "🍃 Calm mind, strong spirit, matcha heart.",
+        "🍃 Flow with life's rhythm today.",
+        "🍃 Your zen is showing. Keep it up!",
+      ]
+    };
+    const getCozyQuote = (brewType) => {
+      const quotes = cozyQuotes[brewType];
+      const today = new Date();
+      const index = (today.getDate() + today.getMonth()) % quotes.length;
+      return quotes[index];
+    };
+
     // ═══════════════════════════════════════════════════════════════
     // WHAT'S NEW CONTENT
     // ═══════════════════════════════════════════════════════════════
@@ -721,14 +791,26 @@
     // MAIN APP COMPONENT
     // ═══════════════════════════════════════════════════════════════
     function App() {
-      const APP_VERSION = '6.7.3';
+      const APP_VERSION = '7.2.0';
       const season = getCurrentSeason();
       const seasonDeco = seasonalDecorations[season];
 
       // Core state
       const [brewType, setBrewType] = useState(() => load('brewType', 'coffee'));
       const [isDark, setIsDark] = useState(() => load('isDark', false));
+      const [autoDarkMode, setAutoDarkMode] = useState(() => load('autoDarkMode', false));
       const [highContrast, setHighContrast] = useState(() => load('highContrast', false));
+      
+      // Auto dark mode effect
+      useEffect(() => {
+        if (!autoDarkMode) return;
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        const handleChange = (e) => setIsDark(e.matches);
+        setIsDark(mediaQuery.matches);
+        mediaQuery.addEventListener('change', handleChange);
+        return () => mediaQuery.removeEventListener('change', handleChange);
+      }, [autoDarkMode]);
+      
       const theme = brewThemes[brewType][isDark ? 'dark' : 'light'];
       const levels = brewRanks[brewType];
       const badges = brewBadges[brewType];
@@ -763,6 +845,9 @@
       const [showSubtaskInput, setShowSubtaskInput] = useState(null);
       const [showChallenges, setShowChallenges] = useState(false);
       const [showYearReview, setShowYearReview] = useState(false);
+      const [unlockedDecorations, setUnlockedDecorations] = useState(() => load('unlockedDecorations', []));
+      const [showDecorations, setShowDecorations] = useState(false);
+      const [showFreezeAnimation, setShowFreezeAnimation] = useState(false);
       const [showCustomTimer, setShowCustomTimer] = useState(false);
       const [showExport, setShowExport] = useState(false);
       const [confirmDelete, setConfirmDelete] = useState(null); // { type: 'habit'|'task', id, name }
@@ -859,9 +944,11 @@
       useEffect(() => { store('habitHistory', habitHistory); }, [habitHistory]);
       useEffect(() => { store('gameStats', gameStats); }, [gameStats]);
       useEffect(() => { store('challenges', challenges); }, [challenges]);
+      useEffect(() => { store('unlockedDecorations', unlockedDecorations); }, [unlockedDecorations]);
       useEffect(() => { store('dailyXPAwarded', dailyXPAwarded); }, [dailyXPAwarded]);
       useEffect(() => { store('brewType', brewType); }, [brewType]);
       useEffect(() => { store('isDark', isDark); }, [isDark]);
+      useEffect(() => { store('autoDarkMode', autoDarkMode); }, [autoDarkMode]);
       useEffect(() => { store('highContrast', highContrast); }, [highContrast]);
       useEffect(() => { store('cafeName', cafeName); }, [cafeName]);
       useEffect(() => { store('ambientSound', ambientSound); }, [ambientSound]);
@@ -1185,11 +1272,28 @@
           const isConsecutive = lastDate === getDateKey(yesterday);
           if (!isConsecutive && lastDate && gameStats.freezesAvailable > 0) {
             setGameStats(s => ({ ...s, freezesUsed: s.freezesUsed + 1, freezesAvailable: s.freezesAvailable - 1 }));
+            setShowFreezeAnimation(true);
+            setTimeout(() => setShowFreezeAnimation(false), 3000);
             triggerCelebration(messages.freeze);
           }
           const weekNum = getWeekNumber();
           if (gameStats.weeklyFreeze !== weekNum) setGameStats(s => ({ ...s, freezesAvailable: 1, weeklyFreeze: weekNum }));
-          setGameStats(s => ({ ...s, lastActiveDate: todayKey, appStreak: isConsecutive || (s.freezesUsed > 0) ? s.appStreak + 1 : 1, perfectDayToday: false }));
+          
+          // Calculate new streak and check milestones
+          const newAppStreak = isConsecutive || (gameStats.freezesUsed > 0) ? gameStats.appStreak + 1 : 1;
+          const streakMilestones = [
+            { days: 7, msg: '🔥 1 Week Streak! You\'re on fire!', xp: 50 },
+            { days: 14, msg: '⚡ 2 Week Streak! Unstoppable!', xp: 75 },
+            { days: 30, msg: '🌟 1 Month Streak! Legendary!', xp: 150 },
+            { days: 60, msg: '💫 2 Month Streak! Incredible!', xp: 200 },
+            { days: 100, msg: '💯 100 Day Streak! AMAZING!', xp: 500 },
+            { days: 365, msg: '👑 1 YEAR STREAK! You are a LEGEND!', xp: 1000 }
+          ];
+          const milestone = streakMilestones.find(m => m.days === newAppStreak);
+          if (milestone) {
+            setTimeout(() => { triggerCelebration(milestone.msg); addXP(milestone.xp); }, 1000);
+          }
+          setGameStats(s => ({ ...s, lastActiveDate: todayKey, appStreak: newAppStreak, perfectDayToday: false }));
           
           // Weekly challenge reset
           if (challenges.weekly.week !== weekNum) {
@@ -1372,6 +1476,15 @@
       const nextLevel = useMemo(() => { const idx = levels.findIndex(l => l.level === currentLevel.level); return levels[idx + 1] || null; }, [currentLevel, levels]);
       const xpProgress = useMemo(() => { if (!nextLevel) return 100; const min = currentLevel.xp; const need = nextLevel.xp - min; const have = gameStats.xp - min; return Math.round((have / need) * 100); }, [gameStats.xp, currentLevel, nextLevel]);
       const addXP = (amount) => setGameStats(s => ({ ...s, xp: s.xp + amount }));
+      const unlockDecoration = (decoId) => {
+        const deco = cafeDecorations.find(d => d.id === decoId);
+        if (!deco || unlockedDecorations.includes(decoId)) return;
+        if (gameStats.xp >= deco.xpCost) {
+          setGameStats(s => ({ ...s, xp: s.xp - deco.xpCost }));
+          setUnlockedDecorations([...unlockedDecorations, decoId]);
+          triggerCelebration(`${deco.icon} ${deco.name} unlocked!`);
+        }
+      };
       const triggerCelebration = (msg) => { setCelebration(msg); if ('vibrate' in navigator) navigator.vibrate(100); setTimeout(() => setCelebration(null), 2500); };
 
       // Challenge progress
@@ -1400,6 +1513,7 @@
 
       // Daily tip
       const dailyTip = useMemo(() => getDailyTip(gameStats, brewType), [gameStats, brewType]);
+      const cozyQuote = useMemo(() => getCozyQuote(brewType), [brewType]);
       const dismissDailyTip = () => { setShowDailyTip(false); store('lastTipDate', todayKey); };
 
       // Habit actions
@@ -1427,7 +1541,9 @@
         checkPerfectDay();
       };
 
-      const addHabit = () => { if (!newHabit.name.trim()) return; setHabits([...habits, { id: Date.now(), name: newHabit.name, icon: newHabit.icon, completed: false, streak: 0, history: {} }]); setNewHabit({ name: '', icon: '💧' }); setShowAddHabit(false); setShowQuickAdd(false); };
+      const addHabit = () => { if (!newHabit.name.trim()) return; setHabits([...habits, { id: Date.now(), name: newHabit.name, icon: newHabit.icon, completed: false, streak: 0, history: {}, pinned: false }]); setNewHabit({ name: '', icon: '💧' }); setShowAddHabit(false); setShowQuickAdd(false); };
+      const togglePinHabit = (id) => setHabits(habits.map(h => h.id === id ? { ...h, pinned: !h.pinned } : h));
+      const duplicateHabit = (h) => { setHabits([...habits, { ...h, id: Date.now(), completed: false, streak: 0, history: {} }]); };
       const confirmDeleteHabit = (id) => { const habit = habits.find(h => h.id === id); setConfirmDelete({ type: 'habit', id, name: habit.name, icon: habit.icon }); };
       const deleteHabit = (id) => { const habit = habits.find(h => h.id === id); setHabits(habits.filter(h => h.id !== id)); setUndoAction({ type: 'habit', action: () => setHabits(h => [...h, habit]) }); setTimeout(() => setUndoAction(null), 4000); setConfirmDelete(null); };
       const reorderHabit = (id, dir) => { const idx = habits.findIndex(h => h.id === id); if ((dir === -1 && idx === 0) || (dir === 1 && idx === habits.length - 1)) return; const n = [...habits]; [n[idx], n[idx + dir]] = [n[idx + dir], n[idx]]; setHabits(n); };
@@ -1454,7 +1570,10 @@
 
       const toggleSubtask = (taskId, subIdx) => { setTasks(tasks.map(t => { if (t.id !== taskId) return t; const subs = [...(t.subtasks || [])]; subs[subIdx] = { ...subs[subIdx], done: !subs[subIdx].done }; const allDone = subs.every(s => s.done); return { ...t, subtasks: subs, done: allDone ? true : t.done }; })); };
       const addSubtaskToTask = (taskId, text) => { if (!text.trim()) return; setTasks(tasks.map(t => t.id === taskId ? { ...t, subtasks: [...(t.subtasks || []), { text, done: false }] } : t)); setNewSubtask(''); setShowSubtaskInput(null); };
-      const addTask = () => { if (!newTask.text.trim()) return; setTasks([...tasks, { ...newTask, id: Date.now(), done: false, lastReset: todayKey }]); setNewTask({ text: '', time: '', priority: 'medium', category: null, recurring: 'none', subtasks: [] }); setShowAddTask(false); setShowQuickAdd(false); };
+      const addTask = () => { if (!newTask.text.trim()) return; setTasks([...tasks, { ...newTask, id: Date.now(), done: false, lastReset: todayKey, pinned: false, notes: '' }]); setNewTask({ text: '', time: '', priority: 'medium', category: null, recurring: 'none', subtasks: [] }); setShowAddTask(false); setShowQuickAdd(false); };
+      const togglePinTask = (id) => setTasks(tasks.map(t => t.id === id ? { ...t, pinned: !t.pinned } : t));
+      const duplicateTask = (task) => { setTasks([...tasks, { ...task, id: Date.now(), done: false, notes: '' }]); };
+      const updateTaskNotes = (id, notes) => setTasks(tasks.map(t => t.id === id ? { ...t, notes } : t));
       const confirmDeleteTask = (id) => { const task = tasks.find(t => t.id === id); setConfirmDelete({ type: 'task', id, name: task.text }); };
       const deleteTask = (id) => { const task = tasks.find(t => t.id === id); setTasks(tasks.filter(t => t.id !== id)); setUndoAction({ type: 'task', action: () => setTasks(ts => [...ts, task]) }); setTimeout(() => setUndoAction(null), 4000); setConfirmDelete(null); };
 
@@ -1586,21 +1705,24 @@
         btnSecondary: { background: theme.progressBg, color: theme.text, border: `1px solid ${theme.cardBorder}`, borderRadius: '12px', padding: '10px 16px', fontFamily: "'Lora',serif", fontWeight: 500, cursor: 'pointer' },
         input: { background: theme.inputBg, border: `1px solid ${theme.inputBorder}`, borderRadius: '12px', padding: '12px', fontFamily: "'Lora',serif", fontSize: '1rem', color: theme.text, width: '100%', outline: 'none' },
         navItem: (a) => ({ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px', padding: '8px 12px', borderRadius: '12px', background: a ? theme.accentGradient : 'transparent', color: a ? (theme.isDark ? '#1a1a1a' : '#fff') : theme.textSecondary, border: 'none', cursor: 'pointer', fontFamily: "'Lora',serif", fontSize: '9px', fontWeight: a ? 600 : 400 }),
-        fab: { position: 'fixed', bottom: '68px', right: '16px', width: '52px', height: '52px', borderRadius: '50%', background: theme.accentGradient, border: 'none', fontSize: '22px', cursor: 'pointer', boxShadow: '0 4px 20px rgba(0,0,0,0.3)', zIndex: 99, display: 'flex', alignItems: 'center', justifyContent: 'center', color: theme.isDark ? '#1a1a1a' : '#fff' },
+        fab: { position: 'fixed', bottom: '75px', right: '16px', width: '52px', height: '52px', borderRadius: '50%', background: theme.accentGradient, border: 'none', fontSize: '22px', cursor: 'pointer', boxShadow: '0 4px 20px rgba(0,0,0,0.3)', zIndex: 99, display: 'flex', alignItems: 'center', justifyContent: 'center', color: theme.isDark ? '#1a1a1a' : '#fff' },
         modal: { position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' },
         modalContent: { background: theme.modalBg, borderRadius: '20px', maxWidth: '360px', width: '100%', padding: '20px', maxHeight: '85vh', overflow: 'auto' }
       };
 
       return (
-        <div style={{ minHeight: '100vh', minHeight: '100dvh', background: theme.bg, transition: 'background 0.4s', filter: highContrast ? 'contrast(1.2)' : 'none', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ minHeight: '100vh', background: theme.bg, transition: 'background 0.4s', filter: highContrast ? 'contrast(1.2)' : 'none' }}>
           <style>{`
             .hw { font-family: 'Caveat', cursive; }
             .bt { font-family: 'Lora', serif; }
             @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
             @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
             @keyframes pop { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
+            @keyframes signSwing { 0%, 100% { transform: rotate(-1deg); } 50% { transform: rotate(1deg); } }
             @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
             @keyframes confetti { 0% { transform: translateY(0) rotate(0deg); opacity: 1; } 100% { transform: translateY(-100px) rotate(720deg); opacity: 0; } }
+            @keyframes freezeShimmer { 0% { transform: scale(1) rotate(0deg); filter: brightness(1); } 25% { transform: scale(1.1) rotate(-5deg); filter: brightness(1.2); } 50% { transform: scale(1.05) rotate(5deg); filter: brightness(1.1); } 75% { transform: scale(1.15) rotate(-3deg); filter: brightness(1.3); } 100% { transform: scale(1) rotate(0deg); filter: brightness(1); } }
+            @keyframes iceFloat { 0%, 100% { transform: translateY(0) rotate(0deg); } 25% { transform: translateY(-10px) rotate(-5deg); } 50% { transform: translateY(-5px) rotate(5deg); } 75% { transform: translateY(-15px) rotate(-3deg); } }
             .fade { animation: fadeIn 0.3s; }
             .slide { animation: slideUp 0.4s; }
             .pop { animation: pop 0.3s; }
@@ -1608,14 +1730,30 @@
             .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
           `}</style>
 
-          <div style={{ flex: 1, maxWidth: '100%', margin: '0 auto', padding: '12px 12px 70px', width: '100%', boxSizing: 'border-box' }}>
-            {/* Header with seasonal decoration */}
+          <div style={{ maxWidth: 'min(100%, 480px)', margin: '0 auto', padding: '12px 12px 85px' }}>
+            {/* Header with hanging sign */}
             <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '14px' }}>
               <div>
-                <h1 className="hw" style={{ fontSize: '1.6rem', color: theme.text, margin: 0, display: 'flex', alignItems: 'center', gap: '6px' }} aria-label={`${cafeName} - ${brewThemes[brewType].name} theme`}>
-                  {brewThemes[brewType].icon} {cafeName} <span style={{ fontSize: '0.9rem' }}>{seasonDeco.emoji}</span>
-                </h1>
-                <p className="bt" style={{ fontSize: '0.75rem', color: theme.textSecondary, marginTop: '2px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                {/* Hanging Café Sign */}
+                <div style={{ 
+                  display: 'inline-block',
+                  background: theme.cardBg,
+                  border: `2px solid ${theme.accent}`,
+                  borderRadius: '8px',
+                  padding: '6px 14px',
+                  boxShadow: `0 4px 12px ${theme.isDark ? 'rgba(0,0,0,0.4)' : 'rgba(0,0,0,0.1)'}`,
+                  animation: 'signSwing 4s ease-in-out infinite',
+                  transformOrigin: 'top center',
+                  position: 'relative'
+                }}>
+                  {/* Hanging hooks */}
+                  <div style={{ position: 'absolute', top: '-8px', left: '20%', width: '8px', height: '8px', background: theme.accent, borderRadius: '50%' }} />
+                  <div style={{ position: 'absolute', top: '-8px', right: '20%', width: '8px', height: '8px', background: theme.accent, borderRadius: '50%' }} />
+                  <h1 className="hw" style={{ fontSize: '1.4rem', color: theme.text, margin: 0, display: 'flex', alignItems: 'center', gap: '6px' }} aria-label={`${cafeName} - ${brewThemes[brewType].name} theme`}>
+                    {brewThemes[brewType].icon} {cafeName} <span style={{ fontSize: '0.85rem' }}>{seasonDeco.emoji}</span>
+                  </h1>
+                </div>
+                <p className="bt" style={{ fontSize: '0.75rem', color: theme.textSecondary, marginTop: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                   {today.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
                   {weather.temp && (
                     <span style={{ display: 'inline-flex', alignItems: 'center', gap: '2px', padding: '1px 6px', background: theme.progressBg, borderRadius: '8px', fontSize: '0.7rem' }}>
@@ -1623,6 +1761,16 @@
                     </span>
                   )}
                 </p>
+                {unlockedDecorations.length > 0 && (
+                  <div style={{ display: 'flex', gap: '4px', marginTop: '4px', flexWrap: 'wrap' }}>
+                    {unlockedDecorations.slice(0, 6).map(id => {
+                      const deco = cafeDecorations.find(d => d.id === id);
+                      return deco ? <span key={id} title={deco.name} style={{ fontSize: '0.9rem' }}>{deco.icon}</span> : null;
+                    })}
+                    {unlockedDecorations.length > 6 && <span style={{ fontSize: '0.7rem', color: theme.textMuted }}>+{unlockedDecorations.length - 6}</span>}
+                    <button onClick={() => setShowDecorations(true)} style={{ background: 'none', border: 'none', fontSize: '0.65rem', color: theme.accent, cursor: 'pointer', padding: 0 }}>🛒</button>
+                  </div>
+                )}
               </div>
               <div style={{ display: 'flex', gap: '6px' }}>
                 <button onClick={() => setShowSoundMenu(true)} aria-label="Sound settings" style={{ background: soundEnabled ? theme.accentGradient : theme.accentLight, border: `1px solid ${theme.cardBorder}`, borderRadius: '10px', padding: '6px 10px', cursor: 'pointer', position: 'relative' }}>
@@ -1662,6 +1810,7 @@
                   <div style={{ flex: 1 }}>
                     <p className="bt" style={{ fontSize: '0.7rem', color: theme.accent, fontWeight: 600, marginBottom: '4px' }}>🤖 Today's Barista Tip</p>
                     <p className="bt" style={{ fontSize: '0.85rem', color: theme.text, lineHeight: 1.4 }}>{dailyTip}</p>
+                    <p className="bt" style={{ fontSize: '0.75rem', color: theme.textSecondary, marginTop: '8px', fontStyle: 'italic', borderTop: `1px solid ${theme.cardBorder}`, paddingTop: '8px' }}>{cozyQuote}</p>
                   </div>
                   <button onClick={dismissDailyTip} style={{ background: 'none', border: 'none', color: theme.textMuted, cursor: 'pointer', padding: '4px' }}>×</button>
                 </div>
@@ -1707,7 +1856,7 @@
 
             {/* TODAY TAB */}
             {activeTab === 'today' && (
-              <div className="fade" style={{ display: 'flex', flexDirection: 'column', minHeight: 'calc(100vh - 180px)' }}>
+              <div className="fade">
                 {/* Progress */}
                 <div style={s.card}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
@@ -1767,15 +1916,19 @@
 
                 {habits.length === 0 && <p className="bt" style={{ textAlign: 'center', color: theme.textMuted, padding: '16px' }}>{messages.emptyHabits}</p>}
 
-                {habits.map(h => (
-                  <SwipeableCard key={h.id} onSwipeRight={() => toggleHabit(h.id)} style={{ ...s.card, display: 'flex', alignItems: 'center', gap: '10px', borderColor: h.completed ? theme.success : theme.cardBorder }}>
+                {[...habits].sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0)).map(h => (
+                  <SwipeableCard key={h.id} onSwipeRight={() => toggleHabit(h.id)} style={{ ...s.card, display: 'flex', alignItems: 'center', gap: '10px', borderColor: h.completed ? theme.success : h.pinned ? theme.accent : theme.cardBorder }}>
                     <button onClick={() => toggleHabit(h.id)} className={h.completed ? 'pop' : ''} aria-pressed={h.completed} style={{ width: '40px', height: '40px', borderRadius: '12px', border: h.completed ? 'none' : `2px solid ${theme.inputBorder}`, background: h.completed ? theme.accentGradient : theme.progressBg, fontSize: '1rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: h.completed ? (theme.isDark ? '#1a1a1a' : '#fff') : theme.text, flexShrink: 0 }}>
                       {h.completed ? '✓' : h.icon}
                     </button>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <p className="bt" style={{ fontSize: '0.9rem', fontWeight: 500, color: h.completed ? theme.textMuted : theme.text, textDecoration: h.completed ? 'line-through' : 'none', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{h.name}</p>
+                      <p className="bt" style={{ fontSize: '0.9rem', fontWeight: 500, color: h.completed ? theme.textMuted : theme.text, textDecoration: h.completed ? 'line-through' : 'none', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{h.pinned && '⭐ '}{h.name}</p>
                       <span className="bt" style={{ fontSize: '0.6rem', padding: '2px 6px', borderRadius: '999px', background: theme.streakGradient, color: theme.isDark ? '#1a1a1a' : '#fff' }}>🔥 {h.streak}d</span>
                     </div>
+                    <button onClick={() => togglePinHabit(h.id)} style={{ background: 'none', border: 'none', color: h.pinned ? '#FFD700' : theme.textMuted, fontSize: '0.9rem', cursor: 'pointer', padding: '4px' }} aria-label={h.pinned ? 'Unpin' : 'Pin'}>
+                      {h.pinned ? '⭐' : '☆'}
+                    </button>
+                    <button onClick={() => duplicateHabit(h)} style={{ background: 'none', border: 'none', color: theme.textMuted, fontSize: '0.8rem', cursor: 'pointer', padding: '4px' }} aria-label="Duplicate">📋</button>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
                       <button onClick={() => reorderHabit(h.id, -1)} style={{ background: 'none', border: 'none', color: theme.textMuted, fontSize: '0.7rem', cursor: 'pointer' }} aria-label="Move up">▲</button>
                       <button onClick={() => reorderHabit(h.id, 1)} style={{ background: 'none', border: 'none', color: theme.textMuted, fontSize: '0.7rem', cursor: 'pointer' }} aria-label="Move down">▼</button>
@@ -1792,25 +1945,30 @@
 
                 {todayTasks.length === 0 && <p className="bt" style={{ textAlign: 'center', color: theme.textMuted, padding: '16px' }}>{messages.emptyTasks}</p>}
 
-                {todayTasks.sort((a, b) => ({ high: 0, medium: 1, low: 2 })[a.priority] - ({ high: 0, medium: 1, low: 2 })[b.priority]).map(task => {
+                {[...todayTasks].sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0) || ({ high: 0, medium: 1, low: 2 })[a.priority] - ({ high: 0, medium: 1, low: 2 })[b.priority]).map(task => {
                   const cat = categories.find(c => c.id === task.category);
                   const subtasksDone = (task.subtasks || []).filter(st => st.done).length;
                   const subtasksTotal = (task.subtasks || []).length;
                   return (
-                    <SwipeableCard key={task.id} onSwipeRight={() => toggleTask(task.id)} style={{ ...s.card, opacity: task.done ? 0.7 : 1 }}>
+                    <SwipeableCard key={task.id} onSwipeRight={() => toggleTask(task.id)} style={{ ...s.card, opacity: task.done ? 0.7 : 1, borderColor: task.pinned ? theme.accent : theme.cardBorder }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                         <button onClick={() => toggleTask(task.id)} className={task.done ? 'pop' : ''} style={{ width: '36px', height: '36px', borderRadius: '12px', border: task.done ? 'none' : `2px solid ${theme.inputBorder}`, background: task.done ? theme.accentGradient : theme.progressBg, fontSize: '0.9rem', cursor: 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: task.done ? (theme.isDark ? '#1a1a1a' : '#fff') : theme.text }}>
                           {task.done && '✓'}
                         </button>
                         <div style={{ flex: 1, minWidth: 0 }}>
-                          <p className="bt" style={{ fontSize: '0.85rem', fontWeight: 500, color: task.done ? theme.textMuted : theme.text, textDecoration: task.done ? 'line-through' : 'none', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{task.text}</p>
+                          <p className="bt" style={{ fontSize: '0.85rem', fontWeight: 500, color: task.done ? theme.textMuted : theme.text, textDecoration: task.done ? 'line-through' : 'none', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{task.pinned && '⭐ '}{task.text}</p>
                           <div style={{ display: 'flex', gap: '4px', alignItems: 'center', marginTop: '3px', flexWrap: 'wrap' }}>
                             {task.time && <span className="bt" style={{ fontSize: '0.6rem', color: theme.textSecondary }}>🕐 {formatTime(task.time)}</span>}
                             {cat && <span style={{ fontSize: '0.55rem', padding: '1px 5px', borderRadius: '4px', background: `${cat.color}22`, color: cat.color }}>{cat.icon}</span>}
                             {task.recurring && task.recurring !== 'none' && <span className="bt" style={{ fontSize: '0.55rem', color: theme.accent }}>🔄 {task.recurring === 'daily' ? 'Daily' : task.recurring === 'weekdays' ? 'Weekdays' : 'Weekly'}</span>}
                             {subtasksTotal > 0 && <span className="bt" style={{ fontSize: '0.55rem', color: theme.textMuted }}>📋 {subtasksDone}/{subtasksTotal}</span>}
+                            {task.notes && <span className="bt" style={{ fontSize: '0.55rem', color: theme.textMuted }}>📝</span>}
                           </div>
                         </div>
+                        <button onClick={() => togglePinTask(task.id)} style={{ background: 'none', border: 'none', color: task.pinned ? '#FFD700' : theme.textMuted, fontSize: '0.8rem', cursor: 'pointer', padding: '4px' }} aria-label={task.pinned ? 'Unpin' : 'Pin'}>
+                          {task.pinned ? '⭐' : '☆'}
+                        </button>
+                        <button onClick={() => duplicateTask(task)} style={{ background: 'none', border: 'none', color: theme.textMuted, fontSize: '0.7rem', cursor: 'pointer', padding: '4px' }} aria-label="Duplicate">📋</button>
                         <button onClick={() => confirmDeleteTask(task.id)} style={{ background: 'none', border: 'none', color: theme.textMuted, fontSize: '0.9rem', cursor: 'pointer', padding: '6px' }}>🗑</button>
                       </div>
                       {subtasksTotal > 0 && (
@@ -1823,6 +1981,15 @@
                           ))}
                         </div>
                       )}
+                      {/* Quick Notes */}
+                      <div style={{ marginTop: '6px', paddingLeft: '46px' }}>
+                        <input 
+                          value={task.notes || ''} 
+                          onChange={e => updateTaskNotes(task.id, e.target.value)} 
+                          placeholder="Add a note..." 
+                          style={{ ...s.input, padding: '6px 8px', fontSize: '0.7rem', width: '100%', background: 'transparent', border: `1px dashed ${theme.cardBorder}`, borderRadius: '6px' }} 
+                        />
+                      </div>
                       {showSubtaskInput === task.id ? (
                         <div style={{ marginTop: '8px', paddingLeft: '46px', display: 'flex', gap: '6px' }}>
                           <input value={newSubtask} onChange={e => setNewSubtask(e.target.value)} placeholder="Add subtask..." style={{ ...s.input, padding: '8px', fontSize: '0.8rem', flex: 1 }} onKeyPress={e => e.key === 'Enter' && addSubtaskToTask(task.id, newSubtask)} autoFocus />
@@ -1836,7 +2003,7 @@
                 })}
 
                 {/* Motivational */}
-                <div style={{ ...s.card, textAlign: 'center', marginTop: 'auto' }}>
+                <div style={{ ...s.card, textAlign: 'center', marginTop: '12px' }}>
                   <span style={{ fontSize: '1.1rem' }}>{brewThemes[brewType].icon}</span>
                   <p className="hw" style={{ fontSize: '1rem', color: theme.textSecondary, marginTop: '4px' }}>
                     {progress === 100 ? messages.perfect : progress > 60 ? messages.good : messages.start}
@@ -2105,10 +2272,10 @@
             onClick={() => setShowSoundMenu(true)} 
             style={{ 
               position: 'fixed', 
-              bottom: '90px', 
-              left: '20px', 
-              width: '48px', 
-              height: '48px', 
+              bottom: '75px', 
+              left: '16px', 
+              width: '44px', 
+              height: '44px', 
               borderRadius: '50%', 
               background: soundEnabled ? theme.accentGradient : theme.cardBg, 
               border: `2px solid ${soundEnabled ? 'transparent' : theme.cardBorder}`, 
@@ -2310,6 +2477,13 @@
                 </div>
 
                 <div style={{ marginBottom: '14px' }}>
+                  <label className="bt" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', color: theme.text, cursor: 'pointer' }}>
+                    <input type="checkbox" checked={autoDarkMode} onChange={e => setAutoDarkMode(e.target.checked)} style={{ accentColor: theme.accent }} />
+                    🌓 Auto Dark Mode (follow system)
+                  </label>
+                </div>
+
+                <div style={{ marginBottom: '14px' }}>
                   <p className="bt" style={{ fontSize: '0.8rem', color: theme.textSecondary, marginBottom: '6px' }}>Season: {seasonDeco.emoji} {seasonDeco.name}</p>
                 </div>
 
@@ -2412,6 +2586,55 @@
                 
                 <p className="bt" style={{ fontSize: '0.7rem', color: theme.textMuted, marginBottom: '14px' }}>💡 Swipe right to complete</p>
                 <button onClick={() => setShowSettings(false)} style={{ ...s.btn, width: '100%' }}>Done</button>
+              </div>
+            </div>
+          )}
+
+          {/* Café Decorations Shop */}
+          {showDecorations && (
+            <div style={s.modal} className="fade" onClick={() => setShowDecorations(false)}>
+              <div style={s.modalContent} className="slide" onClick={e => e.stopPropagation()}>
+                <h2 className="hw" style={{ fontSize: '1.4rem', color: theme.text, textAlign: 'center', marginBottom: '4px' }}>🛒 Café Decorations</h2>
+                <p className="bt" style={{ textAlign: 'center', fontSize: '0.8rem', color: theme.textSecondary, marginBottom: '6px' }}>Spend XP to decorate your café!</p>
+                <p className="bt" style={{ textAlign: 'center', fontSize: '0.9rem', color: theme.accent, marginBottom: '16px', fontWeight: 600 }}>💰 {gameStats.xp} XP available</p>
+                
+                {['plants', 'art', 'cozy', 'pets'].map(category => (
+                  <div key={category} style={{ marginBottom: '14px' }}>
+                    <p className="bt" style={{ fontSize: '0.8rem', fontWeight: 600, color: theme.text, marginBottom: '8px', textTransform: 'capitalize' }}>
+                      {category === 'plants' ? '🌿' : category === 'art' ? '🖼️' : category === 'cozy' ? '🕯️' : '🐱'} {category}
+                    </p>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px' }}>
+                      {cafeDecorations.filter(d => d.category === category).map(deco => {
+                        const owned = unlockedDecorations.includes(deco.id);
+                        const canAfford = gameStats.xp >= deco.xpCost;
+                        return (
+                          <button 
+                            key={deco.id}
+                            onClick={() => !owned && canAfford && unlockDecoration(deco.id)}
+                            disabled={owned || !canAfford}
+                            style={{ 
+                              padding: '10px', 
+                              borderRadius: '10px', 
+                              border: owned ? `2px solid ${theme.success}` : `1px solid ${theme.cardBorder}`,
+                              background: owned ? `${theme.success}15` : theme.progressBg,
+                              cursor: owned ? 'default' : canAfford ? 'pointer' : 'not-allowed',
+                              opacity: !owned && !canAfford ? 0.5 : 1,
+                              textAlign: 'center'
+                            }}
+                          >
+                            <span style={{ fontSize: '1.5rem', display: 'block', marginBottom: '4px' }}>{deco.icon}</span>
+                            <span className="bt" style={{ fontSize: '0.7rem', color: theme.text, display: 'block' }}>{deco.name}</span>
+                            <span className="bt" style={{ fontSize: '0.65rem', color: owned ? theme.success : theme.accent }}>
+                              {owned ? '✓ Owned' : `${deco.xpCost} XP`}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
+                
+                <button onClick={() => setShowDecorations(false)} style={{ ...s.btn, width: '100%', marginTop: '10px' }}>Close</button>
               </div>
             </div>
           )}
@@ -2523,8 +2746,38 @@
           {/* Custom Timer */}
           {showCustomTimer && (
             <div style={s.modal} onClick={() => setShowCustomTimer(false)}>
-              <div style={{ ...s.modalContent, maxWidth: '300px', textAlign: 'center' }} className="slide" onClick={e => e.stopPropagation()}>
-                <h2 className="hw" style={{ fontSize: '1.4rem', color: theme.text, marginBottom: '16px' }}>⏱️ Custom Timer</h2>
+              <div style={{ ...s.modalContent, maxWidth: '320px', textAlign: 'center' }} className="slide" onClick={e => e.stopPropagation()}>
+                <h2 className="hw" style={{ fontSize: '1.4rem', color: theme.text, marginBottom: '16px' }}>⏱️ Focus Timer</h2>
+                
+                {/* Timer Presets */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', marginBottom: '16px' }}>
+                  {[
+                    { label: 'Quick', mins: 15, icon: '⚡' },
+                    { label: 'Pomodoro', mins: 25, icon: '🍅' },
+                    { label: 'Extended', mins: 45, icon: '📚' },
+                    { label: 'Deep Work', mins: 90, icon: '🧠' },
+                    { label: 'Half Day', mins: 120, icon: '☕' },
+                    { label: 'Custom', mins: null, icon: '⚙️' },
+                  ].map(preset => (
+                    <button 
+                      key={preset.label}
+                      onClick={() => preset.mins && setCustomTimerMins(preset.mins)}
+                      style={{ 
+                        padding: '10px 6px', 
+                        borderRadius: '10px', 
+                        border: customTimerMins === preset.mins ? `2px solid ${theme.accent}` : `1px solid ${theme.cardBorder}`,
+                        background: customTimerMins === preset.mins ? theme.accentLight : theme.progressBg,
+                        cursor: 'pointer',
+                        textAlign: 'center'
+                      }}
+                    >
+                      <span style={{ fontSize: '1.2rem', display: 'block' }}>{preset.icon}</span>
+                      <span className="bt" style={{ fontSize: '0.65rem', color: theme.text, display: 'block' }}>{preset.label}</span>
+                      {preset.mins && <span className="bt" style={{ fontSize: '0.6rem', color: theme.textSecondary }}>{preset.mins}m</span>}
+                    </button>
+                  ))}
+                </div>
+                
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', marginBottom: '20px' }}>
                   <button onClick={() => setCustomTimerMins(Math.max(1, customTimerMins - 5))} style={{ ...s.btnSecondary, padding: '10px 16px', fontSize: '1.2rem' }}>-</button>
                   <div>
@@ -2535,7 +2788,7 @@
                 </div>
                 <div style={{ display: 'flex', gap: '10px' }}>
                   <button onClick={() => setShowCustomTimer(false)} style={{ ...s.btnSecondary, flex: 1 }}>Cancel</button>
-                  <button onClick={() => { setTimerSeconds(customTimerMins * 60); setShowCustomTimer(false); }} style={{ ...s.btn, flex: 1 }}>Set Timer</button>
+                  <button onClick={() => { setTimerSeconds(customTimerMins * 60); setShowCustomTimer(false); }} style={{ ...s.btn, flex: 1 }}>Start Timer</button>
                 </div>
               </div>
             </div>
@@ -2857,6 +3110,25 @@
           {celebration && (
             <div style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', background: theme.accentGradient, color: theme.isDark ? '#1a1a1a' : '#fff', padding: '16px 28px', borderRadius: '16px', zIndex: 3000, textAlign: 'center', boxShadow: '0 10px 40px rgba(0,0,0,0.3)' }} className="slide">
               <p className="hw" style={{ fontSize: '1.4rem', margin: 0 }}>{celebration}</p>
+              <div style={{ position: 'absolute', top: '-20px', left: '50%', transform: 'translateX(-50%)', width: '200px', height: '100px', pointerEvents: 'none', overflow: 'visible' }}>
+                {['🎉', '✨', '⭐', '🎊', '💫', '🌟', '❤️', '💛'].map((emoji, i) => (
+                  <span key={i} style={{ position: 'absolute', left: `${10 + (i * 12)}%`, animation: `confetti 1.5s ease-out ${i * 0.1}s forwards`, fontSize: '1.2rem' }}>{emoji}</span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Freeze Animation Overlay */}
+          {showFreezeAnimation && (
+            <div style={{ position: 'fixed', inset: 0, background: 'radial-gradient(circle at center, rgba(135,206,235,0.3) 0%, transparent 70%)', zIndex: 2500, pointerEvents: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }} className="fade">
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ fontSize: '5rem', animation: 'freezeShimmer 1s ease-in-out infinite' }}>🧊</div>
+                <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', marginTop: '10px' }}>
+                  {['❄️', '❄️', '❄️', '❄️', '❄️'].map((s, i) => (
+                    <span key={i} style={{ fontSize: '1.5rem', animation: `iceFloat 2s ease-in-out ${i * 0.2}s infinite`, opacity: 0.8 }}>{s}</span>
+                  ))}
+                </div>
+              </div>
             </div>
           )}
         </div>
