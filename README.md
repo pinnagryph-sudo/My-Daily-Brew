@@ -1,40 +1,35 @@
-# ☕ My Daily Brew v7.5.0
+# ☕ My Daily Brew v8.0.0
 
-**Medium Features Update** - A cozy, café-themed productivity PWA.
+**Visual Theme Enhancements** - The coziest, most delightful productivity PWA!
 
-## ✨ What's New in v7.5
+## ✨ What's New in v8.0
 
-### Medium Effort Features (7 New)
-1. **📂 Habit Categories** - Group habits by Health, Work, Personal, Mindfulness
-2. **📊 Weekly Review** - Summary of your week's accomplishments
-3. **💾 Task Templates** - Save common tasks and reuse them
-4. **⏭️ Habit Skip** - Skip a habit without breaking your streak
-5. **💭 Mood Notes** - Add notes explaining how you feel
-6. **⏱️ Focus Stats** - Track your total focus time
-7. **✏️ Edit Items** - Edit habits & tasks (not just delete)
+### Visual Theme Enhancements (7 Features)
+1. **☕ Coffee Cup Progress** - XP bar fills up like a coffee cup!
+2. **💨 Steam Celebrations** - Steam & confetti rise from your brew
+3. **📋 Café Menu Board** - Challenges styled as chalkboard specials
+4. **🪧 Hanging Sign Header** - Cute swinging café sign with chains
+5. **❄️ Seasonal Particles** - Falling snow, leaves, or petals
+6. **📜 Paper Texture** - Optional notebook/napkin background feel
+7. **🎨 Custom Accent Colors** - 16 colors to personalize (from v7.2)
 
-### Previous Features (v7.2 Easy Wins)
-- ⭐ Pin/Star Favorites
-- 📋 Duplicate Items
-- 🍅 Timer Presets (Pomodoro, Deep Work, etc.)
-- 🎨 Custom Accent Colors (16 options)
-- 🌓 Auto Dark Mode
-- 🔥 Streak Milestones
-- 📊 Habit Completion Rate
-- 📝 Task Notes
-- 🛒 Café Decorations Shop
+### Previous Updates
+- v7.5: Medium Features (Categories, Templates, Skip, Edit, etc.)
+- v7.2: Easy Wins (Pin, Duplicate, Timer Presets, etc.)
+
+## 🎯 Core Features
+- Habit tracking with streaks
+- Task management with priorities
+- Focus timer with soundscapes
+- Mood tracking & journal
+- Gamification with XP & badges
+- Café decorations shop
+- Weekly & yearly reviews
 
 ## 📱 Installation
-
-1. Extract the zip
-2. Host on any static server (GitHub Pages, Netlify, Vercel)
-3. Visit the URL and "Add to Home Screen"
-
-## 📁 Files
-- `index.html` - Main app
-- `sw.js` - Service worker (offline support)
-- `manifest.json` - PWA manifest
-- `icons/` - App icons
+1. Extract zip
+2. Host on GitHub Pages, Netlify, or Vercel
+3. Visit URL and "Add to Home Screen"
 
 ---
 Made with ☕ and care!

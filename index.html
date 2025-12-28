@@ -34,7 +34,7 @@
   <div class="loading-screen" id="loadingScreen">
     <div class="loading-icon">☕</div>
     <div class="loading-text">Brewing something special...</div>
-    <div class="loading-subtext">v7.5 • Medium Features Update</div>
+    <div class="loading-subtext">v8.0 • Visual Theme Enhancements</div>
   </div>
 
   <script type="text/babel">
@@ -742,13 +742,20 @@
     // WHAT'S NEW CONTENT
     // ═══════════════════════════════════════════════════════════════
     const whatsNewContent = [
+      { version: '8.0', title: '🎨 Visual Theme Enhancements', items: [
+        { icon: '☕', title: 'Coffee Cup Progress', desc: 'XP bar fills up like a coffee cup!' },
+        { icon: '💨', title: 'Steam Celebrations', desc: 'Steam & confetti rise from your cup' },
+        { icon: '📋', title: 'Café Menu Board', desc: 'Challenges styled as daily specials' },
+        { icon: '🪧', title: 'Hanging Sign Header', desc: 'Cute swinging café sign' },
+        { icon: '❄️', title: 'Seasonal Particles', desc: 'Falling snow, leaves, or petals' },
+        { icon: '📜', title: 'Paper Texture', desc: 'Optional notebook/napkin feel' },
+      ]},
       { version: '7.5', title: '🔧 Medium Features Update', items: [
         { icon: '📂', title: 'Habit Categories', desc: 'Group habits by Health, Work, Personal, Mindfulness' },
         { icon: '📊', title: 'Weekly Review', desc: 'See your week\'s accomplishments at a glance' },
         { icon: '💾', title: 'Task Templates', desc: 'Save common tasks and reuse them' },
         { icon: '⏭️', title: 'Habit Skip', desc: 'Skip a habit without breaking your streak' },
         { icon: '💭', title: 'Mood Notes', desc: 'Add notes explaining how you feel' },
-        { icon: '⏱️', title: 'Focus Stats', desc: 'Track your total focus time' },
         { icon: '✏️', title: 'Edit Items', desc: 'Edit habits & tasks, not just delete' },
       ]},
       { version: '7.2', title: '✨ Easy Wins & Extras', items: [
@@ -756,26 +763,7 @@
         { icon: '📋', title: 'Duplicate Items', desc: 'Copy habits & tasks with one tap' },
         { icon: '🍅', title: 'Timer Presets', desc: 'Quick, Pomodoro, Extended, Deep Work' },
         { icon: '🎨', title: 'Custom Colors', desc: 'Pick your own accent color in Settings' },
-        { icon: '🌓', title: 'Auto Dark Mode', desc: 'Follows your system preference' },
-        { icon: '🔥', title: 'Streak Milestones', desc: 'Special celebrations at 7, 30, 100 days' },
-        { icon: '📊', title: 'Completion Rate', desc: 'See your % completed this week & month' },
-        { icon: '📝', title: 'Task Notes', desc: 'Add quick notes to any task' },
         { icon: '🛒', title: 'Café Decorations', desc: 'Unlock plants, art & pets with XP!' },
-      ]},
-      { version: '6.4', title: '🎵 Refined Experience', items: [
-        { icon: '🎹', title: 'Improved Music', desc: 'Faster, more harmonious chord progressions' },
-        { icon: '🛡️', title: 'XP Protection', desc: 'No more XP exploits from re-checking' },
-        { icon: '🗑️', title: 'Safe Deletion', desc: 'Confirmation required before deleting' },
-        { icon: '🌤️', title: 'Live Weather', desc: 'Current conditions in your header' },
-        { icon: '🔔', title: 'Notifications', desc: 'Enable reminders in settings' },
-      ]},
-      { version: '6.0', title: '🎉 Grand Reopening!', items: [
-        { icon: '🎚️', title: 'Volume Sliders', desc: 'Control ambiance & music independently' },
-        { icon: '🏠', title: 'Mood Presets', desc: 'Cozy, Chill, Upbeat, Soothing, Meditative, Focus' },
-        { icon: '🌙', title: 'Light/Dark Sound', desc: 'Sounds adapt to your color theme' },
-        { icon: '🍂', title: 'Seasonal Themes', desc: 'Automatic decorations for each season' },
-        { icon: '🏆', title: 'Challenges', desc: 'Weekly & monthly goals for XP' },
-        { icon: '📅', title: 'Year in Review', desc: 'See your complete journey' },
       ]},
     ];
 
@@ -783,16 +771,19 @@
     // TUTORIAL STEPS
     // ═══════════════════════════════════════════════════════════════
     const tutorialSteps = [
-      { id: 'welcome', title: 'Welcome to the Café! ☕', subtitle: 'Pull up a chair, friend!', content: "We've been busy renovating! Your cozy productivity companion is now better than ever. Let me show you around the new digs!", icon: '🏠', highlight: null },
-      { id: 'brew', title: 'Pick Your Signature Drink', subtitle: 'Every regular has their usual...', content: "Choose Coffee ☕, Tea 🍵, or Matcha 🍃 - each with unique ranks, badges, and vibes. Your whole experience adapts to your brew!", icon: '☕', highlight: 'theme' },
-      { id: 'habits', title: 'Your Daily Specials', subtitle: 'The menu of good habits!', content: "Add habits you want to build. Tap or swipe right to complete. Use the 🗑 button to remove (with confirmation). Build streaks and watch them grow!", icon: '⭐', highlight: 'habits' },
-      { id: 'tasks', title: 'Today\'s Orders', subtitle: 'One task at a time, barista!', content: "Add tasks with priorities, categories, times, and subtasks. Set them to repeat daily, on weekdays, or weekly!", icon: '✓', highlight: 'tasks' },
-      { id: 'timer', title: 'The Focus Bar', subtitle: 'Time to get in the zone!', content: "Use our cozy focus timer with brew-specific soundscapes. Pick a preset or set your own custom duration. Deep work, café style!", icon: '⏱️', highlight: 'timer' },
-      { id: 'journal', title: 'The Corner Booth', subtitle: 'Your private reflection spot...', content: "Journal your gratitude, daily reflections, and tomorrow's plans. It's your cozy corner for self-discovery.", icon: '📝', highlight: 'journal' },
-      { id: 'challenges', title: 'Weekly Specials Board', subtitle: 'Extra rewards await!', content: "Check out weekly and monthly challenges for bonus XP. Push yourself and earn special recognition!", icon: '🏆', highlight: 'challenges' },
-      { id: 'streak', title: 'Streak Insurance', subtitle: 'We\'ve got your back!', content: "Life happens! You get one free streak freeze per week. If you miss a day, it activates automatically to protect your progress.", icon: '❄️', highlight: 'streak' },
-      { id: 'sounds', title: 'Your Signature Soundtrack', subtitle: 'Set the perfect mood...', content: "Tap the 🎵 button anytime to open Soundscape. Choose a mood (Cozy, Chill, Focus...), adjust volume sliders, and mix any ambiance with any music. Light mode sounds brighter, dark mode sounds warmer!", icon: '🎵', highlight: 'sounds' },
-      { id: 'ready', title: 'Your Table is Ready!', subtitle: 'Time to make it yours...', content: "That's the grand tour! Remember, every small sip of progress counts. Your journey to better habits starts with a single step. Enjoy your stay! ☕", icon: '✨', highlight: null },
+      { id: 'welcome', title: 'Welcome to Daily Brew 8.0! ☕', subtitle: 'So much has changed!', content: "Wow, we've been busy! Your cozy café has gotten a major renovation with tons of new features. Let me give you the grand tour of everything new!", icon: '🏠', highlight: null },
+      { id: 'sign', title: 'Your Café Sign', subtitle: 'Swinging in the breeze...', content: "Notice your café name now hangs on a cute wooden sign that gently sways! It's the little details that make this place feel like home.", icon: '🪧', highlight: 'header' },
+      { id: 'menu', title: 'Today\'s Specials Board', subtitle: 'Challenges, café-style!', content: "Your active challenges now appear on a charming chalkboard menu. Complete the specials to earn bonus XP!", icon: '📋', highlight: 'challenges' },
+      { id: 'xpbar', title: 'Coffee Cup Progress', subtitle: 'Watch it fill up!', content: "Your XP bar now fills like a coffee cup! As you earn XP, watch the liquid rise. It even shows how much XP until your next rank!", icon: '☕', highlight: 'xp' },
+      { id: 'seasonal', title: 'Seasonal Magic', subtitle: 'Watch the seasons change...', content: "Look closely - seasonal particles float across your screen! ❄️ Snowflakes in winter, 🍂 leaves in autumn, 🌸 petals in spring. Toggle this in Settings.", icon: '✨', highlight: null },
+      { id: 'celebrations', title: 'Steam & Confetti', subtitle: 'Celebrate every win!', content: "When you achieve something, your brew icon appears with rising steam and confetti! Every accomplishment deserves a little celebration.", icon: '🎉', highlight: null },
+      { id: 'habits', title: 'Enhanced Habits', subtitle: 'New superpowers!', content: "Habits now have categories (💪 Health, 💼 Work, 🌟 Personal, 🧘 Mindfulness). You can also ⏭️ skip a day without breaking your streak, and ✏️ edit any habit!", icon: '⭐', highlight: 'habits' },
+      { id: 'tasks', title: 'Supercharged Tasks', subtitle: 'Work smarter!', content: "Tasks now have ✏️ Edit, 💾 Save as Template, and quick notes. Build a library of templates for tasks you do often!", icon: '✓', highlight: 'tasks' },
+      { id: 'timer', title: 'Timer Presets', subtitle: 'Ready-made focus sessions!', content: "Quick access to ⚡ Quick (15m), 🍅 Pomodoro (25m), 📚 Extended (45m), and 🧠 Deep Work (90m). Just tap and go!", icon: '⏱️', highlight: 'timer' },
+      { id: 'mood', title: 'Mood Notes', subtitle: 'Tell your story...', content: "After selecting your mood, you can now add a note explaining why you feel that way. Great for reflection!", icon: '😊', highlight: 'mood' },
+      { id: 'weekly', title: 'Weekly Review', subtitle: 'See your progress!', content: "Head to the Stats tab and tap 'Weekly Review' for a beautiful summary of your week's accomplishments, streaks, and focus time!", icon: '📊', highlight: 'stats' },
+      { id: 'visuals', title: 'Visual Settings', subtitle: 'Make it yours!', content: "In Settings, find 'Visual Effects' to toggle 📜 Paper Texture (notebook feel) and seasonal animations. Plus 16 custom accent colors!", icon: '🎨', highlight: 'settings' },
+      { id: 'ready', title: 'Enjoy Your Stay! ☕', subtitle: 'Your table is ready...', content: "That's everything new! Remember: small, consistent sips of progress add up. Your cozy productivity journey continues!", icon: '✨', highlight: null },
     ];
 
     // ═══════════════════════════════════════════════════════════════
@@ -814,7 +805,7 @@
     // MAIN APP COMPONENT
     // ═══════════════════════════════════════════════════════════════
     function App() {
-      const APP_VERSION = '7.5.0';
+      const APP_VERSION = '8.0.0';
       const season = getCurrentSeason();
       const seasonDeco = seasonalDecorations[season];
 
@@ -879,6 +870,8 @@
       const [showYearReview, setShowYearReview] = useState(false);
       const [showWeeklyReview, setShowWeeklyReview] = useState(false);
       const [showTemplates, setShowTemplates] = useState(false);
+      const [paperTexture, setPaperTexture] = useState(() => load('paperTexture', false));
+      const [seasonalAnimations, setSeasonalAnimations] = useState(() => load('seasonalAnimations', true));
       const [unlockedDecorations, setUnlockedDecorations] = useState(() => load('unlockedDecorations', []));
       const [showDecorations, setShowDecorations] = useState(false);
       const [showFreezeAnimation, setShowFreezeAnimation] = useState(false);
@@ -986,6 +979,8 @@
       useEffect(() => { store('isDark', isDark); }, [isDark]);
       useEffect(() => { store('autoDarkMode', autoDarkMode); }, [autoDarkMode]);
       useEffect(() => { store('customAccentColor', customAccentColor); }, [customAccentColor]);
+      useEffect(() => { store('paperTexture', paperTexture); }, [paperTexture]);
+      useEffect(() => { store('seasonalAnimations', seasonalAnimations); }, [seasonalAnimations]);
       useEffect(() => { store('highContrast', highContrast); }, [highContrast]);
       useEffect(() => { store('cafeName', cafeName); }, [cafeName]);
       useEffect(() => { store('ambientSound', ambientSound); }, [ambientSound]);
@@ -1653,8 +1648,21 @@
         setShowExport(false);
       };
 
-      const dismissWhatsNew = () => { setShowWhatsNew(false); store('lastSeenVersion', APP_VERSION); if (!load('tutorialSeen', false)) setShowTutorial(true); };
-      const dismissTutorial = () => { setShowTutorial(false); store('tutorialSeen', true); };
+      // v8.0.0 has major changes - show tutorial for ALL users on this update (even existing users)
+      const v8TutorialSeen = load('tutorialSeenV8', false);
+      const dismissWhatsNew = () => { 
+        setShowWhatsNew(false); 
+        store('lastSeenVersion', APP_VERSION); 
+        // Show tutorial if: new user OR updating to v8.0.0 for first time
+        if (!load('tutorialSeen', false) || !v8TutorialSeen) {
+          setShowTutorial(true); 
+        }
+      };
+      const dismissTutorial = () => { 
+        setShowTutorial(false); 
+        store('tutorialSeen', true); 
+        store('tutorialSeenV8', true); // Mark v8 tutorial as seen
+      };
 
       // Stats
       const completedHabits = habits.filter(h => h.completed).length;
@@ -1760,18 +1768,43 @@
       };
 
       return (
-        <div style={{ minHeight: '100vh', background: theme.bg, transition: 'background 0.4s', filter: highContrast ? 'contrast(1.2)' : 'none' }}>
+        <div style={{ minHeight: '100vh', background: paperTexture ? `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E"), ${theme.bg}` : theme.bg, transition: 'background 0.4s', filter: highContrast ? 'contrast(1.2)' : 'none', position: 'relative', overflow: 'hidden' }}>
+          
+          {/* Seasonal Falling Particles */}
+          {seasonalAnimations && (
+            <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, pointerEvents: 'none', zIndex: 0, overflow: 'hidden' }}>
+              {[...Array(8)].map((_, i) => (
+                <span key={i} style={{
+                  position: 'absolute',
+                  left: `${10 + (i * 12)}%`,
+                  top: '-20px',
+                  fontSize: '1rem',
+                  opacity: 0.4,
+                  animation: `${seasonDeco.name === 'Winter' ? 'snowFall' : seasonDeco.name === 'Autumn' ? 'leafFall' : seasonDeco.name === 'Spring' ? 'petalFall' : 'leafFall'} ${8 + (i * 2)}s linear infinite`,
+                  animationDelay: `${i * 1.5}s`
+                }}>
+                  {seasonDeco.name === 'Winter' ? '❄️' : seasonDeco.name === 'Autumn' ? '🍂' : seasonDeco.name === 'Spring' ? '🌸' : '☀️'}
+                </span>
+              ))}
+            </div>
+          )}
           <style>{`
             .hw { font-family: 'Caveat', cursive; }
             .bt { font-family: 'Lora', serif; }
             @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
             @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
             @keyframes pop { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
-            @keyframes signSwing { 0%, 100% { transform: rotate(-1deg); } 50% { transform: rotate(1deg); } }
+            @keyframes signSwing { 0%, 100% { transform: rotate(-2deg); } 50% { transform: rotate(2deg); } }
             @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
             @keyframes confetti { 0% { transform: translateY(0) rotate(0deg); opacity: 1; } 100% { transform: translateY(-100px) rotate(720deg); opacity: 0; } }
             @keyframes freezeShimmer { 0% { transform: scale(1) rotate(0deg); filter: brightness(1); } 25% { transform: scale(1.1) rotate(-5deg); filter: brightness(1.2); } 50% { transform: scale(1.05) rotate(5deg); filter: brightness(1.1); } 75% { transform: scale(1.15) rotate(-3deg); filter: brightness(1.3); } 100% { transform: scale(1) rotate(0deg); filter: brightness(1); } }
             @keyframes iceFloat { 0%, 100% { transform: translateY(0) rotate(0deg); } 25% { transform: translateY(-10px) rotate(-5deg); } 50% { transform: translateY(-5px) rotate(5deg); } 75% { transform: translateY(-15px) rotate(-3deg); } }
+            @keyframes steamRise { 0% { transform: translateY(0) scale(0.8); opacity: 0.6; } 50% { transform: translateY(-20px) scale(1); opacity: 0.3; } 100% { transform: translateY(-40px) scale(1.2); opacity: 0; } }
+            @keyframes cupFill { 0% { height: 0%; } 100% { height: var(--fill-percent); } }
+            @keyframes leafFall { 0% { transform: translateY(-20px) rotate(0deg); opacity: 1; } 100% { transform: translateY(100vh) rotate(360deg); opacity: 0; } }
+            @keyframes snowFall { 0% { transform: translateY(-20px) translateX(0); opacity: 1; } 100% { transform: translateY(100vh) translateX(20px); opacity: 0; } }
+            @keyframes petalFall { 0% { transform: translateY(-20px) rotate(0deg) scale(1); opacity: 1; } 50% { transform: translateY(50vh) rotate(180deg) scale(0.8); opacity: 0.7; } 100% { transform: translateY(100vh) rotate(360deg) scale(0.6); opacity: 0; } }
+            @keyframes celebrateSteam { 0% { transform: translateY(0) scale(1); opacity: 0.8; } 50% { transform: translateY(-30px) scale(1.5); opacity: 0.4; } 100% { transform: translateY(-60px) scale(2); opacity: 0; } }
             .fade { animation: fadeIn 0.3s; }
             .slide { animation: slideUp 0.4s; }
             .pop { animation: pop 0.3s; }
@@ -1779,26 +1812,38 @@
             .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
           `}</style>
 
-          <div style={{ flex: 1, maxWidth: '100%', margin: '0 auto', padding: '12px 12px 70px', width: '100%', boxSizing: 'border-box' }}>
-            {/* Header with seasonal decoration */}
+          <div style={{ flex: 1, maxWidth: '100%', margin: '0 auto', padding: '12px 12px 70px', width: '100%', boxSizing: 'border-box', position: 'relative', zIndex: 1 }}>
+            {/* Header with Cute Hanging Café Sign */}
             <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '14px' }}>
               <div>
-                <h1 className="hw" style={{ 
-                  fontSize: '1.6rem', 
-                  color: theme.text, 
-                  margin: 0, 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  gap: '6px',
-                  animation: 'signSwing 6s ease-in-out infinite',
-                  transformOrigin: 'top left'
-                }} aria-label={`${cafeName} - ${brewThemes[brewType].name} theme`}>
-                  {brewThemes[brewType].icon} {cafeName} <span style={{ fontSize: '0.9rem' }}>{seasonDeco.emoji}</span>
-                </h1>
-                <p className="bt" style={{ fontSize: '0.75rem', color: theme.textSecondary, marginTop: '2px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                {/* Hanging Sign */}
+                <div style={{ position: 'relative', display: 'inline-block' }}>
+                  {/* Chain/Rope decorations */}
+                  <div style={{ position: 'absolute', top: '-8px', left: '10%', width: '2px', height: '10px', background: theme.textMuted, borderRadius: '1px' }} />
+                  <div style={{ position: 'absolute', top: '-8px', right: '10%', width: '2px', height: '10px', background: theme.textMuted, borderRadius: '1px' }} />
+                  <h1 className="hw" style={{ 
+                    fontSize: '1.5rem', 
+                    color: theme.text, 
+                    margin: 0, 
+                    padding: '8px 16px',
+                    background: theme.isDark ? 'rgba(255,255,255,0.05)' : 'rgba(139,115,85,0.1)',
+                    border: `2px solid ${theme.cardBorder}`,
+                    borderRadius: '8px',
+                    boxShadow: `0 4px 8px ${theme.isDark ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.1)'}`,
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '6px',
+                    animation: 'signSwing 4s ease-in-out infinite',
+                    transformOrigin: 'top center'
+                  }} aria-label={`${cafeName} - ${brewThemes[brewType].name} theme`}>
+                    {brewThemes[brewType].icon} {cafeName} <span style={{ fontSize: '0.9rem' }}>{seasonDeco.emoji}</span>
+                  </h1>
+                </div>
+                <p className="bt" style={{ fontSize: '0.75rem', color: theme.textSecondary, marginTop: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                   {today.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
                   {weather.temp && (
                     <span style={{ display: 'inline-flex', alignItems: 'center', gap: '2px', padding: '1px 6px', background: theme.progressBg, borderRadius: '8px', fontSize: '0.7rem' }}>
+
                       {weather.icon} {weather.temp}°
                     </span>
                   )}
@@ -1831,9 +1876,34 @@
               </div>
             </header>
 
-            {/* XP Bar */}
+            {/* XP Bar with Coffee Cup Progress */}
             <div style={{ ...s.card, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: '10px' }} onClick={() => setShowBadges(true)} role="button" aria-label={`Level ${currentLevel.level}: ${currentLevel.title}. ${gameStats.xp} XP. Tap to view badges.`}>
-              <div style={{ fontSize: '1.3rem' }}>{currentLevel.icon}</div>
+              {/* Coffee Cup Fill Animation */}
+              <div style={{ position: 'relative', width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{ 
+                  position: 'absolute', 
+                  bottom: '4px', 
+                  left: '50%', 
+                  transform: 'translateX(-50%)',
+                  width: '24px', 
+                  height: '24px', 
+                  borderRadius: '0 0 8px 8px',
+                  background: theme.progressBg,
+                  overflow: 'hidden'
+                }}>
+                  <div style={{ 
+                    position: 'absolute',
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    height: `${xpProgress}%`,
+                    background: theme.xpBar,
+                    transition: 'height 0.5s ease-out',
+                    borderRadius: '0 0 6px 6px'
+                  }} />
+                </div>
+                <span style={{ fontSize: '1.4rem', position: 'relative', zIndex: 1 }}>{currentLevel.icon}</span>
+              </div>
               <div style={{ flex: 1 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3px' }}>
                   <span className="bt" style={{ fontSize: '0.75rem', fontWeight: 600, color: theme.text }}>{currentLevel.title}</span>
@@ -1842,6 +1912,7 @@
                 <div style={{ height: '5px', background: theme.progressBg, borderRadius: '999px', overflow: 'hidden' }} role="progressbar" aria-valuenow={xpProgress} aria-valuemin="0" aria-valuemax="100">
                   <div style={{ height: '100%', width: `${xpProgress}%`, background: theme.xpBar, borderRadius: '999px', transition: 'width 0.5s' }} />
                 </div>
+                {nextLevel && <p className="bt" style={{ fontSize: '0.55rem', color: theme.textMuted, marginTop: '2px' }}>{nextLevel.xp - gameStats.xp} XP to {nextLevel.title}</p>}
               </div>
               <div style={{ textAlign: 'center' }}>
                 <div style={{ fontSize: '0.7rem', color: theme.textMuted }}>🏆 {gameStats.unlockedBadges.length}/{badges.length}</div>
@@ -1941,24 +2012,44 @@
                   )}
                 </div>
 
-                {/* Active Challenges Preview */}
+                {/* Café Menu Board - Active Challenges */}
                 {(weeklyChallenge || monthlyChallenge) && (
-                  <div style={{ ...s.card, cursor: 'pointer' }} onClick={() => setShowChallenges(true)}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                      <p className="bt" style={{ fontSize: '0.8rem', fontWeight: 600, color: theme.text }}>🏆 Active Challenges</p>
-                      <span className="bt" style={{ fontSize: '0.7rem', color: theme.accent }}>View all →</span>
+                  <div style={{ 
+                    ...s.card, 
+                    cursor: 'pointer',
+                    background: theme.isDark ? '#2a2520' : '#3a322a',
+                    border: `3px solid ${theme.isDark ? '#4a4035' : '#5a4a3a'}`,
+                    borderRadius: '4px',
+                    position: 'relative',
+                    boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.3)'
+                  }} onClick={() => setShowChallenges(true)}>
+                    {/* Menu Board Header */}
+                    <div style={{ textAlign: 'center', marginBottom: '10px', paddingBottom: '8px', borderBottom: `1px dashed ${theme.isDark ? '#5a5045' : '#6a5a4a'}` }}>
+                      <p className="hw" style={{ fontSize: '0.9rem', color: '#f5e6d3', margin: 0, letterSpacing: '1px' }}>☕ TODAY'S SPECIALS ☕</p>
                     </div>
                     {weeklyChallenge && (
-                      <div style={{ marginBottom: '6px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', marginBottom: '3px' }}>
-                          <span className="bt" style={{ color: theme.textSecondary }}>{weeklyChallenge.icon} {weeklyChallenge.name}</span>
-                          <span className="bt" style={{ color: theme.accent }}>{challenges.weekly.progress}/{weeklyChallenge.target}</span>
+                      <div style={{ marginBottom: '8px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', marginBottom: '4px' }}>
+                          <span className="hw" style={{ color: '#f5e6d3' }}>{weeklyChallenge.icon} {weeklyChallenge.name}</span>
+                          <span className="bt" style={{ color: '#c4a574', fontStyle: 'italic' }}>{challenges.weekly.progress}/{weeklyChallenge.target}</span>
                         </div>
-                        <div style={{ height: '4px', background: theme.progressBg, borderRadius: '999px', overflow: 'hidden' }}>
-                          <div style={{ height: '100%', width: `${Math.min(100, (challenges.weekly.progress / weeklyChallenge.target) * 100)}%`, background: theme.streakGradient, borderRadius: '999px' }} />
+                        <div style={{ height: '6px', background: 'rgba(255,255,255,0.1)', borderRadius: '3px', overflow: 'hidden' }}>
+                          <div style={{ height: '100%', width: `${Math.min(100, (challenges.weekly.progress / weeklyChallenge.target) * 100)}%`, background: 'linear-gradient(90deg, #c4a574 0%, #e5d5b5 100%)', borderRadius: '3px' }} />
                         </div>
                       </div>
                     )}
+                    {monthlyChallenge && (
+                      <div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', marginBottom: '4px' }}>
+                          <span className="hw" style={{ color: '#f5e6d3' }}>{monthlyChallenge.icon} {monthlyChallenge.name}</span>
+                          <span className="bt" style={{ color: '#c4a574', fontStyle: 'italic' }}>{challenges.monthly.progress}/{monthlyChallenge.target}</span>
+                        </div>
+                        <div style={{ height: '6px', background: 'rgba(255,255,255,0.1)', borderRadius: '3px', overflow: 'hidden' }}>
+                          <div style={{ height: '100%', width: `${Math.min(100, (challenges.monthly.progress / monthlyChallenge.target) * 100)}%`, background: 'linear-gradient(90deg, #c4a574 0%, #e5d5b5 100%)', borderRadius: '3px' }} />
+                        </div>
+                      </div>
+                    )}
+                    <p className="bt" style={{ fontSize: '0.6rem', color: '#8a7a6a', textAlign: 'center', marginTop: '8px', fontStyle: 'italic' }}>Tap for full menu →</p>
                   </div>
                 )}
 
@@ -2773,6 +2864,19 @@
                   )}
                 </div>
 
+                {/* Visual Enhancements */}
+                <div style={{ marginBottom: '14px', padding: '12px', background: theme.progressBg, borderRadius: '10px' }}>
+                  <p className="bt" style={{ fontSize: '0.85rem', fontWeight: 600, color: theme.text, marginBottom: '10px' }}>✨ Visual Effects</p>
+                  <label className="bt" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.8rem', color: theme.text, cursor: 'pointer', marginBottom: '8px' }}>
+                    <input type="checkbox" checked={paperTexture} onChange={e => setPaperTexture(e.target.checked)} style={{ accentColor: theme.accent }} />
+                    📜 Paper texture (notebook feel)
+                  </label>
+                  <label className="bt" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.8rem', color: theme.text, cursor: 'pointer' }}>
+                    <input type="checkbox" checked={seasonalAnimations} onChange={e => setSeasonalAnimations(e.target.checked)} style={{ accentColor: theme.accent }} />
+                    {seasonDeco.emoji} Falling {seasonDeco.name === 'Winter' ? 'snowflakes' : seasonDeco.name === 'Autumn' ? 'leaves' : seasonDeco.name === 'Spring' ? 'petals' : 'particles'}
+                  </label>
+                </div>
+
                 <div style={{ marginBottom: '14px' }}>
                   <p className="bt" style={{ fontSize: '0.8rem', color: theme.textSecondary, marginBottom: '6px' }}>Season: {seasonDeco.emoji} {seasonDeco.name}</p>
                 </div>
@@ -2875,6 +2979,15 @@
                 </p>
                 
                 <p className="bt" style={{ fontSize: '0.7rem', color: theme.textMuted, marginBottom: '14px' }}>💡 Swipe right to complete</p>
+                
+                {/* Show me around button */}
+                <button 
+                  onClick={() => { setShowSettings(false); setTutorialStep(0); setShowTutorial(true); }} 
+                  style={{ ...s.btnSecondary, width: '100%', marginBottom: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+                >
+                  <span>🗺️</span> Show Me Around (v8.0 Features)
+                </button>
+                
                 <button onClick={() => setShowSettings(false)} style={{ ...s.btn, width: '100%' }}>Done</button>
               </div>
             </div>
@@ -3495,11 +3608,22 @@
 
           {/* Celebration */}
           {celebration && (
-            <div style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', background: theme.accentGradient, color: theme.isDark ? '#1a1a1a' : '#fff', padding: '16px 28px', borderRadius: '16px', zIndex: 3000, textAlign: 'center', boxShadow: '0 10px 40px rgba(0,0,0,0.3)' }} className="slide">
-              <p className="hw" style={{ fontSize: '1.4rem', margin: 0 }}>{celebration}</p>
-              <div style={{ position: 'absolute', top: '-20px', left: '50%', transform: 'translateX(-50%)', width: '200px', height: '100px', pointerEvents: 'none', overflow: 'visible' }}>
-                {['🎉', '✨', '⭐', '🎊', '💫', '🌟', '❤️', '💛'].map((emoji, i) => (
-                  <span key={i} style={{ position: 'absolute', left: `${10 + (i * 12)}%`, animation: `confetti 1.5s ease-out ${i * 0.1}s forwards`, fontSize: '1.2rem' }}>{emoji}</span>
+            <div style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', background: theme.accentGradient, color: theme.isDark ? '#1a1a1a' : '#fff', padding: '20px 32px 24px', borderRadius: '20px', zIndex: 3000, textAlign: 'center', boxShadow: '0 10px 40px rgba(0,0,0,0.3)' }} className="slide">
+              {/* Coffee Cup with Steam */}
+              <div style={{ position: 'relative', display: 'inline-block', marginBottom: '8px' }}>
+                <span style={{ fontSize: '3rem' }}>{brewThemes[brewType].icon}</span>
+                {/* Rising Steam */}
+                <div style={{ position: 'absolute', top: '-20px', left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: '8px' }}>
+                  {[0, 1, 2].map(i => (
+                    <span key={i} style={{ fontSize: '1rem', opacity: 0.7, animation: `celebrateSteam 1.5s ease-out ${i * 0.3}s infinite` }}>☁️</span>
+                  ))}
+                </div>
+              </div>
+              <p className="hw" style={{ fontSize: '1.3rem', margin: 0 }}>{celebration}</p>
+              {/* Confetti burst */}
+              <div style={{ position: 'absolute', top: '0', left: '50%', transform: 'translateX(-50%)', width: '250px', height: '120px', pointerEvents: 'none', overflow: 'visible' }}>
+                {['🎉', '✨', '⭐', '🎊', '💫', '🌟', '❤️', '💛', '☕'].map((emoji, i) => (
+                  <span key={i} style={{ position: 'absolute', left: `${5 + (i * 11)}%`, animation: `confetti 1.8s ease-out ${i * 0.08}s forwards`, fontSize: '1.1rem' }}>{emoji}</span>
                 ))}
               </div>
             </div>
