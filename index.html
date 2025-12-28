@@ -961,6 +961,7 @@
       const ambianceAudioRef = useRef(null);
       
       const [todayJournal, setTodayJournal] = useState(() => load('journal', {})[getDateKey()] || { gratitude: '', reflection: '', tomorrow: '', promptResponse: '' });
+      const [viewingPastJournal, setViewingPastJournal] = useState(null); // date key of entry being viewed
       
       // Get today's journal prompt (0-365 based on day of year)
       const getDayOfYear = (date) => {
@@ -2360,6 +2361,89 @@
                   </div>
                 </div>
                 <p className="bt" style={{ textAlign: 'center', fontSize: '0.7rem', color: theme.textMuted }}>Auto-saved • {Object.keys(journal).length} entries</p>
+                
+                {/* Past Journal Entries - Notebook Style */}
+                {Object.keys(journal).length > 0 && (
+                  <div style={{ ...s.card, marginTop: '16px', background: theme.isDark ? '#2a2520' : '#faf6f0', border: `2px solid ${theme.isDark ? '#4a3f35' : '#d4c4a8'}`, borderRadius: '12px', position: 'relative', overflow: 'hidden' }}>
+                    {/* Notebook spiral binding effect */}
+                    <div style={{ position: 'absolute', left: '20px', top: 0, bottom: 0, width: '2px', background: `repeating-linear-gradient(to bottom, transparent, transparent 8px, ${theme.isDark ? '#6b5a4a' : '#c9b896'} 8px, ${theme.isDark ? '#6b5a4a' : '#c9b896'} 16px)` }} />
+                    <div style={{ position: 'absolute', left: '16px', top: '8px', bottom: '8px', display: 'flex', flexDirection: 'column', justifyContent: 'space-around' }}>
+                      {[...Array(Math.min(8, Math.ceil((Object.keys(journal).length > 1 ? 180 : 100) / 25)))].map((_, i) => (
+                        <div key={i} style={{ width: '10px', height: '10px', borderRadius: '50%', background: theme.isDark ? '#5a4a3a' : '#a89878', border: `1px solid ${theme.isDark ? '#4a3a2a' : '#8a7858'}` }} />
+                      ))}
+                    </div>
+                    
+                    <div style={{ paddingLeft: '32px' }}>
+                      <h3 style={{ fontFamily: "'Caveat', cursive", fontSize: '1.4rem', color: theme.accent, marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        📓 My Journal
+                        <span className="bt" style={{ fontSize: '0.7rem', color: theme.textMuted, fontFamily: "'Lora', serif" }}>({Object.keys(journal).filter(k => k !== todayKey).length} past entries)</span>
+                      </h3>
+                      
+                      {/* Scrollable past entries */}
+                      <div style={{ maxHeight: '300px', overflowY: 'auto', paddingRight: '8px' }}>
+                        {Object.keys(journal)
+                          .filter(k => k !== todayKey)
+                          .sort((a, b) => new Date(b) - new Date(a))
+                          .map((dateKey, idx) => {
+                            const entry = journal[dateKey];
+                            const entryDate = new Date(dateKey);
+                            const hasContent = entry.gratitude || entry.reflection || entry.tomorrow || entry.promptResponse;
+                            if (!hasContent) return null;
+                            
+                            return (
+                              <div key={dateKey} style={{ 
+                                marginBottom: '16px', 
+                                paddingBottom: '16px', 
+                                borderBottom: idx < Object.keys(journal).filter(k => k !== todayKey).length - 1 ? `1px dashed ${theme.isDark ? '#4a3f35' : '#d4c4a8'}` : 'none',
+                                background: `repeating-linear-gradient(transparent, transparent 23px, ${theme.isDark ? 'rgba(74,63,53,0.3)' : 'rgba(212,196,168,0.3)'} 24px)`
+                              }}>
+                                {/* Date header */}
+                                <div style={{ fontFamily: "'Caveat', cursive", fontSize: '1.2rem', color: theme.accent, marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                  📅 {entryDate.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' })}
+                                </div>
+                                
+                                {/* Entry content */}
+                                <div style={{ fontFamily: "'Caveat', cursive", fontSize: '1.1rem', color: theme.text, lineHeight: '1.6' }}>
+                                  {entry.promptResponse && (
+                                    <div style={{ marginBottom: '8px' }}>
+                                      <span style={{ color: theme.textSecondary, fontSize: '0.95rem' }}>✨ Prompt reflection:</span>
+                                      <p style={{ margin: '4px 0 0 0', whiteSpace: 'pre-wrap' }}>{entry.promptResponse}</p>
+                                    </div>
+                                  )}
+                                  {entry.gratitude && (
+                                    <div style={{ marginBottom: '8px' }}>
+                                      <span style={{ color: theme.textSecondary, fontSize: '0.95rem' }}>🙏 Grateful for:</span>
+                                      <p style={{ margin: '4px 0 0 0', whiteSpace: 'pre-wrap' }}>{entry.gratitude}</p>
+                                    </div>
+                                  )}
+                                  {entry.reflection && (
+                                    <div style={{ marginBottom: '8px' }}>
+                                      <span style={{ color: theme.textSecondary, fontSize: '0.95rem' }}>💭 Reflection:</span>
+                                      <p style={{ margin: '4px 0 0 0', whiteSpace: 'pre-wrap' }}>{entry.reflection}</p>
+                                    </div>
+                                  )}
+                                  {entry.tomorrow && (
+                                    <div>
+                                      <span style={{ color: theme.textSecondary, fontSize: '0.95rem' }}>🎯 Goals set:</span>
+                                      <p style={{ margin: '4px 0 0 0', whiteSpace: 'pre-wrap' }}>{entry.tomorrow}</p>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        
+                        {Object.keys(journal).filter(k => k !== todayKey).length === 0 && (
+                          <p style={{ fontFamily: "'Caveat', cursive", fontSize: '1.1rem', color: theme.textMuted, textAlign: 'center', padding: '20px 0' }}>
+                            ✍️ Your past entries will appear here...
+                            <br />
+                            <span style={{ fontSize: '0.95rem' }}>Start journaling today!</span>
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
