@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Coffee Cup - Cozy Style -->
+  <defs>
+    <linearGradient id="coffeeGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#8B6914"/>
+      <stop offset="100%" style="stop-color:#5D4037"/>
+    </linearGradient>
+    <linearGradient id="cupGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#F5E6D3"/>
+      <stop offset="100%" style="stop-color:#E8DCC8"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Saucer -->
+  <ellipse cx="32" cy="56" rx="22" ry="5" fill="#D4C4A8"/>
+  <ellipse cx="32" cy="55" rx="18" ry="4" fill="#E8DCC8"/>
+  
+  <!-- Cup Body -->
+  <path d="M12 22 L12 46 Q12 54 20 54 L44 54 Q52 54 52 46 L52 22 Z" fill="url(#cupGrad)" stroke="#C4A77D" stroke-width="2"/>
+  
+  <!-- Coffee Fill -->
+  <path d="M14 26 L14 44 Q14 50 21 50 L43 50 Q50 50 50 44 L50 26 Z" fill="url(#coffeeGrad)"/>
+  
+  <!-- Coffee Foam/Crema -->
+  <ellipse cx="32" cy="26" rx="18" ry="4" fill="#D4A574"/>
+  <ellipse cx="32" cy="25" rx="14" ry="3" fill="#E8C8A0" opacity="0.6"/>
+  
+  <!-- Handle -->
+  <path d="M52 28 Q62 28 62 38 Q62 48 52 48" fill="none" stroke="#C4A77D" stroke-width="4" stroke-linecap="round"/>
+  
+  <!-- Steam Lines -->
+  <path d="M24 18 Q26 12 24 6" stroke="#8B7355" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.5"/>
+  <path d="M32 16 Q34 10 32 4" stroke="#8B7355" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.6"/>
+  <path d="M40 18 Q42 12 40 6" stroke="#8B7355" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.5"/>
+</svg>

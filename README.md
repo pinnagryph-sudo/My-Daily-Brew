@@ -1,154 +1,86 @@
-# ☕ My Daily Brew v7.4.0 - Ultimate Cozy Experience
+# ☕ My Daily Brew v7.3.0
 
-A comprehensive habit tracker, task manager, and daily reflection app with warm café aesthetics.
+**The Easy Wins Update** - A cozy, café-themed productivity PWA for building habits and managing daily tasks.
 
-## 🎉 What's New in v7.4.0
+## ✨ What's New in v7.3
 
-### ☕ Visual & Cozy Enhancements
-- **Coffee Cup Progress** - Watch your cup fill up as you complete tasks!
-- **Steam Animation** - Rising steam when you're over 80% done
-- **Café Sign Header** - Cute hanging sign style for your café name
-- **Daily Cozy Quotes** - Rotating inspirational quotes
-- **Streak Milestones** - Special celebrations at 7, 21, 30, 50, 100, 365 days!
-- **Seasonal Decorations** - Falling leaves, snow, petals by season
+### Easy Wins (10 New Features)
+- ⭐ **Pin/Star Favorites** - Keep important habits & tasks at the top
+- 📋 **Duplicate Items** - Copy habits & tasks with one tap
+- 🍅 **Timer Presets** - Quick (15m), Pomodoro (25m), Extended (45m), Deep Work (90m)
+- 🎨 **Custom Accent Colors** - Pick from 16 colors to personalize your theme
+- 🌓 **Auto Dark Mode** - Follows your system preference
+- 🔥 **Streak Milestones** - Special celebrations at 7, 30, 100 days (+XP bonus!)
+- 📊 **Habit Completion Rate** - See your % completed this week & month
+- 📝 **Quick Notes on Tasks** - Add notes to any task
+- ☕ **Cozy Quotes** - Random café-themed encouragements daily
+- 📈 **Gradient Progress Bars** - Beautiful themed progress indicators
 
-### 🛠️ Functional QoL
-- **Task Due Dates** - Multi-day scheduling with overdue indicators
-- **Habit Categories** - Morning ☀️, Evening 🌙, Health 💪, Mind 🧠, Social 💬, Creative 🎨
-- **Habit Category Filter** - Quick filter by category
-- **Pin Favorites** - Star important habits to always show first
-- **Duplicate Items** - Copy existing habits with one tap
-- **Best Streak Tracking** - Each habit remembers its all-time best
-- **Weekly Completion Rate** - See your habit consistency percentage
-- **Task Templates** - Save and reuse common task setups
-- **Timer Presets** - Named presets: Quick ⚡, Short ☕, Pomodoro 🍅, Deep 🧘, Flow 🌊
+### Delightful Extras
+- 🛒 **Café Decorations Shop** - Unlock plants, art, cozy items & pets with XP
+- 🤖 **Rotating Barista Tips** - Context-aware daily tips
+- 🎉 **Achievement Confetti** - Emoji burst celebrations
+- ❄️ **Streak Freeze Animation** - Visual feedback when freeze activates
 
-### 🔔 Notifications & Reminders
-- **Daily Reminder** - Configurable "Open your café!" notification
-- **Auto Dark Mode** - Follow system preference automatically
-- **Mood Notes** - Add context to your mood tracking
-
-### 📊 Stats & Insights
-- **Weekly Receipt** - Café-style summary of your week
-- **Habit Analytics** - Completion rate displayed in header
-
-## ✨ All Features
-
-### Daily Routine
-- 🌅 Daily prompts (366 unique, one per day)
-- 😊 Mood tracking with optional notes
-- 📝 Gratitude journal + reflection + planning
-- 📚 Past journal entries viewer
+## 🎯 Core Features
 
 ### Habits
-- ⭐ Custom emoji icons
-- 🔥 Current streak + best streak tracking
-- 📌 Pin favorites to top
-- 📋 Duplicate habits
-- 🏷️ 6 categories (Morning, Evening, Health, Mind, Social, Creative)
-- 🔍 Search & filter by category
-- 📊 Weekly completion rate
-- ❄️ Weekly streak freeze
+- Daily habit tracking with streak counters
+- Pin favorites to top
+- Duplicate for quick creation
+- History calendar view
+- Swipe right to complete
 
-### Tasks  
-- 🔴🟡🟢 Priority levels
-- 📅 Due dates with overdue warnings
-- 🏷️ 6 categories
-- 📋 Subtasks
-- 🔄 Recurring (daily, weekdays, weekly)
-- ⏰ Time-based reminders
-- 💾 Save as templates
+### Tasks
+- Priority levels (High/Medium/Low)
+- Categories with color coding
+- Due times with notifications
+- Recurring tasks (Daily/Weekdays/Weekly)
+- Subtasks support
+- Quick notes
 
-### 🍅 Pomodoro Timer
-- Focus/Break mode toggle
-- Automatic break reminders (5min / 15min every 4th)
-- Named presets (Quick, Short, Pomodoro, Deep, Flow)
-- Ambient sound integration
-- Session counter
+### Focus Timer
+- Preset durations (15m, 25m, 45m, 90m, 120m)
+- Custom timer with +/- controls
+- Ambient soundscapes (Café, Rain, Ocean, Forest, Fire)
+- Lo-fi music generation
+- Task linking
 
-### 🎵 Ambient Sounds
-- 6 music tracks + 4 ambiance tracks
-- Theme-matched defaults
-- Crossfade looping
-- Independent volume controls
-
-### 🎮 Gamification
-- XP for completing tasks/habits
-- 7 level progression
-- 18 achievement badges
+### Gamification
+- XP system with brew-themed ranks
+- 15+ unlockable badges per theme
 - Weekly & monthly challenges
-- Streak milestones (7, 21, 30, 50, 100, 365 days)
+- Year in Review summary
+- Café decorations shop
 
-### 📊 Stats & Insights
-- 🧾 Weekly receipt summary
-- 📅 Year in review
-- 😊 Mood insights
-- 📈 Habit completion analytics
-
-### ⚙️ Settings
-- 🎨 3 themes × 2 modes = 6 looks
-- ☀️🌙 Quick dark/light toggle
-- 🌓 Auto dark mode (follow system)
-- ⏰ Daily reminder notifications
-- 🍂 Seasonal decorations toggle
-- ♿ High contrast mode
-- 💾 Backup & restore
-
-## ⌨️ Keyboard Shortcuts
-
-| Key | Action |
-|-----|--------|
-| H / 1 | Today tab |
-| F / 2 | Focus Timer |
-| J / 3 | Journal |
-| C / 4 | Calendar |
-| S / 5 | Stats |
-| N | Quick Add |
-| D | Toggle Dark Mode |
-| / | Focus Search |
-| ? | Show Shortcuts |
-| Esc | Close Modals |
+### Themes
+- **Coffee** ☕ - Warm browns (Light Brew / Dark Brew)
+- **Tea** 🍵 - Golden yellows (White Tea / Black Tea)
+- **Matcha** 🍃 - Fresh greens (Light Matcha / Dark Matcha)
+- Custom accent color override
+- Auto dark mode (follows system)
 
 ## 📱 Installation
 
-1. Open in mobile browser (Chrome/Safari)
-2. Tap "Add to Home Screen"
-3. Complete onboarding
-4. Enable notifications (optional)
+### As PWA (Recommended)
+1. Visit the hosted URL in your mobile browser
+2. Tap "Add to Home Screen" (iOS) or install prompt (Android)
+3. Launch from your home screen for full-screen experience
 
-## 🔄 Version History
+## 📁 File Structure
 
-### v7.4.0 - Ultimate Cozy Experience
-- ☕ Coffee cup progress visualization
-- 🏷️ Habit categories & filtering
-- 📅 Task due dates
-- 📌 Pin favorites
-- 📋 Task templates
-- ⏰ Daily reminders
-- 🌓 Auto dark mode
-- 💬 Mood notes
-- 🎖️ Streak milestones
-- ✨ Cozy quotes
-- 🪧 Café sign header
+```
+daily-brew-pwa/
+├── index.html      # Main app
+├── sw.js           # Service worker
+├── manifest.json   # PWA manifest
+└── icons/          # App icons
+```
 
-### v7.3.x - Polish
-- Weekly receipt summary
-- Better template system
+## 📄 License
 
-### v7.2.0 - QoL Update
-- Data import/restore
-- Pomodoro breaks
-- Past journal viewer
-- Best streak tracking
-
-### v7.0.0 - Polish Update
-- 74% smaller audio (69MB → 18MB)
-- Onboarding flow
-- Keyboard shortcuts
-- Accessibility improvements
+MIT License - Free to use, modify, and distribute.
 
 ---
 
-Made with ☕ warmth, 🍵 calm, and 🍃 balance.
-
-*Your cozy corner of productivity awaits!*
+Made with ☕ and care. Enjoy your Daily Brew!

@@ -34,7 +34,7 @@
   <div class="loading-screen" id="loadingScreen">
     <div class="loading-icon">☕</div>
     <div class="loading-text">Brewing something special...</div>
-    <div class="loading-subtext">v7.2 • Easy Wins + Delightful Extras</div>
+    <div class="loading-subtext">v7.3 • The Easy Wins Update</div>
   </div>
 
   <script type="text/babel">
@@ -734,6 +734,17 @@
     // WHAT'S NEW CONTENT
     // ═══════════════════════════════════════════════════════════════
     const whatsNewContent = [
+      { version: '7.2', title: '✨ Easy Wins & Extras', items: [
+        { icon: '⭐', title: 'Pin Favorites', desc: 'Star habits & tasks to keep them on top' },
+        { icon: '📋', title: 'Duplicate Items', desc: 'Copy habits & tasks with one tap' },
+        { icon: '🍅', title: 'Timer Presets', desc: 'Quick, Pomodoro, Extended, Deep Work' },
+        { icon: '🎨', title: 'Custom Colors', desc: 'Pick your own accent color in Settings' },
+        { icon: '🌓', title: 'Auto Dark Mode', desc: 'Follows your system preference' },
+        { icon: '🔥', title: 'Streak Milestones', desc: 'Special celebrations at 7, 30, 100 days' },
+        { icon: '📊', title: 'Completion Rate', desc: 'See your % completed this week & month' },
+        { icon: '📝', title: 'Task Notes', desc: 'Add quick notes to any task' },
+        { icon: '🛒', title: 'Café Decorations', desc: 'Unlock plants, art & pets with XP!' },
+      ]},
       { version: '6.4', title: '🎵 Refined Experience', items: [
         { icon: '🎹', title: 'Improved Music', desc: 'Faster, more harmonious chord progressions' },
         { icon: '🛡️', title: 'XP Protection', desc: 'No more XP exploits from re-checking' },
@@ -791,7 +802,7 @@
     // MAIN APP COMPONENT
     // ═══════════════════════════════════════════════════════════════
     function App() {
-      const APP_VERSION = '7.2.0';
+      const APP_VERSION = '7.3.0';
       const season = getCurrentSeason();
       const seasonDeco = seasonalDecorations[season];
 
@@ -811,7 +822,16 @@
         return () => mediaQuery.removeEventListener('change', handleChange);
       }, [autoDarkMode]);
       
-      const theme = brewThemes[brewType][isDark ? 'dark' : 'light'];
+      const [customAccentColor, setCustomAccentColor] = useState(() => load('customAccentColor', null));
+      const baseTheme = brewThemes[brewType][isDark ? 'dark' : 'light'];
+      // Apply custom accent color if set
+      const theme = customAccentColor ? {
+        ...baseTheme,
+        accent: customAccentColor,
+        accentGradient: `linear-gradient(145deg, ${customAccentColor} 0%, ${customAccentColor}dd 100%)`,
+        streakGradient: `linear-gradient(145deg, ${customAccentColor} 0%, ${customAccentColor}cc 100%)`,
+        xpBar: `linear-gradient(90deg, ${customAccentColor} 0%, ${customAccentColor}99 100%)`
+      } : baseTheme;
       const levels = brewRanks[brewType];
       const badges = brewBadges[brewType];
       const messages = brewMessages[brewType];
@@ -949,6 +969,7 @@
       useEffect(() => { store('brewType', brewType); }, [brewType]);
       useEffect(() => { store('isDark', isDark); }, [isDark]);
       useEffect(() => { store('autoDarkMode', autoDarkMode); }, [autoDarkMode]);
+      useEffect(() => { store('customAccentColor', customAccentColor); }, [customAccentColor]);
       useEffect(() => { store('highContrast', highContrast); }, [highContrast]);
       useEffect(() => { store('cafeName', cafeName); }, [cafeName]);
       useEffect(() => { store('ambientSound', ambientSound); }, [ambientSound]);
@@ -1705,7 +1726,7 @@
         btnSecondary: { background: theme.progressBg, color: theme.text, border: `1px solid ${theme.cardBorder}`, borderRadius: '12px', padding: '10px 16px', fontFamily: "'Lora',serif", fontWeight: 500, cursor: 'pointer' },
         input: { background: theme.inputBg, border: `1px solid ${theme.inputBorder}`, borderRadius: '12px', padding: '12px', fontFamily: "'Lora',serif", fontSize: '1rem', color: theme.text, width: '100%', outline: 'none' },
         navItem: (a) => ({ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px', padding: '8px 12px', borderRadius: '12px', background: a ? theme.accentGradient : 'transparent', color: a ? (theme.isDark ? '#1a1a1a' : '#fff') : theme.textSecondary, border: 'none', cursor: 'pointer', fontFamily: "'Lora',serif", fontSize: '9px', fontWeight: a ? 600 : 400 }),
-        fab: { position: 'fixed', bottom: '75px', right: '16px', width: '52px', height: '52px', borderRadius: '50%', background: theme.accentGradient, border: 'none', fontSize: '22px', cursor: 'pointer', boxShadow: '0 4px 20px rgba(0,0,0,0.3)', zIndex: 99, display: 'flex', alignItems: 'center', justifyContent: 'center', color: theme.isDark ? '#1a1a1a' : '#fff' },
+        fab: { position: 'fixed', bottom: '68px', right: '16px', width: '52px', height: '52px', borderRadius: '50%', background: theme.accentGradient, border: 'none', fontSize: '22px', cursor: 'pointer', boxShadow: '0 4px 20px rgba(0,0,0,0.3)', zIndex: 99, display: 'flex', alignItems: 'center', justifyContent: 'center', color: theme.isDark ? '#1a1a1a' : '#fff' },
         modal: { position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' },
         modalContent: { background: theme.modalBg, borderRadius: '20px', maxWidth: '360px', width: '100%', padding: '20px', maxHeight: '85vh', overflow: 'auto' }
       };
@@ -1730,30 +1751,23 @@
             .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
           `}</style>
 
-          <div style={{ maxWidth: 'min(100%, 480px)', margin: '0 auto', padding: '12px 12px 85px' }}>
-            {/* Header with hanging sign */}
+          <div style={{ flex: 1, maxWidth: '100%', margin: '0 auto', padding: '12px 12px 70px', width: '100%', boxSizing: 'border-box' }}>
+            {/* Header with seasonal decoration */}
             <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '14px' }}>
               <div>
-                {/* Hanging Café Sign */}
-                <div style={{ 
-                  display: 'inline-block',
-                  background: theme.cardBg,
-                  border: `2px solid ${theme.accent}`,
-                  borderRadius: '8px',
-                  padding: '6px 14px',
-                  boxShadow: `0 4px 12px ${theme.isDark ? 'rgba(0,0,0,0.4)' : 'rgba(0,0,0,0.1)'}`,
-                  animation: 'signSwing 4s ease-in-out infinite',
-                  transformOrigin: 'top center',
-                  position: 'relative'
-                }}>
-                  {/* Hanging hooks */}
-                  <div style={{ position: 'absolute', top: '-8px', left: '20%', width: '8px', height: '8px', background: theme.accent, borderRadius: '50%' }} />
-                  <div style={{ position: 'absolute', top: '-8px', right: '20%', width: '8px', height: '8px', background: theme.accent, borderRadius: '50%' }} />
-                  <h1 className="hw" style={{ fontSize: '1.4rem', color: theme.text, margin: 0, display: 'flex', alignItems: 'center', gap: '6px' }} aria-label={`${cafeName} - ${brewThemes[brewType].name} theme`}>
-                    {brewThemes[brewType].icon} {cafeName} <span style={{ fontSize: '0.85rem' }}>{seasonDeco.emoji}</span>
-                  </h1>
-                </div>
-                <p className="bt" style={{ fontSize: '0.75rem', color: theme.textSecondary, marginTop: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <h1 className="hw" style={{ 
+                  fontSize: '1.6rem', 
+                  color: theme.text, 
+                  margin: 0, 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: '6px',
+                  animation: 'signSwing 6s ease-in-out infinite',
+                  transformOrigin: 'top left'
+                }} aria-label={`${cafeName} - ${brewThemes[brewType].name} theme`}>
+                  {brewThemes[brewType].icon} {cafeName} <span style={{ fontSize: '0.9rem' }}>{seasonDeco.emoji}</span>
+                </h1>
+                <p className="bt" style={{ fontSize: '0.75rem', color: theme.textSecondary, marginTop: '2px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                   {today.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
                   {weather.temp && (
                     <span style={{ display: 'inline-flex', alignItems: 'center', gap: '2px', padding: '1px 6px', background: theme.progressBg, borderRadius: '8px', fontSize: '0.7rem' }}>
@@ -1761,6 +1775,7 @@
                     </span>
                   )}
                 </p>
+                {/* Unlocked Decorations Display */}
                 {unlockedDecorations.length > 0 && (
                   <div style={{ display: 'flex', gap: '4px', marginTop: '4px', flexWrap: 'wrap' }}>
                     {unlockedDecorations.slice(0, 6).map(id => {
@@ -1768,11 +1783,14 @@
                       return deco ? <span key={id} title={deco.name} style={{ fontSize: '0.9rem' }}>{deco.icon}</span> : null;
                     })}
                     {unlockedDecorations.length > 6 && <span style={{ fontSize: '0.7rem', color: theme.textMuted }}>+{unlockedDecorations.length - 6}</span>}
-                    <button onClick={() => setShowDecorations(true)} style={{ background: 'none', border: 'none', fontSize: '0.65rem', color: theme.accent, cursor: 'pointer', padding: 0 }}>🛒</button>
                   </div>
                 )}
               </div>
               <div style={{ display: 'flex', gap: '6px' }}>
+                {/* Shop Button - Always Visible */}
+                <button onClick={() => setShowDecorations(true)} aria-label="Café Shop" style={{ background: theme.accentLight, border: `1px solid ${theme.cardBorder}`, borderRadius: '10px', padding: '6px 10px', cursor: 'pointer' }}>
+                  <span>🛒</span>
+                </button>
                 <button onClick={() => setShowSoundMenu(true)} aria-label="Sound settings" style={{ background: soundEnabled ? theme.accentGradient : theme.accentLight, border: `1px solid ${theme.cardBorder}`, borderRadius: '10px', padding: '6px 10px', cursor: 'pointer', position: 'relative' }}>
                   <span>{soundEnabled ? '🔊' : '🔇'}</span>
                   {soundEnabled && <span style={{ position: 'absolute', top: '-2px', right: '-2px', width: '8px', height: '8px', background: '#4ade80', borderRadius: '50%', border: '2px solid ' + theme.bg }} />}
@@ -2056,11 +2074,16 @@
                     <button onClick={() => { setTimerRunning(false); setTimerSeconds(25 * 60); setTimerTask(null); setTimerStartTime(null); setSoundEnabled(false); }} style={s.btnSecondary}>↺</button>
                   </div>
                   <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '12px' }}>
-                    {[5, 15, 25, 45, 60].map(m => (
-                      <button key={m} onClick={() => { setTimerSeconds(m * 60); setTimerRunning(false); }} style={{ padding: '6px 12px', borderRadius: '8px', border: `1px solid ${theme.cardBorder}`, background: 'transparent', color: theme.textSecondary, fontFamily: "'Lora',serif", fontSize: '0.75rem', cursor: 'pointer' }}>{m}m</button>
+                    {[
+                      { mins: 15, label: '⚡ Quick' },
+                      { mins: 25, label: '🍅 Pomodoro' },
+                      { mins: 45, label: '📚 Extended' },
+                      { mins: 90, label: '🧠 Deep Work' }
+                    ].map(p => (
+                      <button key={p.mins} onClick={() => { setTimerSeconds(p.mins * 60); setTimerRunning(false); }} style={{ padding: '6px 10px', borderRadius: '8px', border: timerSeconds === p.mins * 60 ? `2px solid ${theme.accent}` : `1px solid ${theme.cardBorder}`, background: timerSeconds === p.mins * 60 ? theme.accentLight : 'transparent', color: timerSeconds === p.mins * 60 ? theme.accent : theme.textSecondary, fontFamily: "'Lora',serif", fontSize: '0.7rem', cursor: 'pointer' }}>{p.label}</button>
                     ))}
                   </div>
-                  <button onClick={() => setShowCustomTimer(true)} className="bt" style={{ background: 'none', border: 'none', color: theme.accent, fontSize: '0.8rem', cursor: 'pointer' }}>⚙️ Custom time</button>
+                  <button onClick={() => setShowCustomTimer(true)} className="bt" style={{ background: 'none', border: 'none', color: theme.accent, fontSize: '0.8rem', cursor: 'pointer' }}>⚙️ More options</button>
                 </div>
 
                 {soundEnabled && ambientSound !== 'off' && (
@@ -2165,6 +2188,69 @@
             {/* STATS TAB */}
             {activeTab === 'stats' && (
               <div className="fade">
+                {/* Habit Completion Rate */}
+                <div style={s.card}>
+                  <h3 className="bt" style={{ fontSize: '0.85rem', fontWeight: 600, color: theme.text, marginBottom: '10px' }}>📊 Habit Completion Rate</h3>
+                  {(() => {
+                    // Calculate this week's completion
+                    const today = new Date();
+                    const weekStart = new Date(today);
+                    weekStart.setDate(today.getDate() - today.getDay());
+                    let weekCompleted = 0, weekTotal = 0;
+                    let monthCompleted = 0, monthTotal = 0;
+                    
+                    for (let i = 0; i < 7; i++) {
+                      const d = new Date(weekStart);
+                      d.setDate(weekStart.getDate() + i);
+                      if (d <= today) {
+                        const key = d.toISOString().split('T')[0];
+                        habits.forEach(h => {
+                          weekTotal++;
+                          if (h.history && h.history[key]) weekCompleted++;
+                        });
+                      }
+                    }
+                    
+                    // Calculate this month's completion
+                    const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+                    for (let d = new Date(monthStart); d <= today; d.setDate(d.getDate() + 1)) {
+                      const key = d.toISOString().split('T')[0];
+                      habits.forEach(h => {
+                        monthTotal++;
+                        if (h.history && h.history[key]) monthCompleted++;
+                      });
+                    }
+                    
+                    const weekRate = weekTotal > 0 ? Math.round((weekCompleted / weekTotal) * 100) : 0;
+                    const monthRate = monthTotal > 0 ? Math.round((monthCompleted / monthTotal) * 100) : 0;
+                    
+                    return (
+                      <div>
+                        <div style={{ marginBottom: '12px' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                            <span className="bt" style={{ fontSize: '0.75rem', color: theme.textSecondary }}>This Week</span>
+                            <span className="bt" style={{ fontSize: '0.9rem', fontWeight: 600, color: theme.accent }}>{weekRate}%</span>
+                          </div>
+                          <div style={{ height: '8px', background: theme.progressBg, borderRadius: '999px', overflow: 'hidden' }}>
+                            <div style={{ height: '100%', width: `${weekRate}%`, background: theme.streakGradient, borderRadius: '999px', transition: 'width 0.5s' }} />
+                          </div>
+                          <p className="bt" style={{ fontSize: '0.65rem', color: theme.textMuted, marginTop: '2px' }}>{weekCompleted}/{weekTotal} habits completed</p>
+                        </div>
+                        <div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                            <span className="bt" style={{ fontSize: '0.75rem', color: theme.textSecondary }}>This Month</span>
+                            <span className="bt" style={{ fontSize: '0.9rem', fontWeight: 600, color: theme.accent }}>{monthRate}%</span>
+                          </div>
+                          <div style={{ height: '8px', background: theme.progressBg, borderRadius: '999px', overflow: 'hidden' }}>
+                            <div style={{ height: '100%', width: `${monthRate}%`, background: theme.xpBar, borderRadius: '999px', transition: 'width 0.5s' }} />
+                          </div>
+                          <p className="bt" style={{ fontSize: '0.65rem', color: theme.textMuted, marginTop: '2px' }}>{monthCompleted}/{monthTotal} habits completed</p>
+                        </div>
+                      </div>
+                    );
+                  })()}
+                </div>
+
                 {/* Year in Review */}
                 <button onClick={() => setShowYearReview(true)} style={{ ...s.card, width: '100%', textAlign: 'center', cursor: 'pointer', border: `2px solid ${theme.accent}` }}>
                   <span style={{ fontSize: '1.2rem' }}>📅</span>
@@ -2481,6 +2567,49 @@
                     <input type="checkbox" checked={autoDarkMode} onChange={e => setAutoDarkMode(e.target.checked)} style={{ accentColor: theme.accent }} />
                     🌓 Auto Dark Mode (follow system)
                   </label>
+                </div>
+
+                {/* Custom Accent Color */}
+                <div style={{ marginBottom: '14px' }}>
+                  <p className="bt" style={{ fontSize: '0.8rem', color: theme.textSecondary, marginBottom: '8px' }}>🎨 Custom Accent Color</p>
+                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
+                    {[
+                      null, // Default/reset
+                      '#E57373', '#F06292', '#BA68C8', '#9575CD', 
+                      '#7986CB', '#64B5F6', '#4FC3F7', '#4DD0E1',
+                      '#4DB6AC', '#81C784', '#AED581', '#DCE775',
+                      '#FFD54F', '#FFB74D', '#FF8A65', '#A1887F'
+                    ].map((color, i) => (
+                      <button
+                        key={i}
+                        onClick={() => setCustomAccentColor(color)}
+                        style={{
+                          width: '28px',
+                          height: '28px',
+                          borderRadius: '50%',
+                          border: (customAccentColor === color || (!customAccentColor && !color)) ? '3px solid ' + theme.text : '2px solid ' + theme.cardBorder,
+                          background: color || baseTheme.accent,
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '0.7rem'
+                        }}
+                        title={color ? color : 'Default'}
+                      >
+                        {!color && '↺'}
+                      </button>
+                    ))}
+                  </div>
+                  {customAccentColor && (
+                    <button 
+                      onClick={() => setCustomAccentColor(null)} 
+                      className="bt" 
+                      style={{ marginTop: '8px', background: 'none', border: 'none', color: theme.accent, fontSize: '0.75rem', cursor: 'pointer' }}
+                    >
+                      Reset to default
+                    </button>
+                  )}
                 </div>
 
                 <div style={{ marginBottom: '14px' }}>

@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Matcha Bowl - Traditional Chawan Style -->
+  <defs>
+    <linearGradient id="matchaGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#7CB342"/>
+      <stop offset="100%" style="stop-color:#558B2F"/>
+    </linearGradient>
+    <linearGradient id="bowlGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#5D4037"/>
+      <stop offset="100%" style="stop-color:#3E2723"/>
+    </linearGradient>
+    <radialGradient id="foamGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#AED581"/>
+      <stop offset="100%" style="stop-color:#8BC34A"/>
+    </radialGradient>
+  </defs>
+  
+  <!-- Shadow -->
+  <ellipse cx="32" cy="58" rx="20" ry="4" fill="#2E1B0F" opacity="0.2"/>
+  
+  <!-- Bowl Body -->
+  <path d="M6 28 Q6 56 32 56 Q58 56 58 28 Q58 24 32 24 Q6 24 6 28 Z" fill="url(#bowlGrad)"/>
+  
+  <!-- Bowl Rim -->
+  <ellipse cx="32" cy="24" rx="26" ry="6" fill="#6D4C41"/>
+  <ellipse cx="32" cy="24" rx="24" ry="5" fill="#8D6E63"/>
+  
+  <!-- Matcha Fill -->
+  <ellipse cx="32" cy="26" rx="22" ry="4" fill="url(#matchaGrad)"/>
+  
+  <!-- Foam Pattern (whisked matcha) -->
+  <ellipse cx="32" cy="26" rx="18" ry="3" fill="url(#foamGrad)" opacity="0.8"/>
+  
+  <!-- Foam bubbles -->
+  <circle cx="26" cy="25" r="1.5" fill="#C5E1A5" opacity="0.6"/>
+  <circle cx="32" cy="24" r="2" fill="#C5E1A5" opacity="0.5"/>
+  <circle cx="38" cy="26" r="1" fill="#C5E1A5" opacity="0.7"/>
+  <circle cx="28" cy="27" r="1" fill="#C5E1A5" opacity="0.4"/>
+  <circle cx="36" cy="25" r="1.2" fill="#C5E1A5" opacity="0.5"/>
+  
+  <!-- Steam -->
+  <path d="M26 18 Q28 12 26 6" stroke="#8BC34A" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0.3"/>
+  <path d="M32 16 Q34 10 32 4" stroke="#8BC34A" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0.4"/>
+  <path d="M38 18 Q40 12 38 6" stroke="#8BC34A" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0.3"/>
+</svg>
