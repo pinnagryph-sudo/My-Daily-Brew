@@ -45,7 +45,8 @@
     // ═══════════════════════════════════════════════════════════════
     const store = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch(e) {} };
     const load = (k, d) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } };
-    const getDateKey = (d = new Date()) => d.toISOString().split('T')[0];
+    // Fixed: Use local timezone instead of UTC for date keys
+    const getDateKey = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
     const getDayOfWeek = (d = new Date()) => d.getDay();
     const isSameDay = (d1, d2) => getDateKey(d1) === getDateKey(d2);
     const formatTime = (t) => { if (!t) return ''; const [h, m] = t.split(':').map(Number); return `${h % 12 || 12}:${m.toString().padStart(2, '0')} ${h >= 12 ? 'PM' : 'AM'}`; };
@@ -1521,6 +1522,34 @@
           }
         }
       }, []);
+      
+      // Periodic check for date change (handles app open across midnight)
+      useEffect(() => {
+        const checkDateChange = () => {
+          const currentDateKey = getDateKey();
+          if (gameStats.lastActiveDate && gameStats.lastActiveDate !== currentDateKey) {
+            // Date has changed, trigger a reset by reloading the page
+            // This ensures all state is fresh for the new day
+            window.location.reload();
+          }
+        };
+        
+        // Check every minute for date changes
+        const intervalId = setInterval(checkDateChange, 60000);
+        
+        // Also check when the page becomes visible again (e.g., user returns to tab)
+        const handleVisibilityChange = () => {
+          if (document.visibilityState === 'visible') {
+            checkDateChange();
+          }
+        };
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        
+        return () => {
+          clearInterval(intervalId);
+          document.removeEventListener('visibilitychange', handleVisibilityChange);
+        };
+      }, [gameStats.lastActiveDate]);
 
       // Timer
       useEffect(() => {
@@ -3409,7 +3438,7 @@
                       const d = new Date(weekStart);
                       d.setDate(weekStart.getDate() + i);
                       if (d <= today) {
-                        const key = d.toISOString().split('T')[0];
+                        const key = getDateKey(d);
                         habits.forEach(h => {
                           weekTotal++;
                           if (h.history && h.history[key]) weekCompleted++;
@@ -3420,7 +3449,7 @@
                     // Calculate this month's completion
                     const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
                     for (let d = new Date(monthStart); d <= today; d.setDate(d.getDate() + 1)) {
-                      const key = d.toISOString().split('T')[0];
+                      const key = getDateKey(d);
                       habits.forEach(h => {
                         monthTotal++;
                         if (h.history && h.history[key]) monthCompleted++;
@@ -4518,7 +4547,7 @@
                   for (let i = 0; i < 7; i++) {
                     const d = new Date(weekStart);
                     d.setDate(weekStart.getDate() + i);
-                    const key = d.toISOString().split('T')[0];
+                    const key = getDateKey(d);
                     let dayHabits = 0;
                     
                     habits.forEach(h => {
