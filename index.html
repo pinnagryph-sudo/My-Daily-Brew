@@ -2167,62 +2167,7 @@
             </>
           )}
           
-          {/* Coffee Ring Overlays with Theme-aware Blend Mode */}
-          {paperTexture && (
-            <>
-              {/* Ring 1 - top left */}
-              <div style={{
-                position: 'fixed',
-                top: '-5%',
-                left: '-8%',
-                width: '280px',
-                height: '280px',
-                backgroundImage: `url(${COFFEE_RING})`,
-                backgroundSize: 'contain',
-                backgroundRepeat: 'no-repeat',
-                opacity: theme.isDark ? 0.6 : 0.15,
-                mixBlendMode: theme.isDark ? 'soft-light' : 'multiply',
-                pointerEvents: 'none',
-                zIndex: 0,
-                transform: 'rotate(-15deg)',
-                filter: theme.isDark ? 'brightness(1.5) saturate(1.2)' : 'none'
-              }} />
-              {/* Ring 2 - bottom right */}
-              <div style={{
-                position: 'fixed',
-                bottom: '5%',
-                right: '-5%',
-                width: '320px',
-                height: '320px',
-                backgroundImage: `url(${COFFEE_RING})`,
-                backgroundSize: 'contain',
-                backgroundRepeat: 'no-repeat',
-                opacity: theme.isDark ? 0.55 : 0.12,
-                mixBlendMode: theme.isDark ? 'soft-light' : 'multiply',
-                pointerEvents: 'none',
-                zIndex: 0,
-                transform: 'rotate(45deg)',
-                filter: theme.isDark ? 'brightness(1.5) saturate(1.2)' : 'none'
-              }} />
-              {/* Ring 3 - middle bottom overlapping */}
-              <div style={{
-                position: 'fixed',
-                bottom: '15%',
-                left: '30%',
-                width: '200px',
-                height: '200px',
-                backgroundImage: `url(${COFFEE_RING})`,
-                backgroundSize: 'contain',
-                backgroundRepeat: 'no-repeat',
-                opacity: theme.isDark ? 0.5 : 0.10,
-                mixBlendMode: theme.isDark ? 'soft-light' : 'multiply',
-                pointerEvents: 'none',
-                zIndex: 0,
-                transform: 'rotate(120deg)',
-                filter: theme.isDark ? 'brightness(1.5) saturate(1.2)' : 'none'
-              }} />
-            </>
-          )}
+
           
           {/* Seasonal Falling Particles */}
           {seasonalAnimations && (
@@ -2987,13 +2932,11 @@
                         >Week</button>
                         <button 
                           onClick={() => { 
-                            const todayDate = new Date();
-                            setCalendarDate(todayDate); 
-                            setCalendarViewMode('week');
-                            setSelectedCalendarDay({ date: todayDate, key: getDateKey(todayDate) });
+                            setCalendarDate(new Date());
+                            setCalendarViewMode('today');
                           }} 
                           className="bt"
-                          style={{ background: theme.accent, border: 'none', color: '#fff', fontSize: '0.65rem', padding: '3px 8px', borderRadius: '10px', cursor: 'pointer' }}
+                          style={{ background: calendarViewMode === 'today' ? theme.accent : 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', fontSize: '0.65rem', padding: '3px 8px', borderRadius: '10px', cursor: 'pointer' }}
                         >Today</button>
                       </div>
                     </div>
@@ -3010,14 +2953,123 @@
                     }} style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', fontSize: '1rem', cursor: 'pointer', padding: '8px 12px', borderRadius: '8px' }}>›</button>
                   </div>
 
-                  {/* Day headers */}
+                  {/* Day headers - hide in Today view */}
+                  {(calendarViewMode === 'week' || calendarViewMode === 'month') && (
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', gap: '4px', marginBottom: '6px' }}>
                     {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((d, i) => (
                       <div key={i} style={{ textAlign: 'center', fontFamily: "'Caveat', cursive", fontSize: '0.85rem', color: 'rgba(255,255,255,0.7)', padding: '4px' }}>{d}</div>
                     ))}
                   </div>
+                  )}
+
+                  {/* Today View - Single day large format */}
+                  {calendarViewMode === 'today' && (() => {
+                    const todayKey = getDateKey(today);
+                    const todayMood = moods[todayKey];
+                    const todayJournalData = journal[todayKey];
+                    const hasJournal = todayJournalData && (todayJournalData.gratitude || todayJournalData.reflection || todayJournalData.tomorrow || todayJournalData.promptResponse);
+                    const completedHabits = habits.filter(h => h.completed);
+                    const completedTasks = tasks.filter(t => t.done);
+                    const habitProgress = habits.length > 0 ? completedHabits.length / habits.length : 0;
+                    
+                    return (
+                      <div style={{ 
+                        background: 'rgba(255,255,255,0.08)', 
+                        borderRadius: '12px', 
+                        padding: '20px',
+                        fontFamily: "'Courier New', monospace"
+                      }}>
+                        {/* Date header */}
+                        <div style={{ textAlign: 'center', marginBottom: '16px' }}>
+                          <div style={{ fontSize: '2.5rem', fontFamily: "'Caveat', cursive", color: theme.accent }}>
+                            {today.getDate()}
+                          </div>
+                          <div style={{ fontSize: '0.9rem', color: theme.textSecondary }}>
+                            {today.toLocaleDateString('en-US', { weekday: 'long', month: 'long', year: 'numeric' })}
+                          </div>
+                        </div>
+                        
+                        {/* Progress ring */}
+                        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
+                          <div style={{ 
+                            width: '100px', 
+                            height: '100px', 
+                            borderRadius: '50%', 
+                            background: `conic-gradient(${theme.accent} ${habitProgress * 360}deg, rgba(255,255,255,0.1) 0deg)`,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                          }}>
+                            <div style={{ 
+                              width: '80px', 
+                              height: '80px', 
+                              borderRadius: '50%', 
+                              background: theme.cardBg,
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              flexDirection: 'column'
+                            }}>
+                              <span style={{ fontSize: '1.5rem' }}>{tc.full}</span>
+                              <span style={{ fontSize: '0.7rem', color: theme.textSecondary }}>{Math.round(habitProgress * 100)}%</span>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* Stats grid */}
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' }}>
+                          <div style={{ background: 'rgba(255,255,255,0.05)', padding: '12px', borderRadius: '8px', textAlign: 'center' }}>
+                            <div style={{ fontSize: '1.5rem', color: theme.accent }}>{completedHabits.length}/{habits.length}</div>
+                            <div style={{ fontSize: '0.7rem', color: theme.textSecondary }}>Habits</div>
+                          </div>
+                          <div style={{ background: 'rgba(255,255,255,0.05)', padding: '12px', borderRadius: '8px', textAlign: 'center' }}>
+                            <div style={{ fontSize: '1.5rem', color: theme.accent }}>{completedTasks.length}/{tasks.length}</div>
+                            <div style={{ fontSize: '0.7rem', color: theme.textSecondary }}>Tasks</div>
+                          </div>
+                        </div>
+                        
+                        {/* Mood */}
+                        {todayMood && (
+                          <div style={{ background: 'rgba(255,255,255,0.05)', padding: '12px', borderRadius: '8px', marginBottom: '12px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <span style={{ fontSize: '1.5rem' }}>{moodEmojis.find(m => m.value === todayMood.value)?.emoji}</span>
+                              <div>
+                                <div style={{ fontSize: '0.8rem', color: theme.text }}>Today's Mood</div>
+                                {todayMood.note && <div style={{ fontSize: '0.7rem', color: theme.textSecondary }}>{todayMood.note}</div>}
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                        
+                        {/* Journal preview */}
+                        {hasJournal && (
+                          <div style={{ background: 'rgba(255,255,255,0.05)', padding: '12px', borderRadius: '8px' }}>
+                            <div style={{ fontSize: '0.8rem', color: theme.text, marginBottom: '6px' }}>📝 Journal Entry</div>
+                            {todayJournalData.gratitude && (
+                              <div style={{ fontSize: '0.7rem', color: theme.textSecondary, marginBottom: '4px' }}>
+                                <strong>Grateful for:</strong> {todayJournalData.gratitude.substring(0, 100)}{todayJournalData.gratitude.length > 100 ? '...' : ''}
+                              </div>
+                            )}
+                            {todayJournalData.reflection && (
+                              <div style={{ fontSize: '0.7rem', color: theme.textSecondary }}>
+                                <strong>Reflection:</strong> {todayJournalData.reflection.substring(0, 100)}{todayJournalData.reflection.length > 100 ? '...' : ''}
+                              </div>
+                            )}
+                          </div>
+                        )}
+                        
+                        {/* No activity message */}
+                        {!todayMood && !hasJournal && completedHabits.length === 0 && completedTasks.length === 0 && (
+                          <div style={{ textAlign: 'center', padding: '20px', color: theme.textSecondary, fontSize: '0.8rem' }}>
+                            ☕ Start your day! Complete habits, log your mood, or write in your journal.
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })()}
 
                   {/* Calendar grid - Theme-aware Style */}
+                  {(calendarViewMode === 'week' || calendarViewMode === 'month') && (
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', gap: '4px' }}>
                     {(calendarViewMode === 'week' 
                       ? (() => {
@@ -3112,6 +3164,7 @@
                       );
                     })}
                   </div>
+                  )}
 
                   {/* Month Summary - Receipt Style */}
                   <div style={{ 
