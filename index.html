@@ -990,7 +990,25 @@
       const [journal, setJournal] = useState(() => load('journal', {}));
       const [habitHistory, setHabitHistory] = useState(() => load('habitHistory', {}));
       const [gameStats, setGameStats] = useState(() => load('gameStats', { xp: 0, totalHabitsCompleted: 0, totalTasksCompleted: 0, perfectDays: 0, moodDaysTracked: 0, totalFocusMinutes: 0, journalEntries: 0, earlyTasks: 0, lateTasks: 0, appStreak: 0, maxStreak: 0, lastActiveDate: null, unlockedBadges: [], freezesAvailable: 1, freezesUsed: 0, weeklyFreeze: null, challengesCompleted: 0, timesShared: 0, timesExported: 0, lastMoodValue: 3, perfectDayToday: false }));
-      const [challenges, setChallenges] = useState(() => load('challenges', { weekly: { id: null, progress: 0, week: null }, monthly: { id: null, progress: 0, month: null } }));
+      const [challenges, setChallenges] = useState(() => {
+        const saved = load('challenges', { weekly: { id: null, progress: 0, week: null }, monthly: { id: null, progress: 0, month: null } });
+        const weekNum = getWeekNumber();
+        const monthKey = getMonthKey();
+        
+        // Initialize weekly challenge if needed
+        if (!saved.weekly.id || saved.weekly.week !== weekNum) {
+          const newChallenge = weeklyChallengeDefs[Math.floor(Math.random() * weeklyChallengeDefs.length)];
+          saved.weekly = { id: newChallenge.id, progress: saved.weekly.week === weekNum ? saved.weekly.progress : 0, week: weekNum };
+        }
+        
+        // Initialize monthly challenge if needed
+        if (!saved.monthly.id || saved.monthly.month !== monthKey) {
+          const newChallenge = monthlyChallengeDefs[Math.floor(Math.random() * monthlyChallengeDefs.length)];
+          saved.monthly = { id: newChallenge.id, progress: saved.monthly.month === monthKey ? saved.monthly.progress : 0, month: monthKey };
+        }
+        
+        return saved;
+      });
       const [dailyXPAwarded, setDailyXPAwarded] = useState(() => {
         const saved = load('dailyXPAwarded', { date: null, habits: [], tasks: [] });
         // Reset if it's a new day
@@ -1049,12 +1067,28 @@
         if (!calendarTouchStart || !calendarTouchEnd) return;
         const distance = calendarTouchStart - calendarTouchEnd;
         if (Math.abs(distance) > minSwipeDistance) {
-          if (distance > 0) {
-            // Swipe left - next month
-            setCalendarDate(new Date(calYear, calMonth + 1, 1));
+          if (calendarViewMode === 'week') {
+            // Week view navigation
+            if (distance > 0) {
+              // Swipe left - next week
+              const newDate = new Date(calendarDate);
+              newDate.setDate(newDate.getDate() + 7);
+              setCalendarDate(newDate);
+            } else {
+              // Swipe right - previous week
+              const newDate = new Date(calendarDate);
+              newDate.setDate(newDate.getDate() - 7);
+              setCalendarDate(newDate);
+            }
           } else {
-            // Swipe right - previous month
-            setCalendarDate(new Date(calYear, calMonth - 1, 1));
+            // Month view navigation
+            if (distance > 0) {
+              // Swipe left - next month
+              setCalendarDate(new Date(calYear, calMonth + 1, 1));
+            } else {
+              // Swipe right - previous month
+              setCalendarDate(new Date(calYear, calMonth - 1, 1));
+            }
           }
         }
         setCalendarTouchStart(null);
@@ -1067,6 +1101,7 @@
       const [timerTask, setTimerTask] = useState(null);
       const [timerStartTime, setTimerStartTime] = useState(null);
       const [customTimerMins, setCustomTimerMins] = useState(25);
+      const [customTimerSecs, setCustomTimerSecs] = useState(0);
       const [ambientSound, setAmbientSound] = useState(() => load('ambientSound', 'off')); // 'off', 'ambiance', 'music', 'both'
       const [musicTrack, setMusicTrack] = useState(() => load('musicTrack', 'auto')); // 'auto' or specific track id
       const [ambianceTrack, setAmbianceTrack] = useState(() => load('ambianceTrack', 'auto')); // 'auto' or specific track id
@@ -1262,17 +1297,34 @@
       const setupCrossfadeLoop = useCallback((audio, file, targetVolume, type) => {
         if (!audio) return;
         
+        // Fallback: if crossfade fails, just restart with loop
+        const handleEnded = () => {
+          if (!audio) return;
+          // Reset and replay
+          audio.currentTime = 0;
+          audio.volume = targetVolume;
+          audio.play().catch(() => {});
+        };
+        audio.addEventListener('ended', handleEnded);
+        
+        // Also set loop as additional fallback
+        audio.loop = true;
+        
         const handleTimeUpdate = () => {
-          if (!audio || audio.paused) return;
+          if (!audio || audio.paused || isNaN(audio.duration)) return;
           
           const timeLeft = audio.duration - audio.currentTime;
           const nextRef = type === 'music' ? musicNextRef : ambianceNextRef;
           
-          // Start crossfade when approaching end
-          if (timeLeft <= CROSSFADE_BUFFER && timeLeft > CROSSFADE_BUFFER - 0.5 && !nextRef.current) {
+          // Start crossfade when approaching end (only for tracks longer than CROSSFADE_BUFFER * 2)
+          if (audio.duration > CROSSFADE_BUFFER * 2 && timeLeft <= CROSSFADE_BUFFER && timeLeft > CROSSFADE_BUFFER - 0.5 && !nextRef.current) {
+            // Disable loop for crossfade transition
+            audio.loop = false;
+            
             // Create next audio for seamless loop
             const nextAudio = new Audio(file);
             nextAudio.volume = 0;
+            nextAudio.loop = true; // Enable loop on the next audio
             nextAudio.play().catch(() => {});
             nextRef.current = nextAudio;
             
@@ -1280,6 +1332,7 @@
             fadeIntervalsRef.current[type] = fadeAudio(audio, targetVolume, 0, FADE_DURATION, () => {
               audio.pause();
               audio.currentTime = 0;
+              audio.removeEventListener('ended', handleEnded);
             });
             
             // Fade in next
@@ -1301,7 +1354,10 @@
         audio.addEventListener('timeupdate', handleTimeUpdate);
         audio.dataset.hasCrossfade = 'true';
         
-        return () => audio.removeEventListener('timeupdate', handleTimeUpdate);
+        return () => {
+          audio.removeEventListener('timeupdate', handleTimeUpdate);
+          audio.removeEventListener('ended', handleEnded);
+        };
       }, [fadeAudio]);
       
       // Start audio with fade in
@@ -1520,6 +1576,18 @@
             const newChallenge = monthlyChallengeDefs[Math.floor(Math.random() * monthlyChallengeDefs.length)];
             setChallenges(c => ({ ...c, monthly: { id: newChallenge.id, progress: 0, month: monthKey } }));
           }
+        }
+        
+        // Always ensure challenges are initialized (fixes null challenge bug)
+        const weekNum = getWeekNumber();
+        const monthKey = getMonthKey();
+        if (!challenges.weekly.id || challenges.weekly.week !== weekNum) {
+          const newChallenge = weeklyChallengeDefs[Math.floor(Math.random() * weeklyChallengeDefs.length)];
+          setChallenges(c => ({ ...c, weekly: { id: newChallenge.id, progress: c.weekly.week === weekNum ? c.weekly.progress : 0, week: weekNum } }));
+        }
+        if (!challenges.monthly.id || challenges.monthly.month !== monthKey) {
+          const newChallenge = monthlyChallengeDefs[Math.floor(Math.random() * monthlyChallengeDefs.length)];
+          setChallenges(c => ({ ...c, monthly: { id: newChallenge.id, progress: c.monthly.month === monthKey ? c.monthly.progress : 0, month: monthKey } }));
         }
       }, []);
       
@@ -2071,25 +2139,43 @@
       return (
         <div style={{ minHeight: '100vh', background: theme.bg, transition: 'background 0.4s', filter: highContrast ? 'contrast(1.2)' : 'none', position: 'relative', overflow: 'hidden' }}>
           
-          {/* Paper Grain Texture Layer */}
+          {/* Paper Grain Texture Layer - Noise filter that adds texture without darkening */}
           {paperTexture && (
-            <div style={{
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              backgroundImage: `url(${PAPER_TEXTURE})`,
-              backgroundSize: '400px 400px',
-              backgroundRepeat: 'repeat',
-              opacity: theme.isDark ? 0.03 : 0.08,
-              mixBlendMode: 'multiply',
-              pointerEvents: 'none',
-              zIndex: 0
-            }} />
+            <>
+              {/* Primary noise layer - visible grain texture */}
+              <div style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
+                backgroundSize: '180px 180px',
+                backgroundRepeat: 'repeat',
+                opacity: theme.isDark ? 0.5 : 0.3,
+                mixBlendMode: 'overlay',
+                pointerEvents: 'none',
+                zIndex: 1
+              }} />
+              {/* Fine detail layer for paper fiber effect */}
+              <div style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='turbulence' baseFrequency='1.5' numOctaves='2' seed='42' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23grain)'/%3E%3C/svg%3E")`,
+                backgroundSize: '80px 80px',
+                backgroundRepeat: 'repeat',
+                opacity: theme.isDark ? 0.35 : 0.25,
+                mixBlendMode: 'overlay',
+                pointerEvents: 'none',
+                zIndex: 1
+              }} />
+            </>
           )}
           
-          {/* Coffee Ring Overlays with Multiply Blend Mode */}
+          {/* Coffee Ring Overlays with Theme-aware Blend Mode */}
           {paperTexture && (
             <>
               {/* Ring 1 - top left */}
@@ -2102,11 +2188,12 @@
                 backgroundImage: `url(${COFFEE_RING})`,
                 backgroundSize: 'contain',
                 backgroundRepeat: 'no-repeat',
-                opacity: theme.isDark ? 0.08 : 0.15,
-                mixBlendMode: 'multiply',
+                opacity: theme.isDark ? 0.4 : 0.15,
+                mixBlendMode: theme.isDark ? 'screen' : 'multiply',
                 pointerEvents: 'none',
                 zIndex: 0,
-                transform: 'rotate(-15deg)'
+                transform: 'rotate(-15deg)',
+                filter: theme.isDark ? 'invert(1) sepia(0.5) saturate(0.5) brightness(0.8)' : 'none'
               }} />
               {/* Ring 2 - bottom right */}
               <div style={{
@@ -2118,11 +2205,12 @@
                 backgroundImage: `url(${COFFEE_RING})`,
                 backgroundSize: 'contain',
                 backgroundRepeat: 'no-repeat',
-                opacity: theme.isDark ? 0.06 : 0.12,
-                mixBlendMode: 'multiply',
+                opacity: theme.isDark ? 0.35 : 0.12,
+                mixBlendMode: theme.isDark ? 'screen' : 'multiply',
                 pointerEvents: 'none',
                 zIndex: 0,
-                transform: 'rotate(45deg)'
+                transform: 'rotate(45deg)',
+                filter: theme.isDark ? 'invert(1) sepia(0.5) saturate(0.5) brightness(0.8)' : 'none'
               }} />
               {/* Ring 3 - middle bottom overlapping */}
               <div style={{
@@ -2134,11 +2222,12 @@
                 backgroundImage: `url(${COFFEE_RING})`,
                 backgroundSize: 'contain',
                 backgroundRepeat: 'no-repeat',
-                opacity: theme.isDark ? 0.05 : 0.10,
-                mixBlendMode: 'multiply',
+                opacity: theme.isDark ? 0.30 : 0.10,
+                mixBlendMode: theme.isDark ? 'screen' : 'multiply',
                 pointerEvents: 'none',
                 zIndex: 0,
-                transform: 'rotate(120deg)'
+                transform: 'rotate(120deg)',
+                filter: theme.isDark ? 'invert(1) sepia(0.5) saturate(0.5) brightness(0.8)' : 'none'
               }} />
             </>
           )}
@@ -2621,7 +2710,56 @@
                       <button key={p.mins} onClick={() => { setTimerSeconds(p.mins * 60); setTimerRunning(false); }} style={{ padding: '6px 10px', borderRadius: '8px', border: timerSeconds === p.mins * 60 ? `2px solid ${theme.accent}` : `1px solid ${theme.cardBorder}`, background: timerSeconds === p.mins * 60 ? theme.accentLight : 'transparent', color: timerSeconds === p.mins * 60 ? theme.accent : theme.textSecondary, fontFamily: "'Lora',serif", fontSize: '0.7rem', cursor: 'pointer' }}>{p.label}</button>
                     ))}
                   </div>
-                  <button onClick={() => setShowCustomTimer(true)} className="bt" style={{ background: 'none', border: 'none', color: theme.accent, fontSize: '0.8rem', cursor: 'pointer' }}>⚙️ More options</button>
+                  
+                  {/* Inline Custom Timer Input */}
+                  <div style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center', 
+                    gap: '8px', 
+                    padding: '12px', 
+                    background: theme.cardBg, 
+                    borderRadius: '12px', 
+                    border: `1px solid ${theme.cardBorder}`,
+                    marginBottom: '12px'
+                  }}>
+                    <span className="bt" style={{ fontSize: '0.75rem', color: theme.textSecondary }}>⏱️ Custom:</span>
+                    <input 
+                      type="number" 
+                      value={customTimerMins} 
+                      onChange={e => setCustomTimerMins(Math.max(0, Math.min(180, parseInt(e.target.value) || 0)))} 
+                      style={{ ...s.input, width: '50px', textAlign: 'center', fontSize: '1rem', padding: '6px', fontWeight: 600 }} 
+                      min="0" 
+                      max="180"
+                      aria-label="Minutes"
+                    />
+                    <span className="bt" style={{ fontSize: '0.8rem', color: theme.textSecondary }}>m</span>
+                    <input 
+                      type="number" 
+                      value={customTimerSecs} 
+                      onChange={e => setCustomTimerSecs(Math.max(0, Math.min(59, parseInt(e.target.value) || 0)))} 
+                      style={{ ...s.input, width: '50px', textAlign: 'center', fontSize: '1rem', padding: '6px', fontWeight: 600 }} 
+                      min="0" 
+                      max="59"
+                      aria-label="Seconds"
+                    />
+                    <span className="bt" style={{ fontSize: '0.8rem', color: theme.textSecondary }}>s</span>
+                    <button 
+                      onClick={() => { 
+                        const totalSecs = (customTimerMins * 60) + customTimerSecs;
+                        if (totalSecs > 0) {
+                          setTimerSeconds(totalSecs); 
+                          setTimerRunning(false); 
+                        }
+                      }} 
+                      style={{ ...s.btn, padding: '6px 12px', fontSize: '0.75rem' }}
+                      disabled={(customTimerMins * 60) + customTimerSecs === 0}
+                    >
+                      Set
+                    </button>
+                  </div>
+                  
+                  <button onClick={() => setShowCustomTimer(true)} className="bt" style={{ background: 'none', border: 'none', color: theme.accent, fontSize: '0.75rem', cursor: 'pointer' }}>📋 More presets</button>
                 </div>
 
                 {soundEnabled && ambientSound !== 'off' && (
@@ -2829,10 +2967,33 @@
                   
                   {/* Header with navigation */}
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', position: 'relative' }}>
-                    <button onClick={() => setCalendarDate(new Date(calYear, calMonth - 1, 1))} style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', fontSize: '1rem', cursor: 'pointer', padding: '8px 12px', borderRadius: '8px' }}>‹</button>
+                    <button onClick={() => {
+                      if (calendarViewMode === 'week') {
+                        // Navigate to previous week
+                        const newDate = new Date(calendarDate);
+                        newDate.setDate(newDate.getDate() - 7);
+                        setCalendarDate(newDate);
+                      } else {
+                        // Navigate to previous month
+                        setCalendarDate(new Date(calYear, calMonth - 1, 1));
+                      }
+                    }} style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', fontSize: '1rem', cursor: 'pointer', padding: '8px 12px', borderRadius: '8px' }}>‹</button>
                     <div style={{ textAlign: 'center' }}>
                       <h2 style={{ fontFamily: "'Caveat', cursive", fontSize: '1.5rem', color: '#fff', margin: 0 }}>
-                        {tc.icon} {calendarDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                        {tc.icon} {calendarViewMode === 'week' 
+                          ? (() => {
+                              const weekStart = new Date(calendarDate);
+                              weekStart.setDate(calendarDate.getDate() - calendarDate.getDay());
+                              const weekEnd = new Date(weekStart);
+                              weekEnd.setDate(weekStart.getDate() + 6);
+                              if (weekStart.getMonth() === weekEnd.getMonth()) {
+                                return `${weekStart.toLocaleDateString('en-US', { month: 'short' })} ${weekStart.getDate()}-${weekEnd.getDate()}, ${weekStart.getFullYear()}`;
+                              } else {
+                                return `${weekStart.toLocaleDateString('en-US', { month: 'short' })} ${weekStart.getDate()} - ${weekEnd.toLocaleDateString('en-US', { month: 'short' })} ${weekEnd.getDate()}`;
+                              }
+                            })()
+                          : calendarDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+                        }
                       </h2>
                       <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', marginTop: '4px' }}>
                         <button 
@@ -2846,13 +3007,23 @@
                           style={{ background: calendarViewMode === 'week' ? theme.accent : 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', fontSize: '0.65rem', padding: '3px 8px', borderRadius: '10px', cursor: 'pointer' }}
                         >Week</button>
                         <button 
-                          onClick={() => setCalendarDate(new Date())} 
+                          onClick={() => { setCalendarDate(new Date()); setCalendarViewMode('week'); }} 
                           className="bt"
-                          style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', fontSize: '0.65rem', padding: '3px 8px', borderRadius: '10px', cursor: 'pointer' }}
+                          style={{ background: theme.accent, border: 'none', color: '#fff', fontSize: '0.65rem', padding: '3px 8px', borderRadius: '10px', cursor: 'pointer' }}
                         >Today</button>
                       </div>
                     </div>
-                    <button onClick={() => setCalendarDate(new Date(calYear, calMonth + 1, 1))} style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', fontSize: '1rem', cursor: 'pointer', padding: '8px 12px', borderRadius: '8px' }}>›</button>
+                    <button onClick={() => {
+                      if (calendarViewMode === 'week') {
+                        // Navigate to next week
+                        const newDate = new Date(calendarDate);
+                        newDate.setDate(newDate.getDate() + 7);
+                        setCalendarDate(newDate);
+                      } else {
+                        // Navigate to next month
+                        setCalendarDate(new Date(calYear, calMonth + 1, 1));
+                      }
+                    }} style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', fontSize: '1rem', cursor: 'pointer', padding: '8px 12px', borderRadius: '8px' }}>›</button>
                   </div>
 
                   {/* Day headers */}
@@ -2866,9 +3037,10 @@
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', gap: '4px' }}>
                     {(calendarViewMode === 'week' 
                       ? (() => {
-                          // Get current week's days
-                          const weekStart = new Date(today);
-                          weekStart.setDate(today.getDate() - today.getDay());
+                          // Get week's days based on calendarDate (respects Today button)
+                          const baseDate = new Date(calendarDate);
+                          const weekStart = new Date(baseDate);
+                          weekStart.setDate(baseDate.getDate() - baseDate.getDay());
                           return [...Array(7)].map((_, i) => {
                             const d = new Date(weekStart);
                             d.setDate(weekStart.getDate() + i);
@@ -4678,12 +4850,12 @@
                   ].map(preset => (
                     <button 
                       key={preset.label}
-                      onClick={() => preset.mins && setCustomTimerMins(preset.mins)}
+                      onClick={() => { if (preset.mins) { setCustomTimerMins(preset.mins); setCustomTimerSecs(0); } }}
                       style={{ 
                         padding: '10px 6px', 
                         borderRadius: '10px', 
-                        border: customTimerMins === preset.mins ? `2px solid ${theme.accent}` : `1px solid ${theme.cardBorder}`,
-                        background: customTimerMins === preset.mins ? theme.accentLight : theme.progressBg,
+                        border: (customTimerMins === preset.mins && customTimerSecs === 0) ? `2px solid ${theme.accent}` : `1px solid ${theme.cardBorder}`,
+                        background: (customTimerMins === preset.mins && customTimerSecs === 0) ? theme.accentLight : theme.progressBg,
                         cursor: 'pointer',
                         textAlign: 'center'
                       }}
@@ -4695,17 +4867,43 @@
                   ))}
                 </div>
                 
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', marginBottom: '20px' }}>
-                  <button onClick={() => setCustomTimerMins(Math.max(1, customTimerMins - 5))} style={{ ...s.btnSecondary, padding: '10px 16px', fontSize: '1.2rem' }}>-</button>
-                  <div>
-                    <input type="number" value={customTimerMins} onChange={e => setCustomTimerMins(Math.max(1, Math.min(180, parseInt(e.target.value) || 1)))} style={{ ...s.input, width: '80px', textAlign: 'center', fontSize: '1.5rem', fontWeight: 600 }} min="1" max="180" />
-                    <p className="bt" style={{ fontSize: '0.75rem', color: theme.textSecondary, marginTop: '4px' }}>minutes</p>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '20px' }}>
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <button onClick={() => setCustomTimerMins(Math.max(0, customTimerMins - 1))} style={{ ...s.btnSecondary, padding: '8px 12px', fontSize: '1rem' }}>-</button>
+                      <input type="number" value={customTimerMins} onChange={e => setCustomTimerMins(Math.max(0, Math.min(180, parseInt(e.target.value) || 0)))} style={{ ...s.input, width: '60px', textAlign: 'center', fontSize: '1.3rem', fontWeight: 600 }} min="0" max="180" />
+                      <button onClick={() => setCustomTimerMins(Math.min(180, customTimerMins + 1))} style={{ ...s.btnSecondary, padding: '8px 12px', fontSize: '1rem' }}>+</button>
+                    </div>
+                    <p className="bt" style={{ fontSize: '0.7rem', color: theme.textSecondary, marginTop: '4px' }}>minutes</p>
                   </div>
-                  <button onClick={() => setCustomTimerMins(Math.min(180, customTimerMins + 5))} style={{ ...s.btnSecondary, padding: '10px 16px', fontSize: '1.2rem' }}>+</button>
+                  <span style={{ fontSize: '1.5rem', color: theme.text, fontWeight: 300 }}>:</span>
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <button onClick={() => setCustomTimerSecs(Math.max(0, customTimerSecs - 5))} style={{ ...s.btnSecondary, padding: '8px 12px', fontSize: '1rem' }}>-</button>
+                      <input type="number" value={customTimerSecs} onChange={e => setCustomTimerSecs(Math.max(0, Math.min(59, parseInt(e.target.value) || 0)))} style={{ ...s.input, width: '60px', textAlign: 'center', fontSize: '1.3rem', fontWeight: 600 }} min="0" max="59" />
+                      <button onClick={() => setCustomTimerSecs(Math.min(59, customTimerSecs + 5))} style={{ ...s.btnSecondary, padding: '8px 12px', fontSize: '1rem' }}>+</button>
+                    </div>
+                    <p className="bt" style={{ fontSize: '0.7rem', color: theme.textSecondary, marginTop: '4px' }}>seconds</p>
+                  </div>
                 </div>
+                <p className="bt" style={{ fontSize: '0.75rem', color: theme.textMuted, marginBottom: '16px' }}>
+                  Total: {customTimerMins > 0 ? `${customTimerMins}m ` : ''}{customTimerSecs > 0 ? `${customTimerSecs}s` : customTimerMins === 0 ? '0s' : ''}
+                </p>
                 <div style={{ display: 'flex', gap: '10px' }}>
                   <button onClick={() => setShowCustomTimer(false)} style={{ ...s.btnSecondary, flex: 1 }}>Cancel</button>
-                  <button onClick={() => { setTimerSeconds(customTimerMins * 60); setShowCustomTimer(false); }} style={{ ...s.btn, flex: 1 }}>Start Timer</button>
+                  <button 
+                    onClick={() => { 
+                      const totalSecs = (customTimerMins * 60) + customTimerSecs;
+                      if (totalSecs > 0) {
+                        setTimerSeconds(totalSecs); 
+                        setShowCustomTimer(false); 
+                      }
+                    }} 
+                    style={{ ...s.btn, flex: 1 }}
+                    disabled={(customTimerMins * 60) + customTimerSecs === 0}
+                  >
+                    Set Timer
+                  </button>
                 </div>
               </div>
             </div>
