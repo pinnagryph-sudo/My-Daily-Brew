@@ -1212,37 +1212,64 @@
 
       // One-time streak recalculation migration (v8.1 fix)
       useEffect(() => {
-        const migrationKey = 'streakMigrationV81';
+        const migrationKey = 'streakMigrationV81d';
         if (load(migrationKey, false)) return; // Already ran
         
-        // Collect all dates with activity from habits, moods, and journal
+        // Read directly from localStorage to ensure we get this user's actual data
+        const savedMoods = load('moods', {});
+        const savedJournal = load('journal', {});
+        const savedHabits = load('habits', []);
+        const savedHabitHistory = load('habitHistory', {});
+        const savedTasks = load('tasks', []);
+        
+        // Collect dates with ANY real activity
         const activeDates = new Set();
         
-        // From habit history (each habit has history object)
-        habits.forEach(h => {
-          if (h.history) Object.keys(h.history).forEach(d => activeDates.add(d));
-        });
-        Object.keys(habitHistory).forEach(habitId => {
-          Object.keys(habitHistory[habitId] || {}).forEach(d => activeDates.add(d));
-        });
-        
-        // From moods
-        Object.keys(moods).forEach(d => activeDates.add(d));
-        
-        // From journal
-        Object.keys(journal).forEach(d => {
-          const j = journal[d];
-          if (j && (j.gratitude || j.reflection || j.tomorrow || j.promptResponse)) {
-            activeDates.add(d);
+        // From moods - must have an actual value
+        Object.entries(savedMoods).forEach(([dateKey, mood]) => {
+          if (mood && typeof mood.value === 'number') {
+            activeDates.add(dateKey);
           }
         });
         
-        if (activeDates.size === 0) {
-          store(migrationKey, true);
-          return;
-        }
+        // From journal - must have actual written content
+        Object.entries(savedJournal).forEach(([dateKey, entry]) => {
+          if (entry && (
+            (entry.gratitude && entry.gratitude.trim()) || 
+            (entry.reflection && entry.reflection.trim()) || 
+            (entry.tomorrow && entry.tomorrow.trim()) || 
+            (entry.promptResponse && entry.promptResponse.trim())
+          )) {
+            activeDates.add(dateKey);
+          }
+        });
         
-        // Calculate actual consecutive streak from today going backwards
+        // From habits - check history on each habit
+        savedHabits.forEach(habit => {
+          if (habit.history) {
+            Object.entries(habit.history).forEach(([dateKey, completed]) => {
+              if (completed === true) activeDates.add(dateKey);
+            });
+          }
+        });
+        
+        // From habitHistory object
+        Object.values(savedHabitHistory).forEach(history => {
+          if (history && typeof history === 'object') {
+            Object.entries(history).forEach(([dateKey, completed]) => {
+              if (completed === true) activeDates.add(dateKey);
+            });
+          }
+        });
+        
+        // From tasks - check if done on specific dates (via lastReset)
+        savedTasks.forEach(task => {
+          if (task.done && task.lastReset) {
+            activeDates.add(task.lastReset);
+          }
+        });
+        
+        // Calculate consecutive streak from today going backwards
         let calculatedStreak = 0;
         const checkDate = new Date();
         
@@ -1251,22 +1278,21 @@
           calculatedStreak = 1;
           checkDate.setDate(checkDate.getDate() - 1);
           
-          // Count backwards
+          // Count backwards - must be consecutive (no gaps)
           while (activeDates.has(getDateKey(checkDate))) {
             calculatedStreak++;
             checkDate.setDate(checkDate.getDate() - 1);
           }
         }
         
-        // Update if calculated streak is higher than stored
-        if (calculatedStreak > gameStats.appStreak) {
-          setGameStats(s => ({
-            ...s,
-            appStreak: calculatedStreak,
-            maxStreak: Math.max(s.maxStreak, calculatedStreak)
-          }));
-          console.log(`Streak recalculated: ${gameStats.appStreak} → ${calculatedStreak}`);
-        }
+        // Update streak to calculated value (fix both over and under counts)
+        setGameStats(s => ({
+          ...s,
+          appStreak: calculatedStreak,
+          maxStreak: Math.max(calculatedStreak, s.maxStreak)
+        }));
+        
+        console.log('Streak recalculated from activity data:', calculatedStreak, 'Active dates found:', [...activeDates].sort());
         
         store(migrationKey, true);
       }, []); // Run once on mount
