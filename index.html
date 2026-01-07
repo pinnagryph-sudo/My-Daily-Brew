@@ -34,7 +34,7 @@
   <div class="loading-screen" id="loadingScreen">
     <div class="loading-icon">☕</div>
     <div class="loading-text">Brewing something special...</div>
-    <div class="loading-subtext">v8.0 • Visual Theme Enhancements</div>
+    <div class="loading-subtext">v8.1 • Streak Fix & Today View</div>
   </div>
 
   <script type="text/babel">
@@ -1210,6 +1210,67 @@
       useEffect(() => { store('weather', weather); }, [weather]);
       useEffect(() => { document.getElementById('themeColor').content = theme.themeColor; }, [theme]);
 
+      // One-time streak recalculation migration (v8.1 fix)
+      useEffect(() => {
+        const migrationKey = 'streakMigrationV81';
+        if (load(migrationKey, false)) return; // Already ran
+        
+        // Collect all dates with activity from habits, moods, and journal
+        const activeDates = new Set();
+        
+        // From habit history (each habit has history object)
+        habits.forEach(h => {
+          if (h.history) Object.keys(h.history).forEach(d => activeDates.add(d));
+        });
+        Object.keys(habitHistory).forEach(habitId => {
+          Object.keys(habitHistory[habitId] || {}).forEach(d => activeDates.add(d));
+        });
+        
+        // From moods
+        Object.keys(moods).forEach(d => activeDates.add(d));
+        
+        // From journal
+        Object.keys(journal).forEach(d => {
+          const j = journal[d];
+          if (j && (j.gratitude || j.reflection || j.tomorrow || j.promptResponse)) {
+            activeDates.add(d);
+          }
+        });
+        
+        if (activeDates.size === 0) {
+          store(migrationKey, true);
+          return;
+        }
+        
+        // Calculate actual consecutive streak from today going backwards
+        let calculatedStreak = 0;
+        const checkDate = new Date();
+        
+        // Check today first
+        if (activeDates.has(getDateKey(checkDate))) {
+          calculatedStreak = 1;
+          checkDate.setDate(checkDate.getDate() - 1);
+          
+          // Count backwards
+          while (activeDates.has(getDateKey(checkDate))) {
+            calculatedStreak++;
+            checkDate.setDate(checkDate.getDate() - 1);
+          }
+        }
+        
+        // Update if calculated streak is higher than stored
+        if (calculatedStreak > gameStats.appStreak) {
+          setGameStats(s => ({
+            ...s,
+            appStreak: calculatedStreak,
+            maxStreak: Math.max(s.maxStreak, calculatedStreak)
+          }));
+          console.log(`Streak recalculated: ${gameStats.appStreak} → ${calculatedStreak}`);
+        }
+        
+        store(migrationKey, true);
+      }, []); // Run once on mount
+
       // Weather fetching
       useEffect(() => {
         const fetchWeather = async () => {
@@ -1543,7 +1604,11 @@
           
           const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
           const isConsecutive = lastDate === getDateKey(yesterday);
+          
+          // Track if freeze was just used this session
+          let freezeUsedNow = false;
           if (!isConsecutive && lastDate && gameStats.freezesAvailable > 0) {
+            freezeUsedNow = true;
             setGameStats(s => ({ ...s, freezesUsed: s.freezesUsed + 1, freezesAvailable: s.freezesAvailable - 1 }));
             setShowFreezeAnimation(true);
             setTimeout(() => setShowFreezeAnimation(false), 3000);
@@ -1551,8 +1616,8 @@
           }
           if (gameStats.weeklyFreeze !== weekNum) setGameStats(s => ({ ...s, freezesAvailable: 1, weeklyFreeze: weekNum }));
           
-          // Calculate new streak and check milestones
-          const newAppStreak = isConsecutive || (gameStats.freezesUsed > 0) ? gameStats.appStreak + 1 : 1;
+          // Calculate new streak - use freezeUsedNow flag instead of stale state
+          const newAppStreak = isConsecutive || freezeUsedNow ? gameStats.appStreak + 1 : 1;
           const streakMilestones = [
             { days: 7, msg: '🔥 1 Week Streak! You\'re on fire!', xp: 50 },
             { days: 14, msg: '⚡ 2 Week Streak! Unstoppable!', xp: 75 },
@@ -1565,7 +1630,7 @@
           if (milestone) {
             setTimeout(() => { triggerCelebration(milestone.msg); addXP(milestone.xp); }, 1000);
           }
-          setGameStats(s => ({ ...s, lastActiveDate: todayKey, appStreak: newAppStreak, perfectDayToday: false }));
+          setGameStats(s => ({ ...s, lastActiveDate: todayKey, appStreak: newAppStreak, maxStreak: Math.max(s.maxStreak, newAppStreak), perfectDayToday: false }));
           
           // Weekly challenge reset (new week started)
           setChallenges(c => {
