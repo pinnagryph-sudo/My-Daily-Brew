@@ -1524,6 +1524,9 @@
       // Daily reset & challenges
       useEffect(() => {
         const lastDate = gameStats.lastActiveDate;
+        const weekNum = getWeekNumber();
+        const monthKey = getMonthKey();
+        
         if (lastDate !== todayKey) {
           setHabits(h => h.map(habit => ({ ...habit, completed: false })));
           
@@ -1546,7 +1549,6 @@
             setTimeout(() => setShowFreezeAnimation(false), 3000);
             triggerCelebration(messages.freeze);
           }
-          const weekNum = getWeekNumber();
           if (gameStats.weeklyFreeze !== weekNum) setGameStats(s => ({ ...s, freezesAvailable: 1, weeklyFreeze: weekNum }));
           
           // Calculate new streak and check milestones
@@ -1565,29 +1567,19 @@
           }
           setGameStats(s => ({ ...s, lastActiveDate: todayKey, appStreak: newAppStreak, perfectDayToday: false }));
           
-          // Weekly challenge reset
-          if (challenges.weekly.week !== weekNum) {
-            const newChallenge = weeklyChallengeDefs[Math.floor(Math.random() * weeklyChallengeDefs.length)];
-            setChallenges(c => ({ ...c, weekly: { id: newChallenge.id, progress: 0, week: weekNum } }));
-          }
-          // Monthly challenge reset
-          const monthKey = getMonthKey();
-          if (challenges.monthly.month !== monthKey) {
-            const newChallenge = monthlyChallengeDefs[Math.floor(Math.random() * monthlyChallengeDefs.length)];
-            setChallenges(c => ({ ...c, monthly: { id: newChallenge.id, progress: 0, month: monthKey } }));
-          }
-        }
-        
-        // Always ensure challenges are initialized (fixes null challenge bug)
-        const weekNum = getWeekNumber();
-        const monthKey = getMonthKey();
-        if (!challenges.weekly.id || challenges.weekly.week !== weekNum) {
-          const newChallenge = weeklyChallengeDefs[Math.floor(Math.random() * weeklyChallengeDefs.length)];
-          setChallenges(c => ({ ...c, weekly: { id: newChallenge.id, progress: c.weekly.week === weekNum ? c.weekly.progress : 0, week: weekNum } }));
-        }
-        if (!challenges.monthly.id || challenges.monthly.month !== monthKey) {
-          const newChallenge = monthlyChallengeDefs[Math.floor(Math.random() * monthlyChallengeDefs.length)];
-          setChallenges(c => ({ ...c, monthly: { id: newChallenge.id, progress: c.monthly.month === monthKey ? c.monthly.progress : 0, month: monthKey } }));
+          // Weekly challenge reset (new week started)
+          setChallenges(c => {
+            let updated = { ...c };
+            if (c.weekly.week !== weekNum) {
+              const newChallenge = weeklyChallengeDefs[Math.floor(Math.random() * weeklyChallengeDefs.length)];
+              updated.weekly = { id: newChallenge.id, progress: 0, week: weekNum };
+            }
+            if (c.monthly.month !== monthKey) {
+              const newChallenge = monthlyChallengeDefs[Math.floor(Math.random() * monthlyChallengeDefs.length)];
+              updated.monthly = { id: newChallenge.id, progress: 0, month: monthKey };
+            }
+            return updated;
+          });
         }
       }, []);
       
@@ -2188,12 +2180,12 @@
                 backgroundImage: `url(${COFFEE_RING})`,
                 backgroundSize: 'contain',
                 backgroundRepeat: 'no-repeat',
-                opacity: theme.isDark ? 0.4 : 0.15,
-                mixBlendMode: theme.isDark ? 'screen' : 'multiply',
+                opacity: theme.isDark ? 0.35 : 0.15,
+                mixBlendMode: theme.isDark ? 'color-dodge' : 'multiply',
                 pointerEvents: 'none',
                 zIndex: 0,
                 transform: 'rotate(-15deg)',
-                filter: theme.isDark ? 'invert(1) sepia(0.5) saturate(0.5) brightness(0.8)' : 'none'
+                filter: theme.isDark ? 'sepia(1) saturate(0.6) brightness(0.4) hue-rotate(-10deg)' : 'none'
               }} />
               {/* Ring 2 - bottom right */}
               <div style={{
@@ -2205,12 +2197,12 @@
                 backgroundImage: `url(${COFFEE_RING})`,
                 backgroundSize: 'contain',
                 backgroundRepeat: 'no-repeat',
-                opacity: theme.isDark ? 0.35 : 0.12,
-                mixBlendMode: theme.isDark ? 'screen' : 'multiply',
+                opacity: theme.isDark ? 0.30 : 0.12,
+                mixBlendMode: theme.isDark ? 'color-dodge' : 'multiply',
                 pointerEvents: 'none',
                 zIndex: 0,
                 transform: 'rotate(45deg)',
-                filter: theme.isDark ? 'invert(1) sepia(0.5) saturate(0.5) brightness(0.8)' : 'none'
+                filter: theme.isDark ? 'sepia(1) saturate(0.6) brightness(0.4) hue-rotate(-10deg)' : 'none'
               }} />
               {/* Ring 3 - middle bottom overlapping */}
               <div style={{
@@ -2222,12 +2214,12 @@
                 backgroundImage: `url(${COFFEE_RING})`,
                 backgroundSize: 'contain',
                 backgroundRepeat: 'no-repeat',
-                opacity: theme.isDark ? 0.30 : 0.10,
-                mixBlendMode: theme.isDark ? 'screen' : 'multiply',
+                opacity: theme.isDark ? 0.25 : 0.10,
+                mixBlendMode: theme.isDark ? 'color-dodge' : 'multiply',
                 pointerEvents: 'none',
                 zIndex: 0,
                 transform: 'rotate(120deg)',
-                filter: theme.isDark ? 'invert(1) sepia(0.5) saturate(0.5) brightness(0.8)' : 'none'
+                filter: theme.isDark ? 'sepia(1) saturate(0.6) brightness(0.4) hue-rotate(-10deg)' : 'none'
               }} />
             </>
           )}
@@ -2663,34 +2655,64 @@
                 <div style={{ ...s.card, textAlign: 'center', padding: '24px 16px' }}>
                   <h2 className="hw" style={{ fontSize: '1.4rem', color: theme.text, marginBottom: '4px' }}>⏱️ Focus Time</h2>
                   <p className="bt" style={{ fontSize: '0.75rem', color: theme.textSecondary, marginBottom: '16px' }}>{timerTask || messages.timerFocus}</p>
-                  <div style={{ fontSize: '3rem', fontWeight: 300, color: theme.text, fontFamily: "'Lora',serif", marginBottom: '16px' }} aria-live="polite">{formatTimer(timerSeconds)}</div>
                   
-                  {/* Sound Settings Button */}
-                  <div style={{ marginBottom: '16px', display: 'flex', gap: '8px', justifyContent: 'center', alignItems: 'center' }}>
-                    <button onClick={() => setShowSoundMenu(true)} style={{ ...s.btnSecondary, display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 16px' }}>
-                      <span style={{ fontSize: '1.1rem' }}>{ambientSound === 'off' ? '🔇' : ambientSound === 'ambiance' ? '🌧️' : ambientSound === 'music' ? '🎹' : '✨'}</span>
-                      <span className="bt" style={{ fontSize: '0.8rem' }}>
-                        {ambientSound === 'off' ? 'Sound Off' : 
-                         ambientSound === 'ambiance' ? (ambianceTracks[getActiveAmbianceTrack()]?.name || 'Ambiance') :
-                         ambientSound === 'music' ? (musicTracks[getActiveMusicTrack()]?.name || 'Music') :
-                         'Full Soundscape'}
-                      </span>
-                      <span style={{ fontSize: '0.7rem', opacity: 0.7 }}>▼</span>
-                    </button>
-                    {ambientSound !== 'off' && (
-                      <button 
-                        onClick={() => setSoundEnabled(!soundEnabled)} 
-                        style={{ 
-                          ...s.btnSecondary, 
-                          padding: '10px 14px',
-                          background: soundEnabled ? theme.accentGradient : theme.progressBg,
-                          color: soundEnabled ? (theme.isDark ? '#1a1a1a' : '#fff') : theme.text
+                  {/* Editable Timer Display */}
+                  {!timerRunning ? (
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', marginBottom: '16px' }}>
+                      <input
+                        type="number"
+                        value={Math.floor(timerSeconds / 60)}
+                        onChange={e => {
+                          const mins = Math.max(0, Math.min(180, parseInt(e.target.value) || 0));
+                          setTimerSeconds(mins * 60 + (timerSeconds % 60));
                         }}
-                      >
-                        {soundEnabled ? '⏸' : '▶'}
-                      </button>
-                    )}
-                  </div>
+                        style={{
+                          width: '80px',
+                          fontSize: '3rem',
+                          fontWeight: 300,
+                          color: theme.text,
+                          fontFamily: "'Lora',serif",
+                          background: 'transparent',
+                          border: `2px dashed ${theme.cardBorder}`,
+                          borderRadius: '12px',
+                          textAlign: 'center',
+                          outline: 'none',
+                          padding: '8px 4px'
+                        }}
+                        min="0"
+                        max="180"
+                        aria-label="Minutes"
+                      />
+                      <span style={{ fontSize: '3rem', fontWeight: 300, color: theme.text, fontFamily: "'Lora',serif" }}>:</span>
+                      <input
+                        type="number"
+                        value={String(timerSeconds % 60).padStart(2, '0')}
+                        onChange={e => {
+                          const secs = Math.max(0, Math.min(59, parseInt(e.target.value) || 0));
+                          setTimerSeconds(Math.floor(timerSeconds / 60) * 60 + secs);
+                        }}
+                        style={{
+                          width: '80px',
+                          fontSize: '3rem',
+                          fontWeight: 300,
+                          color: theme.text,
+                          fontFamily: "'Lora',serif",
+                          background: 'transparent',
+                          border: `2px dashed ${theme.cardBorder}`,
+                          borderRadius: '12px',
+                          textAlign: 'center',
+                          outline: 'none',
+                          padding: '8px 4px'
+                        }}
+                        min="0"
+                        max="59"
+                        aria-label="Seconds"
+                      />
+                    </div>
+                  ) : (
+                    <div style={{ fontSize: '3rem', fontWeight: 300, color: theme.text, fontFamily: "'Lora',serif", marginBottom: '16px' }} aria-live="polite">{formatTimer(timerSeconds)}</div>
+                  )}
+                  <p className="bt" style={{ fontSize: '0.65rem', color: theme.textMuted, marginBottom: '12px', marginTop: '-8px' }}>{!timerRunning ? 'Tap numbers to edit' : ''}</p>
 
                   <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', marginBottom: '16px' }}>
                     {!timerRunning ? (
@@ -2699,67 +2721,24 @@
                       <button onClick={() => { setTimerRunning(false); setSoundEnabled(false); }} style={{ ...s.btn, padding: '10px 24px' }}>⏸ Pause</button>
                     )}
                     <button onClick={() => { setTimerRunning(false); setTimerSeconds(25 * 60); setTimerTask(null); setTimerStartTime(null); setSoundEnabled(false); }} style={s.btnSecondary}>↺</button>
-                  </div>
-                  <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '12px' }}>
-                    {[
-                      { mins: 15, label: '⚡ Quick' },
-                      { mins: 25, label: '🍅 Pomodoro' },
-                      { mins: 45, label: '📚 Extended' },
-                      { mins: 90, label: '🧠 Deep Work' }
-                    ].map(p => (
-                      <button key={p.mins} onClick={() => { setTimerSeconds(p.mins * 60); setTimerRunning(false); }} style={{ padding: '6px 10px', borderRadius: '8px', border: timerSeconds === p.mins * 60 ? `2px solid ${theme.accent}` : `1px solid ${theme.cardBorder}`, background: timerSeconds === p.mins * 60 ? theme.accentLight : 'transparent', color: timerSeconds === p.mins * 60 ? theme.accent : theme.textSecondary, fontFamily: "'Lora',serif", fontSize: '0.7rem', cursor: 'pointer' }}>{p.label}</button>
-                    ))}
-                  </div>
-                  
-                  {/* Inline Custom Timer Input */}
-                  <div style={{ 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    justifyContent: 'center', 
-                    gap: '8px', 
-                    padding: '12px', 
-                    background: theme.cardBg, 
-                    borderRadius: '12px', 
-                    border: `1px solid ${theme.cardBorder}`,
-                    marginBottom: '12px'
-                  }}>
-                    <span className="bt" style={{ fontSize: '0.75rem', color: theme.textSecondary }}>⏱️ Custom:</span>
-                    <input 
-                      type="number" 
-                      value={customTimerMins} 
-                      onChange={e => setCustomTimerMins(Math.max(0, Math.min(180, parseInt(e.target.value) || 0)))} 
-                      style={{ ...s.input, width: '50px', textAlign: 'center', fontSize: '1rem', padding: '6px', fontWeight: 600 }} 
-                      min="0" 
-                      max="180"
-                      aria-label="Minutes"
-                    />
-                    <span className="bt" style={{ fontSize: '0.8rem', color: theme.textSecondary }}>m</span>
-                    <input 
-                      type="number" 
-                      value={customTimerSecs} 
-                      onChange={e => setCustomTimerSecs(Math.max(0, Math.min(59, parseInt(e.target.value) || 0)))} 
-                      style={{ ...s.input, width: '50px', textAlign: 'center', fontSize: '1rem', padding: '6px', fontWeight: 600 }} 
-                      min="0" 
-                      max="59"
-                      aria-label="Seconds"
-                    />
-                    <span className="bt" style={{ fontSize: '0.8rem', color: theme.textSecondary }}>s</span>
-                    <button 
-                      onClick={() => { 
-                        const totalSecs = (customTimerMins * 60) + customTimerSecs;
-                        if (totalSecs > 0) {
-                          setTimerSeconds(totalSecs); 
-                          setTimerRunning(false); 
-                        }
-                      }} 
-                      style={{ ...s.btn, padding: '6px 12px', fontSize: '0.75rem' }}
-                      disabled={(customTimerMins * 60) + customTimerSecs === 0}
-                    >
-                      Set
+                    <button onClick={() => setShowSoundMenu(true)} style={{ ...s.btnSecondary, padding: '10px 14px' }}>
+                      {ambientSound === 'off' ? '🔇' : soundEnabled ? '🔊' : '🔈'}
                     </button>
                   </div>
                   
-                  <button onClick={() => setShowCustomTimer(true)} className="bt" style={{ background: 'none', border: 'none', color: theme.accent, fontSize: '0.75rem', cursor: 'pointer' }}>📋 More presets</button>
+                  {/* Preset buttons */}
+                  <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                    {[
+                      { mins: 5, label: '5m' },
+                      { mins: 15, label: '15m' },
+                      { mins: 25, label: '25m' },
+                      { mins: 45, label: '45m' },
+                      { mins: 60, label: '1h' },
+                      { mins: 90, label: '1.5h' }
+                    ].map(p => (
+                      <button key={p.mins} onClick={() => { setTimerSeconds(p.mins * 60); setTimerRunning(false); }} style={{ padding: '6px 12px', borderRadius: '8px', border: timerSeconds === p.mins * 60 ? `2px solid ${theme.accent}` : `1px solid ${theme.cardBorder}`, background: timerSeconds === p.mins * 60 ? theme.accentLight : 'transparent', color: timerSeconds === p.mins * 60 ? theme.accent : theme.textSecondary, fontFamily: "'Lora',serif", fontSize: '0.75rem', cursor: 'pointer' }}>{p.label}</button>
+                    ))}
+                  </div>
                 </div>
 
                 {soundEnabled && ambientSound !== 'off' && (
