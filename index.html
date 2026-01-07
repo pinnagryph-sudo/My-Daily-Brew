@@ -2986,7 +2986,12 @@
                           style={{ background: calendarViewMode === 'week' ? theme.accent : 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', fontSize: '0.65rem', padding: '3px 8px', borderRadius: '10px', cursor: 'pointer' }}
                         >Week</button>
                         <button 
-                          onClick={() => { setCalendarDate(new Date()); setCalendarViewMode('week'); }} 
+                          onClick={() => { 
+                            const todayDate = new Date();
+                            setCalendarDate(todayDate); 
+                            setCalendarViewMode('week');
+                            setSelectedCalendarDay({ date: todayDate, key: getDateKey(todayDate) });
+                          }} 
                           className="bt"
                           style={{ background: theme.accent, border: 'none', color: '#fff', fontSize: '0.65rem', padding: '3px 8px', borderRadius: '10px', cursor: 'pointer' }}
                         >Today</button>
