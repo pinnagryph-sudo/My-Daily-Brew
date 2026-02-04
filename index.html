@@ -34,7 +34,7 @@
   <div class="loading-screen" id="loadingScreen">
     <div class="loading-icon">☕</div>
     <div class="loading-text">Brewing something special...</div>
-    <div class="loading-subtext">v8.1 • Streak Fix & Today View</div>
+    <div class="loading-subtext">v8.2 • Streak & Challenge Fix</div>
   </div>
 
   <script type="text/babel">
@@ -1212,7 +1212,7 @@
 
       // One-time streak recalculation migration (v8.1 fix)
       useEffect(() => {
-        const migrationKey = 'streakMigrationV81d';
+        const migrationKey = 'streakMigrationV82a';
         if (load(migrationKey, false)) return; // Already ran
         
         // Read directly from localStorage to ensure we get this user's actual data
@@ -1285,14 +1285,28 @@
           }
         }
         
-        // Update streak to calculated value (fix both over and under counts)
+        // Find the true longest streak across ALL activity dates
+        const sortedDates = [...activeDates].sort();
+        let longestHistoricStreak = 0;
+        let currentRun = 0;
+        for (let i = 0; i < sortedDates.length; i++) {
+          if (i === 0) { currentRun = 1; } else {
+            const prev = new Date(sortedDates[i - 1] + 'T12:00:00');
+            const curr = new Date(sortedDates[i] + 'T12:00:00');
+            const diffDays = Math.round((curr - prev) / (1000 * 60 * 60 * 24));
+            currentRun = diffDays === 1 ? currentRun + 1 : 1;
+          }
+          longestHistoricStreak = Math.max(longestHistoricStreak, currentRun);
+        }
+        
+        // Update streak AND fix maxStreak from real activity data
         setGameStats(s => ({
           ...s,
           appStreak: calculatedStreak,
-          maxStreak: Math.max(calculatedStreak, s.maxStreak)
+          maxStreak: Math.max(calculatedStreak, longestHistoricStreak)
         }));
         
-        console.log('Streak recalculated from activity data:', calculatedStreak, 'Active dates found:', [...activeDates].sort());
+        console.log('Streak migration v8.2: current =', calculatedStreak, ', longest =', longestHistoricStreak, ', dates:', sortedDates.length);
         
         store(migrationKey, true);
       }, []); // Run once on mount
@@ -1657,6 +1671,8 @@
             setTimeout(() => { triggerCelebration(milestone.msg); addXP(milestone.xp); }, 1000);
           }
           setGameStats(s => ({ ...s, lastActiveDate: todayKey, appStreak: newAppStreak, maxStreak: Math.max(s.maxStreak, newAppStreak), perfectDayToday: false }));
+          // Update streak-type challenges with current streak value
+          updateChallengeProgress('streak', newAppStreak);
           
           // Weekly challenge reset (new week started)
           setChallenges(c => {
@@ -1887,16 +1903,18 @@
           // Weekly
           const wDef = weeklyChallengeDefs.find(d => d.id === c.weekly.id);
           if (wDef && wDef.type === type) {
-            updated.weekly = { ...c.weekly, progress: c.weekly.progress + amount };
-            if (updated.weekly.progress >= wDef.target && c.weekly.progress < wDef.target) {
+            const newProgress = type === 'streak' ? amount : c.weekly.progress + amount;
+            updated.weekly = { ...c.weekly, progress: newProgress };
+            if (newProgress >= wDef.target && c.weekly.progress < wDef.target) {
               setTimeout(() => { addXP(wDef.xp); triggerCelebration(`🏅 Challenge Complete: ${wDef.name}!`); setGameStats(s => ({ ...s, challengesCompleted: s.challengesCompleted + 1 })); }, 500);
             }
           }
           // Monthly
           const mDef = monthlyChallengeDefs.find(d => d.id === c.monthly.id);
           if (mDef && mDef.type === type) {
-            updated.monthly = { ...c.monthly, progress: c.monthly.progress + amount };
-            if (updated.monthly.progress >= mDef.target && c.monthly.progress < mDef.target) {
+            const newProgress = type === 'streak' ? amount : c.monthly.progress + amount;
+            updated.monthly = { ...c.monthly, progress: newProgress };
+            if (newProgress >= mDef.target && c.monthly.progress < mDef.target) {
               setTimeout(() => { addXP(mDef.xp); triggerCelebration(`🏅 Monthly Challenge: ${mDef.name}!`); setGameStats(s => ({ ...s, challengesCompleted: s.challengesCompleted + 1 })); }, 500);
             }
           }
@@ -1926,7 +1944,7 @@
             updateChallengeProgress('habits'); 
             setDailyXPAwarded(prev => ({ ...prev, habits: [...prev.habits, id] }));
             const newStreak = h.streak + 1; 
-            setGameStats(s => ({ ...s, totalHabitsCompleted: s.totalHabitsCompleted + 1, maxStreak: Math.max(s.maxStreak, newStreak) })); 
+            setGameStats(s => ({ ...s, totalHabitsCompleted: s.totalHabitsCompleted + 1 })); 
             if (newStreak % 7 === 0) triggerCelebration(`🔥 ${newStreak} day streak!`); 
           }
           return { ...h, completed: nowComplete, streak: nowComplete ? h.streak + 1 : Math.max(0, h.streak - 1), history: newHistory };
