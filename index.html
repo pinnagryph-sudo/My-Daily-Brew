@@ -1212,7 +1212,7 @@
 
       // One-time streak recalculation migration (v8.1 fix)
       useEffect(() => {
-        const migrationKey = 'streakMigrationV82c';
+        const migrationKey = 'streakMigrationV81d';
         if (load(migrationKey, false)) return; // Already ran
         
         // Read directly from localStorage to ensure we get this user's actual data
@@ -1269,83 +1269,30 @@
           }
         });
         
-        // Calculate consecutive streak - check today OR yesterday as start
+        // Calculate consecutive streak from today going backwards
         let calculatedStreak = 0;
-        const today = new Date();
-        const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
+        const checkDate = new Date();
         
-        let checkDate;
-        if (activeDates.has(getDateKey(today))) {
-          // Activity today - count from today
+        // Check today first
+        if (activeDates.has(getDateKey(checkDate))) {
           calculatedStreak = 1;
-          checkDate = new Date(today); checkDate.setDate(checkDate.getDate() - 1);
-        } else if (activeDates.has(getDateKey(yesterday))) {
-          // No activity today YET but yesterday was active - streak still valid
-          calculatedStreak = 1;
-          checkDate = new Date(yesterday); checkDate.setDate(checkDate.getDate() - 1);
-        }
-        
-        // Count backwards from start point
-        if (checkDate) {
+          checkDate.setDate(checkDate.getDate() - 1);
+          
+          // Count backwards - must be consecutive (no gaps)
           while (activeDates.has(getDateKey(checkDate))) {
             calculatedStreak++;
             checkDate.setDate(checkDate.getDate() - 1);
           }
         }
         
-        // Find the true longest streak across ALL activity dates
-        const sortedDates = [...activeDates].sort();
-        let longestHistoricStreak = 0;
-        let currentRun = 0;
-        for (let i = 0; i < sortedDates.length; i++) {
-          if (i === 0) { currentRun = 1; } else {
-            const prev = new Date(sortedDates[i - 1] + 'T12:00:00');
-            const curr = new Date(sortedDates[i] + 'T12:00:00');
-            const diffDays = Math.round((curr - prev) / (1000 * 60 * 60 * 24));
-            currentRun = diffDays === 1 ? currentRun + 1 : 1;
-          }
-          longestHistoricStreak = Math.max(longestHistoricStreak, currentRun);
-        }
-        
-        // Update streak AND fix maxStreak from real activity data
+        // Update streak to calculated value (fix both over and under counts)
         setGameStats(s => ({
           ...s,
           appStreak: calculatedStreak,
-          maxStreak: Math.max(calculatedStreak, longestHistoricStreak)
+          maxStreak: Math.max(calculatedStreak, s.maxStreak)
         }));
         
-        // Fix habit streaks - recalculate from actual history data
-        setHabits(prevHabits => prevHabits.map(habit => {
-          const history = habit.history || savedHabitHistory[habit.id] || {};
-          let habitStreak = 0;
-          const hCheck = new Date();
-          // If completed today, start counting from today
-          if (history[getDateKey(hCheck)] === true) {
-            habitStreak = 1;
-            hCheck.setDate(hCheck.getDate() - 1);
-            while (history[getDateKey(hCheck)] === true) {
-              habitStreak++;
-              hCheck.setDate(hCheck.getDate() - 1);
-            }
-          }
-          return { ...habit, streak: habitStreak };
-        }));
-        
-        // Update streak-type challenge progress immediately
-        setChallenges(c => {
-          const updated = { ...c };
-          const wDef = weeklyChallengeDefs.find(d => d.id === c.weekly.id);
-          if (wDef && wDef.type === 'streak') {
-            updated.weekly = { ...c.weekly, progress: calculatedStreak };
-          }
-          const mDef = monthlyChallengeDefs.find(d => d.id === c.monthly.id);
-          if (mDef && mDef.type === 'streak') {
-            updated.monthly = { ...c.monthly, progress: calculatedStreak };
-          }
-          return updated;
-        });
-        
-        console.log('Streak migration v8.2: current =', calculatedStreak, ', longest =', longestHistoricStreak, ', dates:', sortedDates.length);
+        console.log('Streak recalculated from activity data:', calculatedStreak, 'Active dates found:', [...activeDates].sort());
         
         store(migrationKey, true);
       }, []); // Run once on mount
@@ -2165,6 +2112,81 @@
         setGameStats(s => ({ ...s, timesExported: s.timesExported + 1 }));
         triggerCelebration('💾 Data exported!');
         setShowExport(false);
+      };
+
+      // Recalculate streak from actual activity data
+      const recalculateStreak = () => {
+        const savedMoods = load('moods', {});
+        const savedJournal = load('journal', {});
+        const savedHabits = load('habits', []);
+        const savedHabitHistory = load('habitHistory', {});
+        
+        // Collect all dates with activity
+        const activeDates = new Set();
+        Object.entries(savedMoods).forEach(([k, v]) => { if (v && typeof v.value === 'number') activeDates.add(k); });
+        Object.entries(savedJournal).forEach(([k, v]) => { if (v && (v.gratitude?.trim() || v.reflection?.trim() || v.tomorrow?.trim() || v.promptResponse?.trim())) activeDates.add(k); });
+        savedHabits.forEach(h => { if (h.history) Object.entries(h.history).forEach(([k, v]) => { if (v === true) activeDates.add(k); }); });
+        Object.values(savedHabitHistory).forEach(hist => { if (hist) Object.entries(hist).forEach(([k, v]) => { if (v === true) activeDates.add(k); }); });
+        
+        // Count streak - check today first, then yesterday if today empty
+        let streak = 0;
+        const today = new Date();
+        const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
+        let checkDate;
+        
+        if (activeDates.has(getDateKey(today))) {
+          streak = 1;
+          checkDate = new Date(today); checkDate.setDate(checkDate.getDate() - 1);
+        } else if (activeDates.has(getDateKey(yesterday))) {
+          streak = 1;
+          checkDate = new Date(yesterday); checkDate.setDate(checkDate.getDate() - 1);
+        }
+        
+        if (checkDate) {
+          while (activeDates.has(getDateKey(checkDate))) {
+            streak++;
+            checkDate.setDate(checkDate.getDate() - 1);
+          }
+        }
+        
+        // Find longest historic streak
+        const sorted = [...activeDates].sort();
+        let longest = 0, run = 0;
+        for (let i = 0; i < sorted.length; i++) {
+          if (i === 0) { run = 1; } else {
+            const prev = new Date(sorted[i-1] + 'T12:00:00');
+            const curr = new Date(sorted[i] + 'T12:00:00');
+            run = Math.round((curr - prev) / 86400000) === 1 ? run + 1 : 1;
+          }
+          longest = Math.max(longest, run);
+        }
+        
+        // Update state
+        setGameStats(s => ({ ...s, appStreak: streak, maxStreak: Math.max(streak, longest) }));
+        
+        // Fix habit streaks too
+        setHabits(prev => prev.map(habit => {
+          const hist = habit.history || savedHabitHistory[habit.id] || {};
+          let hs = 0;
+          const d = new Date();
+          if (hist[getDateKey(d)] === true) {
+            hs = 1; d.setDate(d.getDate() - 1);
+            while (hist[getDateKey(d)] === true) { hs++; d.setDate(d.getDate() - 1); }
+          }
+          return { ...habit, streak: hs };
+        }));
+        
+        // Update streak challenges
+        setChallenges(c => {
+          const updated = { ...c };
+          const wDef = weeklyChallengeDefs.find(d => d.id === c.weekly.id);
+          if (wDef && wDef.type === 'streak') updated.weekly = { ...c.weekly, progress: streak };
+          const mDef = monthlyChallengeDefs.find(d => d.id === c.monthly.id);
+          if (mDef && mDef.type === 'streak') updated.monthly = { ...c.monthly, progress: streak };
+          return updated;
+        });
+        
+        triggerCelebration(`🔄 Streak recalculated: ${streak} days!`);
       };
 
       // v8.0.0 has major changes - show tutorial for ALL users on this update (even existing users)
@@ -4746,6 +4768,14 @@
                 </p>
                 
                 <p className="bt" style={{ fontSize: '0.7rem', color: theme.textMuted, marginBottom: '14px' }}>💡 Swipe right to complete</p>
+                
+                {/* Recalculate Streak button */}
+                <button 
+                  onClick={() => { recalculateStreak(); }} 
+                  style={{ ...s.btnSecondary, width: '100%', marginBottom: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', background: theme.progressBg }}
+                >
+                  <span>🔄</span> Recalculate Streak
+                </button>
                 
                 {/* Show me around button */}
                 <button 
